@@ -1,26 +1,55 @@
-@article{a1,
-	author = {{Author1, Author2}},
-	title = {Title article 1},
-	journal = {Journal},
-	volume = {1},
-	number = {1},
-	year = {1000},
-	pages = {1--10},
-	publisher = {Publisher}
+@misc{opencl_overview,
+	title = {{OpenCL: Overview}},
+	note = {\url{https://www.khronos.org/opencl/}, Accessed: 2021-04-08}
 }
 
-@book{b1,
-	author = {{Author1, Author2}},
-	title = {Title Book 1},
-	publisher = {Publisher},
-	year = {1000}
+@misc{opencl_conformant_companies,
+	title = {{OpenCL: API Adopters}},
+	note = {\url{https://www.khronos.org/conformance/adopters/conformant-companies}, Accessed: 2021-04-08}
 }
 
-@manual{m1,
-	author = {{Author1, Author2}},
-  title = {Title Manual 1},
-  organization  = {Organization, e.g University},
-  note = {available online at http://www.microlab-mi.net},
-  year = {1000}
+@inproceedings{transparent_cpu_gpu_collaboration,
+	author = {Lee, Janghaeng and Samadi, Mehrzad and Park, Yongjun and Mahlke, Scott},
+	title = {Transparent CPU-GPU Collaboration for Data-Parallel Kernels on Heterogeneous Systems},
+	year = {2013},
+	isbn = {9781479910212},
+	publisher = {IEEE Press},
+	abstract = {Heterogeneous computing on CPUs and GPUs has traditionally used fixed roles for each device: the GPU handles data parallel work by taking advantage of its massive number of cores while the CPU handles non data-parallel work, such as the sequential code or data transfer management. Unfortunately, this work distribution can be a poor solution as it under utilizes the CPU, has difficulty generalizing beyond the single CPU-GPU combination, and may waste a large fraction of time transferring data. Further, CPUs are performance competitive with GPUs on many workloads, thus simply partitioning work based on the fixed roles may be a poor choice. In this paper, we present the single kernel multiple devices (SKMD) system, a framework that transparently orchestrates collaborative execution of a single data-parallel kernel across multiple asymmetric CPUs and GPUs. The programmer is responsible for developing a single data-parallel kernel in OpenCL, while the system automatically partitions the workload across an arbitray set of devices, generates kernels to execute the partial workloads, and efficiently merges the partial outputs together. The goal is performance improvement by maximally utilizing all available resources to execute the kernel. SKMD handles the difficult challenges of exposed data transfer costs and the performance variations GPUs have with respect to input size. On real hardware, SKMD achieves an average speedup of 29% on a system with one multicore CPU and two asymmetric GPUs compared to a fastest device execution strategy for a set of popular OpenCL kernels.},
+	booktitle = {Proceedings of the 22nd International Conference on Parallel Architectures and Compilation Techniques},
+	pages = {245–256},
+	numpages = {12},
+	keywords = {collaboration, openCL, GPGPU, data parallel},
+	location = {Edinburgh, Scotland, UK},
+	series = {PACT '13}
+}
+
+@inproceedings{smart_multitasking_scheduling,
+	author={Y. {Wen} and Z. {Wang} and M. F. P. {O'Boyle}},
+	booktitle={2014 21st International Conference on High Performance Computing (HiPC)}, 
+	title={Smart multi-task scheduling for OpenCL programs on CPU/GPU heterogeneous platforms}, 
+	year={2014},
+	volume={},
+	number={},
+	pages={1-10},
+	doi={10.1109/HiPC.2014.7116910}
+}
+
+@Article{load_balance_model_opencl_integrated_cluster,
+	author={Ahmed, Usman
+	and Lin, Jerry Chun-Wei
+	and Srivastava, Gautam
+	and Aleem, Muhammad},
+	title={A load balance multi-scheduling model for OpenCL kernel tasks in an integrated cluster},
+	journal={Soft Computing},
+	year={2021},
+	month={Jan},
+	day={01},
+	volume={25},
+	number={1},
+	pages={407-420},
+	abstract={Nowadays, embedded systems are comprised of heterogeneous multi-core architectures, i.e., CPUs and GPUs. If the application is mapped to an appropriate processing core, then these architectures provide many performance benefits to applications. Typically, programmers map sequential applications to CPU and parallel applications to GPU. The task mapping becomes challenging because of the usage of evolving and complex CPU- and GPU-based architectures. This paper presents an approach to map the OpenCL application to heterogeneous multi-core architecture by determining the application suitability and processing capability. The classification is achieved by developing a machine learning-based device suitability classifier that predicts which processor has the highest computational compatibility to run OpenCL applications. In this paper, 20 distinct features are proposed that are extracted by using the developed LLVM-based static analyzer. In order to select the best subset of features, feature selection is performed by using both correlation analysis and the feature importance method. For the class imbalance problem, we use and compare synthetic minority over-sampling method with and without feature selection. Instead of hand-tuning the machine learning classifier, we use the tree-based pipeline optimization method to select the best classifier and its hyper-parameter. We then compare the optimized selected method with traditional algorithms, i.e., random forest, decision tree, Na{\"i}ve Bayes and KNN. We apply our novel approach on extensively used OpenCL benchmarks, i.e., AMD and Polybench. The dataset contains 653 training and 277 testing applications. We test the classification results using four performance metrics, i.e., F-measure, precision, recall and {\$}{\$}R^2{\$}{\$}. The optimized and reduced feature subset model achieved a high F-measure of 0.91 and {\$}{\$}R^2{\$}{\$}of 0.76. The proposed framework automatically distributes the workload based on the application requirement and processor compatibility.},
+	issn={1433-7479},
+	doi={10.1007/s00500-020-05152-8},
+	url={https://doi.org/10.1007/s00500-020-05152-8}
 }
 
