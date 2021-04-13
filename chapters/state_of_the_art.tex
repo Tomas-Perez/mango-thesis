@@ -1,5 +1,23 @@
 \chapter{State of the Art}
 
+Text goes here.
+
+Focus on multiprocessing models which focus on performance improvements.
+
+\begin{itemize}
+    \item Single source kernel: OpenCL, HIP.
+    \item Language extensions for high level parallelism: OpenMP, OpenACC, SYCL, C++ AMP.
+    \item Proprietary solutions: CUDA.
+\end{itemize}
+
+Other types of models which focus on scalability, but not covered \cite{survey_programming_models}:
+
+\begin{itemize}
+    \item Actor model
+    \item MPI
+\end{itemize}
+
+
 \section{OpenCL}
 OpenCL is an open standard for cross-platform, parallel programming of diverse accelerators. 
 
@@ -9,7 +27,15 @@ In conjunction with the language, the standard also defines a framework for mana
 
 Today, OpenCL is at the forefront of heterogeneous architecture programming. Seventeen different companies (including Apple, Intel, AMD and Nvidia) distribute products conforming to the standard \cite{opencl_conformant_companies}. This allows an OpenCL kernel to run on the majority of hardware available on the market.
 
-Due to this popularity, a significant amount papers have been published looking into different types of extensions on the OpenCL framework.
+Due to this popularity, a significant amount papers have been published looking into different types of extensions on the framework.
+
+\subsection{Abstraction Layers}
+Even though OpenCL simplifies a big part of heterogeneous systems programming by providing a common API across devices, it still is a complex task. 
+The articles presented in this section focus on simplifying the problem further by adding an abstraction layer on top of OpenCL.
+
+In EngineCL \cite{enginecl}, a new object-oriented API is introduced. The EngineCL class provides a higher level view of the OpenCL context and management of the available devices. The engine in turn uses a Program object which internally manages all the data transfers between the device buffers, the user only needs to provide host input and output buffers, as well as the kernel arguments in order to begin execution. In addition, multiple devices can be used during a single run, the scheduling of which is handled by a Scheduler object. Different scheduling strategies are tested by the paper, with the best results achieved by the HGuided algorithm. HGuided is a dynamic algorithm which starts by assigning big block sizes to all devices and reducing the size of subsequent ones as the execution progresses. This reduces data transfer and synchronization overhead while allowing devices to finish simultaneously towards the end of the execution.
+
+A different approch is presented by FluidiCL \cite{fluidicl}, where the OpenCL API is maintained but implemented in such a way that the user can treat multiple devices as a single entity. Thus, it is very easy to adapt an existing OpenCL application to run using FluidiCL, as all function calls are maintained. The paper considers the implementation running on an experimental system with a single GPU and CPU. At the time of setup, both kernel compilation and buffer writes are broadcasted to both devices. That is, the kernel is compiled for both and, likewise, the input data is transferred to the both of their buffers. When the execution starts, the GPU starts running the kernel with a decreasing order of work-group IDs, meanwhile the CPU executes smaller subkernels in increasing order of work-group IDs. At some point, when the work-groups IDs handled by both cross over, the work is finished and the results are merged on the GPU.
 
 \subsection{Kernel Scheduling}
 Multiple different techniques are discussed in order to optimize the scheduling of the kernels on the devices available on the platform. The overall objective always being minizing the turnaround time of a kernel or group of kernels.
@@ -17,3 +43,34 @@ Multiple different techniques are discussed in order to optimize the scheduling 
 \cite{transparent_cpu_gpu_collaboration} proposes the SKMD (Single Kernel Multiple Devices) system, where the workload of a single kernel can be split among all the available devices. At runtime, a partitioning algorithm will determine how to make this split, based on memory access pattern analysis of the kernel and previous profiling data. An effective partitioning makes sure that the performance improvements outweigh the overhead of extra memory transfers to the different devices. 
 
 Machine learning is an alternative used to forgo the need of profiling the kernels before scheduling. \cite{smart_multitasking_scheduling} achieves this by implementing a model to predict the kernel speedup on a particular device based on static analysis of the code. Also, instead of focusing on a single kernel, it manages scheduling of multiple kernels, possibly belonging to different applications. A very similar approach is also proposed by \cite{load_balance_model_opencl_integrated_cluster}.
+
+\section{OpenMP \& OpenACC}
+In this section we will tackle OpenMP and OpenACC in conjunction as they take very similar approaches.
+
+Both projects are composed of a library and set of compiler directives that provide a model for parallel programming across different architectures. Support is provided for the C, C++ and Fortran languages. The directives extend the languages with useful constructs for parallelizing applications. Further control of the runtime environment is possible through the library \cite{openmp_spec} \cite{openacc_spec}.
+
+OpenMP and OpenACC allow for quick adaptation of existing single threaded code into a parallel execution model. This work requires a compiler which supports the standard, meaning that it is able to handle the directives and generate multithreaded code automatically. 
+
+Up until version 4.0, OpenMP only allowed for this code to be compiled for and executed on the CPU. Version 4.0 (2013) introduced offloading of the parallel code to other devices like GPUs or FPGAs \cite{openmp_gpu_support}. Meanwhile OpenACC focused on heterogeneous computing and accelerator offloading from the start \cite{openacc_initial_spec}, also treating the multicore CPU itself as a device.
+
+\cite{openmp_vs_openacc}
+
+\section{CUDA}
+
+\section{HIP}
+
+\section{Standalone works}
+
+Here goes what we don't where to put. Also may be deleted entirely.
+
+\subsection{Kernel scheduling}
+
+\cite{dynamic_self_scheduling} presents HDSS, a Heterogeneous Dynamic Self Scheduler, which can reschedule at runtime how the workload is partitioned across the devices. This is achieved by a two phase approach. First, in the adaptive phase, the scheduling algorithm will measure the relative performance across devices by dispatching increasing block sizes. Once an accurate performance approximation for each device is calculated, the completion phase starts. Here the scheduler assigns the largest possible block size to each device, according to its calculated performance, in order to minimize data transfer overhead. The approach presented not only keeps all devices busy during the entire execution, but also fully utilizes them by providing appropiate block sizes. 
+
+
+
+\section{SYCL}
+\subsection{Celerity}
+
+\section{C++ AMP}
+Appears dead. Stack overflow post by one of the authors \url{https://stackoverflow.com/a/38604348/7983805}

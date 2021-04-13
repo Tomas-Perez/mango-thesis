@@ -1,11 +1,37 @@
 @misc{opencl_overview,
 	title = {{OpenCL: Overview}},
-	note = {\url{https://www.khronos.org/opencl/}, Accessed: 2021-04-08}
+	note = {\url{https://www.khronos.org/opencl/}, Accessed: Apr 2021}
 }
 
 @misc{opencl_conformant_companies,
 	title = {{OpenCL: API Adopters}},
-	note = {\url{https://www.khronos.org/conformance/adopters/conformant-companies}, Accessed: 2021-04-08}
+	note = {\url{https://www.khronos.org/conformance/adopters/conformant-companies}, Accessed: Apr 2021}
+}
+
+@misc{openmp_spec,
+	title = {{OpenMP API Specification 5.1}},
+	year = {2020},
+	month = {Nov},
+	note = {\url{https://www.openmp.org/wp-content/uploads/OpenMP-API-Specification-5-1.pdf}}
+}
+
+@misc{openmp_gpu_support,
+	title = {{OpenMP Accelerator Support for GPUs}},
+	note = {\url{https://www.openmp.org/updates/openmp-accelerator-support-gpus/}, Accessed: Apr 2021}
+}
+
+@misc{openacc_spec,
+	title = {{OpenACC API Specification 3.1}},
+	year = {2020},
+	month = {Nov},
+	note = {\url{https://www.openacc.org/sites/default/files/inline-images/Specification/OpenACC-3.1-final.pdf}}
+}
+
+@misc{openacc_initial_spec,
+	title = {{OpenACC API Specification 1.0}},
+	year = {2011},
+	month = {Nov},
+	note = {\url{https://www.openacc.org/sites/default/files/inline-files/OpenACC_1_0_specification.pdf}}
 }
 
 @inproceedings{transparent_cpu_gpu_collaboration,
@@ -53,3 +79,80 @@
 	url={https://doi.org/10.1007/s00500-020-05152-8}
 }
 
+@article{dynamic_self_scheduling,
+	author = {Belviranli, Mehmet E. and Bhuyan, Laxmi N. and Gupta, Rajiv},
+	title = {A Dynamic Self-Scheduling Scheme for Heterogeneous Multiprocessor Architectures},
+	year = {2013},
+	issue_date = {January 2013},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {9},
+	number = {4},
+	issn = {1544-3566},
+	url = {https://doi.org/10.1145/2400682.2400716},
+	doi = {10.1145/2400682.2400716},
+	abstract = {Today's heterogeneous architectures bring together multiple general-purpose CPUs and multiple domain-specific GPUs and FPGAs to provide dramatic speedup for many applications. However, the challenge lies in utilizing these heterogeneous processors to optimize overall application performance by minimizing workload completion time. Operating system and application development for these systems is in their infancy.In this article, we propose a new scheduling and workload balancing scheme, HDSS, for execution of loops having dependent or independent iterations on heterogeneous multiprocessor systems. The new algorithm dynamically learns the computational power of each processor during an adaptive phase and then schedules the remainder of the workload using a weighted self-scheduling scheme during the completion phase. Different from previous studies, our scheme uniquely considers the runtime effects of block sizes on the performance for heterogeneous multiprocessors. It finds the right trade-off between large and small block sizes to maintain balanced workload while keeping the accelerator utilization at maximum. Our algorithm does not require offline training or architecture-specific parameters.We have evaluated our scheme on two different heterogeneous architectures: AMD 64-core Bulldozer system with nVidia Fermi C2050 GPU and Intel Xeon 32-core SGI Altix 4700 supercomputer with Xilinx Virtex 4 FPGAs. The experimental results show that our new scheduling algorithm can achieve performance improvements up to over 200% when compared to the closest existing load balancing scheme. Our algorithm also achieves full processor utilization with all processors completing at nearly the same time which is significantly better than alternative current approaches.},
+	journal = {ACM Trans. Archit. Code Optim.},
+	month = jan,
+	articleno = {57},
+	numpages = {20},
+	keywords = {workload balancing, FPGAs, GP-GPUs, Dynamic self-scheduling}
+}
+
+@article{enginecl,
+	author = {Nozal, Raúl and Bosque, Jose and Beivide, Ramon},
+	year = {2020},
+	month = {02},
+	pages = {},
+	title = {EngineCL: Usability and Performance in Heterogeneous Computing},
+	volume = {107},
+	journal = {Future Generation Computer Systems},
+	doi = {10.1016/j.future.2020.02.016}
+}
+
+@inproceedings{fluidicl,
+	author = {Pandit, Prasanna and Govindarajan, R.},
+	title = {Fluidic Kernels: Cooperative Execution of OpenCL Programs on Multiple Heterogeneous Devices},
+	year = {2014},
+	isbn = {9781450326704},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	url = {https://doi.org/10.1145/2581122.2544163},
+	doi = {10.1145/2581122.2544163},
+	abstract = {Programming heterogeneous computing systems with Graphics Processing Units (GPU) and multi-core CPUs in them is complex and time-consuming. OpenCL has emerged as an attractive programming framework for heterogeneous systems. But utilizing multiple devices in OpenCL is a challenge because it requires the programmer to explicitly map data and computation to each device. The problem becomes even more complex if the same OpenCL kernel has to be executed synergistically using multiple devices, as the relative execution time of the kernel on different devices can vary significantly, making it difficult to determine the work partitioning across these devices a priori. Also, after each kernel execution, a coherent version of the data needs to be established.In this work, we present FluidiCL, an OpenCL runtime that takes a program written for a single device and uses both the CPU and the GPU to execute it. Since we consider a setup with devices having discrete address spaces, our solution ensures that execution of OpenCL work-groups on devices is adjusted by taking into account the overheads for data management. The data transfers and data merging needed to ensure coherence are handled transparently without requiring any effort from the programmer. FluidiCL also does not require prior training or profiling and is completely portable across different machines. Across a set of diverse benchmarks having multiple kernels, our runtime shows a geomean speedup of nearly 64% over a high-end GPU and 88% over a 4-core CPU. In all benchmarks, performance of our runtime comes to within 13% of the best of the two devices.},
+	booktitle = {Proceedings of Annual IEEE/ACM International Symposium on Code Generation and Optimization},
+	pages = {273–283},
+	numpages = {11},
+	keywords = {Heterogeneous Devices, GPGPU, Runtime, OpenCL, FluidiCL},
+	location = {Orlando, FL, USA},
+	series = {CGO '14}
+}
+
+@inproceedings{survey_programming_models,
+  author={B. {Pervan} and J. {Knezović}},
+  booktitle={2020 43rd International Convention on Information, Communication and Electronic Technology (MIPRO)}, 
+  title={A Survey on Parallel Architectures and Programming Models}, 
+  year={2020},
+  volume={},
+  number={},
+  pages={999-1005},
+  doi={10.23919/MIPRO48935.2020.9245341}
+}
+
+@inproceedings{openmp_vs_openacc,
+	author="Wienke, Sandra
+	and Terboven, Christian
+	and Beyer, James C.
+	and M{\"u}ller, Matthias S.",
+	editor="Silva, Fernando
+	and Dutra, In{\^e}s
+	and Santos Costa, V{\'i}tor",
+	title="A Pattern-Based Comparison of OpenACC and OpenMP for Accelerator Computing",
+	booktitle="Euro-Par 2014 Parallel Processing",
+	year="2014",
+	publisher="Springer International Publishing",
+	address="Cham",
+	pages="812--823",
+	abstract="Nowadays, HPC systems frequently emerge as clusters of commodity processors with attached accelerators. Moving from tedious low-level accelerator programming to increased development productivity, the directive-based programming models OpenACC and OpenMP are promising candidates. While OpenACC was completed about two years ago, OpenMP just recently added support for accelerator programming. To assist developers in their decision-making which approach to take, we compare both models with respect to their programmability. Besides investigating their expressiveness by putting their constructs side by side, we focus on the evaluation of their power based on structured parallel programming patterns (aka algorithmic skeletons). These patterns describe the basic entities of parallel algorithms of which we cover the patterns map, stencil, reduction, fork-join, superscalar sequence, nesting and geometric decomposition. Architectural targets of this work are NVIDIA-type accelerators (GPUs) and specialties of Intel-type accelerators (Xeon Phis). Additionally, we assess the prospects of OpenACC and OpenMP concerning future development in soft- and hardware design.",
+	isbn="978-3-319-09873-9"
+}

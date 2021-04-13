@@ -1,32 +1,22 @@
 % For printing in a4
 \documentclass[a4,10pt,twoside,openright,italian,english,spanish]{book}% twoside!
 
-% For printing with the A5 format
-% \documentclass[10pt,twoside,openright,english,italian,spanish]{book}% twoside!
-
 % Set paper size
 \usepackage[twoside=true]{geometry}
 
-%For printing with the weird format
-\geometry{
-	paperwidth=17cm,
-	paperheight=24cm,
-	margin=2cm,
-	top=2.3cm,
-	bindingoffset=0.4cm
-}
 % For printing in a4
-%\geometry{a4paper,
-%  margin=3cm,
-%  top=3.8cm,
-%  bindingoffset=0.4cm
-%}
+\geometry{a4paper,
+ margin=3cm,
+ top=3.8cm,
+ bindingoffset=0.4cm
+}
 
 %Uncomment this for final prints: this just enables printing on a4 paper
 \usepackage[cam,center,a4,pdflatex,axes]{crop}
 
 \usepackage{phdthesis}
 
+\usepackage{setspace}
 \usepackage{fancyhdr}
 \usepackage{color}
 \usepackage{array}
@@ -88,6 +78,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Let's Start The Real Document
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\onehalfspacing
+
 \begin{document}
 \selectlanguage{english}
 
@@ -156,7 +149,7 @@
 \phantomsection
 \addcontentsline{toc}{chapter}{\bibname}
 \small
-\bibliographystyle{plain}
+\bibliographystyle{ieeetr}
 \bibliography{thesis}
 
 \end{document}
