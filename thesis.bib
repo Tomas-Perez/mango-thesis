@@ -156,3 +156,48 @@
 	abstract="Nowadays, HPC systems frequently emerge as clusters of commodity processors with attached accelerators. Moving from tedious low-level accelerator programming to increased development productivity, the directive-based programming models OpenACC and OpenMP are promising candidates. While OpenACC was completed about two years ago, OpenMP just recently added support for accelerator programming. To assist developers in their decision-making which approach to take, we compare both models with respect to their programmability. Besides investigating their expressiveness by putting their constructs side by side, we focus on the evaluation of their power based on structured parallel programming patterns (aka algorithmic skeletons). These patterns describe the basic entities of parallel algorithms of which we cover the patterns map, stencil, reduction, fork-join, superscalar sequence, nesting and geometric decomposition. Architectural targets of this work are NVIDIA-type accelerators (GPUs) and specialties of Intel-type accelerators (Xeon Phis). Additionally, we assess the prospects of OpenACC and OpenMP concerning future development in soft- and hardware design.",
 	isbn="978-3-319-09873-9"
 }
+
+@article{cuda_openacc_openmp_performance,
+	doi = {10.1088/1742-6596/1740/1/012056},
+	url = {https://doi.org/10.1088/1742-6596/1740/1/012056},
+	year = 2021,
+	month = {jan},
+	publisher = {{IOP} Publishing},
+	volume = {1740},
+	pages = {012056},
+	author = {Mikhail Khalilov and Alexey Timoveev},
+	title = {Performance analysis of {CUDA}, {OpenACC} and {OpenMP} programming models on {TESLA} V100 {GPU}},
+	journal = {Journal of Physics: Conference Series},
+	abstract = {Graphics processors are widely utilized in modern supercomputers as accelerators. Ability to perform efficient parallelization and low-level allow scientists to greatly boost performance of their codes. Modern Nvidia GPUs feature low-level approaches, such as CUDA, along with high-level approaches: OpenACC and OpenMP. While the low-level approach aims to explore all possible abilities of SIMT GPU architecture by writing low-level C/C++ code, it takes significant effort from programmer. OpenACC and OpenMP programming models are opposite to CUDA. Using these models the programmer only have to identify the blocks of code to be parallelized using pragmas. We compare the performance of CUDA, OpenMP and OpenACC on state-of-the-art Nvidia Tesla V100 GPU in various typical scenarios that arise in scientific programming, such as matrix multiplication, regular memory access patterns and evaluate performance of physical simulation codes implemented using these programming models. Moreover, we study the performance matrix multiplication implemented in vendor-optimized BLAS libraries for Nvidia Tesla V100 GPU and modern Intel Xeon processor.}
+}
+
+@article{openmp_openacc_molecular_docking,
+	author={Vitali, Emanuele
+	and Gadioli, Davide
+	and Palermo, Gianluca
+	and Beccari, Andrea
+	and Cavazzoni, Carlo
+	and Silvano, Cristina},
+	title={Exploiting OpenMP and OpenACC to accelerate a geometric approach to molecular docking in heterogeneous HPC nodes},
+	journal={The Journal of Supercomputing},
+	year={2019},
+	month={Jul},
+	day={01},
+	volume={75},
+	number={7},
+	pages={3374-3396},
+	abstract={In drug discovery, molecular docking is the task in charge of estimating the position of a molecule when interacting with the docking site. This task is usually used to perform screening of a large library of molecules, in the early phase of the process. Given the amount of candidate molecules and the complexity of the application, this task is usually performed using high-performance computing (HPC) platforms. In modern HPC systems, heterogeneous platforms provide a better throughput with respect to homogeneous platforms. In this work, we ported and optimized a molecular docking application to a heterogeneous system, with one or more GPU accelerators, leveraging a hybrid OpenMP and OpenACC approach. The target application focuses on the virtual screening phases in the drug discovery process, and it is based on geometric transformations of the target ligands. We prove that our approach has a better exploitation of the node compared to pure CPU/GPU data splitting approaches, reaching a throughput improvement up to 25{\%} while considering the same computing node.},
+	issn={1573-0484},
+	doi={10.1007/s11227-019-02875-w},
+	url={https://doi.org/10.1007/s11227-019-02875-w}
+}
+
+@inproceedings{openmp_openacc_multigpus,
+	author = {Xu, Rengan and Chandrasekaran, Sunita and Chapman, Barbara},
+	year = {2013},
+	month = {05},
+	pages = {},
+	title = {Exploring programming multi-GPUS using OpenMP and OpenACC-based hybrid model},
+	journal = {Proceedings - IEEE 27th International Parallel and Distributed Processing Symposium Workshops and PhD Forum, IPDPSW 2013},
+	doi = {10.1109/IPDPSW.2013.263}
+}
