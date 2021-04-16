@@ -34,10 +34,9 @@ The framework is comprised by the following components:
 
 OpenCL C \cite{opencl_c_spec} is the programming language provided by the standard to write kernels that execute on an OpenCL device. OpenCL C is based on the \textit{ISO/IEC 9899:1999 - Programming languages - C} specification (also referred to as C99) \cite{c99}, with the addition of some \textit{ISO/IEC 9899:2011 - Information technology - Programming languages - C} specification (also referred to as C11) \cite{c11} features, plus some extensions and restrictions to support parallel kernels.
 
+This dedicated kernel language allows the developer to write a single code base and execute it in different devices. This ensures the \textit{functional} portability of code across devices, eliminating the need for applications to be re-coded on a per-device or per-programming toolkit basis \cite{performance_portability_2013}. However, portability issues may still arise if the hardware supports different versions of the standard. In addition, there can also be issues in terms of performance portability due to architecture differences and compiler optimizations available on each platform \cite{performance_portability_2019}. For maximum performance, some tweaking of the source code may still be necessary depending on which device is being targeted.
 
-% This standard provides a language based on C/C++ which can be used to code kernels that can be executed on any device that supports it. Depending on the target device, the kernel will be passed through a different compiler in order to generate the corresponding instructions. 
-
-% In conjunction with the language, the standard also defines a framework for managing the available devices. It consists of a Platform Layer API to query, select and initialize compute devices, and a Runtime API which handles kernel building and execution \cite{opencl_overview}. 
+% SPIR-V 
 
 Today, OpenCL is at the forefront of heterogeneous architecture programming. Seventeen different companies (including Apple, Intel, AMD and Nvidia) distribute products conforming to the standard \cite{opencl_conformant_companies}. This allows an OpenCL kernel to run on the majority of hardware available on the market.
 
@@ -77,6 +76,9 @@ Finally, the possibility to use both models at the same time exists. Works like 
 
 \section{SYCL}
 \subsection{Celerity}
+
+\section{Kokkos}
+\cite{kokkos}
 
 \section{C++ AMP}
 Appears dead. Stack overflow post by one of the authors \url{https://stackoverflow.com/a/38604348/7983805}
