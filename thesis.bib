@@ -78,6 +78,34 @@
 	note = {\url{https://www.khronos.org/vulkan/}, Accessed: Apr 2021}
 }
 
+@misc{brief_history_gpgpu,
+	title = {{A Brief History of GPGPU}},
+	author = {{Mark Harris}},
+	month = {May},
+	year = {2015}
+}
+
+@misc{ikonas,
+	title = {{Ikonas Graphics Systems - The world's first GPGPU}},
+	author = {{Nick England}},
+	note = {\url{http://www.graphics-history.org/ikonas/}, Accessed: Apr 2021}
+}
+
+@misc{geforce_256,
+	title = {{TechPowerUp: NVIDIA GeForce 256 SDR}},
+	note = {\url{https://www.techpowerup.com/gpu-specs/geforce-256-sdr.c731}, Accessed: Apr 2021}
+}
+
+@misc{opengl,
+	title = {{OpenGL}},
+	note = {\url{https://www.opengl.org/}, Accessed: Apr 2021}
+}
+
+@misc{opengl_fixed_function_pipeline,
+	title = {{OpenGL Wiki: Fixed Function Pipeline}},
+	note = {\url{https://www.khronos.org/opengl/wiki/Fixed_Function_Pipeline}, Accessed: Apr 2021}
+}
+
 @inproceedings{transparent_cpu_gpu_collaboration,
 	author = {Lee, Janghaeng and Samadi, Mehrzad and Park, Yongjun and Mahlke, Scott},
 	title = {Transparent CPU-GPU Collaboration for Data-Parallel Kernels on Heterogeneous Systems},
@@ -303,4 +331,101 @@
   author = {S.J. Pennycook and S.D. Hammond and S.A. Wright and J.A. Herdman and I. Miller and S.A. Jarvis},
   keywords = {Many-core computing, GPU computing, Optimisation, OpenCL, High performance computing},
   abstract = {This paper reports on the development of an MPI/OpenCL implementation of LU, an application-level benchmark from the NAS Parallel Benchmark Suite. An account of the design decisions addressed during the development of this code is presented, demonstrating the importance of memory arrangement and work-item/work-group distribution strategies when applications are deployed on different device types. The resulting platform-agnostic, single source application is benchmarked on a number of different architectures, and is shown to be 1.3–1.5× slower than native FORTRAN 77 or CUDA implementations on a single node and 1.3–3.1× slower on multiple nodes. We also explore the potential performance gains of OpenCL’s device fissioning capability, demonstrating up to a 3× speed-up over our original OpenCL implementation.}
+}
+
+@article{optimizing_opencl_fpga_integer,
+  author={N. {Paulino} and J. C. {Ferreira} and J. M. P. {Cardoso}},
+  journal={IEEE Access}, 
+  title={Optimizing OpenCL Code for Performance on FPGA: k-Means Case Study With Integer Data Sets}, 
+  year={2020},
+  volume={8},
+  number={},
+  pages={152286-152304},
+  doi={10.1109/ACCESS.2020.3017552}
+}
+
+@inproceedings{performance_portability_2020,
+  author={C. {Bertoni} and J. {Kwack} and T. {Applencourt} and Y. {Ghadar} and B. {Homerding} and C. {Knight} and B. {Videau} and H. {Zheng} and V. {Morozov} and S. {Parker}},
+  booktitle={2020 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)}, 
+  title={Performance Portability Evaluation of OpenCL Benchmarks across Intel and NVIDIA Platforms}, 
+  year={2020},
+  volume={},
+  number={},
+  pages={330-339},
+  doi={10.1109/IPDPSW50202.2020.00067}
+}
+
+@inproceedings{optimizing_opencl_fpga_automata,
+  author={M. {Nourian} and M. E. {Zarch} and M. {Becchi}},
+  booktitle={2020 IEEE 26th International Conference on Parallel and Distributed Systems (ICPADS)}, 
+  title={Optimizing Complex OpenCL Code for FPGA: A Case Study on Finite Automata Traversal}, 
+  year={2020},
+  volume={},
+  number={},
+  pages={518-527},
+  doi={10.1109/ICPADS51040.2020.00073}
+}
+
+@article{solid_modeling_ikonas,
+	author = {Van Hook, Tim},
+	title = {Real-Time Shaded NC Milling Display},
+	year = {1986},
+	issue_date = {Aug. 1986},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {20},
+	number = {4},
+	issn = {0097-8930},
+	url = {https://doi.org/10.1145/15886.15887},
+	doi = {10.1145/15886.15887},
+	abstract = {The real-time shaded display of a solid model being milled by a cutting tool following an NC path is attained by the image-space Boolean subtraction of solid objects. The technique is suitable for implementation in microcode in a raster graphic display processor. Update rates of 10 cutting operations per second are typical.},
+	journal = {SIGGRAPH Comput. Graph.},
+	month = aug,
+	pages = {15–20},
+	numpages = {6}
+}
+
+@inproceedings{early_matrix_multiplication_gpgpu,
+	author = {Larsen, E. Scott and McAllister, David},
+	title = {Fast Matrix Multiplies Using Graphics Hardware},
+	year = {2001},
+	isbn = {158113293X},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	url = {https://doi.org/10.1145/582034.582089},
+	doi = {10.1145/582034.582089},
+	abstract = {We present a technique for large matrix-matrix multiplies using low cost graphics hardware. The result is computed by literally visualizing the computations of a simple parallel processing algorithm. Current graphics hardware technology has limited precision and thus limits immediate applicability of our algorithm. We include results demonstrating proof of concept, correctness, speedup, and a simple application. This is therefore forward looking research: a technique ready for technology on the horizon.},
+	booktitle = {Proceedings of the 2001 ACM/IEEE Conference on Supercomputing},
+	pages = {55},
+	numpages = {1},
+	keywords = {graphics hardware, matrix multiplication},
+	location = {Denver, Colorado},
+	series = {SC '01}
+}
+
+@inproceedings {unix_passwords_gpgpu,
+	author = {Gershon Kedem and Yuriko Ishihara},
+	title = {Brute Force Attack on {UNIX} Passwords with {SIMD} Computer},
+	booktitle = {8th {USENIX} Security Symposium ({USENIX} Security 99)},
+	year = {1999},
+	address = {Washington, D.C.},
+	url = {https://www.usenix.org/conference/8th-usenix-security-symposium/brute-force-attack-unix-passwords-simd-computer},
+	publisher = {{USENIX} Association},
+	month = aug,
+}
+
+@inproceedings{voronoi_diagrams_gpgpu,
+	author = {Hoff, Kenneth E. and Keyser, John and Lin, Ming and Manocha, Dinesh and Culver, Tim},
+	title = {Fast Computation of Generalized Voronoi Diagrams Using Graphics Hardware},
+	year = {1999},
+	isbn = {0201485605},
+	publisher = {ACM Press/Addison-Wesley Publishing Co.},
+	address = {USA},
+	url = {https://doi.org/10.1145/311535.311567},
+	doi = {10.1145/311535.311567},
+	booktitle = {Proceedings of the 26th Annual Conference on Computer Graphics and Interactive Techniques},
+	pages = {277–286},
+	numpages = {10},
+	keywords = {voronoi diagrams, proximity query, interpolation, medial axis, OpenGL, motion planning, framebuffer techniques, polygon rasterization, graphics hardware},
+	series = {SIGGRAPH '99}
 }

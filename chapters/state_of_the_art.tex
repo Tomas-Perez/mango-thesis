@@ -18,11 +18,34 @@ Other types of models which focus on scalability, but not covered \cite{survey_p
 \end{itemize}
 
 \section{GPGPU}
-Section on GPGPU maybe? 
-Term coined by Mark Harris \url{https://en.wikipedia.org/wiki/Mark_Harris_(programmer)}
+The first documented case of computation on a graphics processor dates to June 1985, when Tim Van Hook implemented the world's first GPU ray-tracing on the Ikonas RDS-3000 \cite{ikonas}. Van Hook followed this up the next year with a paper on solid modelling with the Ikonas \cite{solid_modeling_ikonas}.
 
+In August 1999, Kedem et al. \cite{unix_passwords_gpgpu} published a paper where they used experimental graphics engine PixelFlow to perform a brute force attack on Unix passwords. PixelFlow was a heterogeneous parallel machine used for high-speed and high-quality image generation. For their research, PixelFlow was setup with 18 SIMD arrays, each one with 8K processing elements (PE) for a total of 144K (147,456) PEs running at 100Mhz. The machine had some performance problems for this application due to the limited instruction set, which was focused on image computations. Due to this, the results were poorer than expected. It was calculated that the machine would be able to check all lowercase passwords (28.9\% of passwords at the time) in 3.19 hours.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/voronoi.png}
+    \captionsetup{justification=centering}
+    \caption{Generalized Voronoi diagram computed interactively on PC (Credit: Hoff et al.)}
+\end{figure}
+
+Also in 1999, Hoff et al. \cite{voronoi_diagrams_gpgpu} managed to perform computations of generalized Voronoi diagrams using graphics accelerators, such as the NVIDIA TNT2, connected to a PC \cite{brief_history_gpgpu}, as opposed to the specialized hardware in the PixelFlow. This was achieved by using the OpenGL API \cite{opengl}. However, at that time GPUs were not programmable. The hardware exposed what is known as a Fixed Function Pipeline which the user would configure according to their needs. With that configuration, the GPU would execute a series of built in math functions which were focused on rendering, not on computation \cite{opengl_fixed_function_pipeline}.
+
+Programmable GPUs did not come until 2001, as NVIDIA introduced GeForce series 3. 
+
+The term GPGPU was coined by Mark Harris in 2002, it is an acronym for "General Purpose computing on Graphics Processing Units" \cite{brief_history_gpgpu}. 
+
+\cite{early_matrix_multiplication_gpgpu}
 
 \section{OpenCL}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/opencl-logo.png}
+    \captionsetup{justification=centering}
+    \caption{OpenCL logo (Credit: Khronos Group)}
+\end{figure}
+
 OpenCL \cite{opencl_spec} is an open industry standard for programming a heterogeneous collection of CPUs, GPUs and other discrete computing devices organized into a single platform. It provides a framework for parallel programming and includes a language, API, libraries and a runtime system to support software development. By leveraging OpenCL, an application can use a host and one or more OpenCL devices as a single heterogeneous parallel computer system.
 
 The framework is comprised by the following components:
@@ -34,11 +57,18 @@ The framework is comprised by the following components:
 
 OpenCL C \cite{opencl_c_spec} is the programming language provided by the standard to write kernels that execute on an OpenCL device. OpenCL C is based on the \textit{ISO/IEC 9899:1999 - Programming languages - C} specification (also referred to as C99) \cite{c99}, with the addition of some \textit{ISO/IEC 9899:2011 - Information technology - Programming languages - C} specification (also referred to as C11) \cite{c11} features, plus some extensions and restrictions to support parallel kernels.
 
-This dedicated kernel language allows the developer to write a single code base and execute it in different devices. This ensures the \textit{functional} portability of code across devices, eliminating the need for applications to be re-coded on a per-device or per-programming toolkit basis \cite{performance_portability_2013}. However, portability issues may still arise if the hardware supports different versions of the standard. In addition, there can also be issues in terms of performance portability due to architecture differences and compiler optimizations available on each platform \cite{performance_portability_2019}. For maximum performance, some tweaking of the source code may still be necessary depending on which device is being targeted.
+This dedicated kernel language allows the developer to write a single code base and execute it in different devices. This ensures the \textit{functional} portability of code across devices, eliminating the need for applications to be re-coded on a per-device or per-programming toolkit basis \cite{performance_portability_2013}. However, portability issues may still arise if the hardware supports different versions of the standard. In addition, there can also be issues in terms of performance portability due to architecture differences and compiler optimizations available on each platform \cite{performance_portability_2013, performance_portability_2019, performance_portability_2020}. For maximum performance, some tweaking of the source code may still be necessary depending on which device is being targeted \cite{optimizing_opencl_fpga_integer, optimizing_opencl_fpga_automata}.
 
 SPIR-V is an intermediate language which is also supported as an input language for OpenCL. Instead of distributing and ingesting OpenCL C in the host, developers can precompile their kernels into SPIR-V, allowing for faster kernel load times and avoiding directly exposed source code \cite{spir_overview}. While SPIR-V is also supported by the Vulkan \cite{vulkan} graphics API, it uses a different execution mode of the language (\textbf{GLCompute} versus \textbf{Kernel} for OpenCL), so compute codes are not interchangable \cite{spir_spec}. Another caveat is that SPIR-V support is only mandatory for OpenCL 2.1 and 2.2 devices, support was made optional for OpenCL 3.0 devices \cite{opencl_spec}.
 
-Today, OpenCL is at the forefront of heterogeneous architecture programming. Seventeen different companies (including Apple, Intel, AMD and Nvidia) distribute products conforming to the standard \cite{opencl_conformant_companies}. This allows an OpenCL kernel to run on the majority of hardware available on the market.
+Today, OpenCL is at the forefront of heterogeneous architecture programming. Seventeen different companies (including Apple, Intel, AMD and NVIDIA) distribute products conforming to the standard \cite{opencl_conformant_companies}. This allows an OpenCL kernel to run on the majority of hardware available on the market, including CPUs, GPUs, FPGAs and more.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/opencl-accelerated-apps.png}
+    \captionsetup{justification=centering}
+    \caption{OpenCL accelerated applications (Credit: Khronos Group)}
+\end{figure}
 
 Due to its popularity, a significant amount papers have been published looking into different types of extensions on the framework. We will focus on the extensions that are particularly relevant to our work. Section \ref{sub-sect:abstraction-layers} covers abstraction layers on top of OpenCL and section \ref{sub-sect:kernel_scheduling} covers kernel scheduling algorithms.
 
@@ -60,7 +90,7 @@ Machine learning is an alternative used to forgo the need of profiling the kerne
 \section{OpenMP \& OpenACC}
 In this section we will tackle OpenMP and OpenACC in conjunction as they take very similar approaches.
 
-Both projects are composed of a library and set of compiler directives that provide a model for parallel programming across different architectures. Support is provided for the C, C++ and Fortran languages. The directives extend the languages with useful constructs for parallelizing applications. Further control of the runtime environment is possible through the library \cite{openmp_spec} \cite{openacc_spec}.
+Both projects are composed of a library and set of compiler directives that provide a model for parallel programming across different architectures. Support is provided for the C, C++ and Fortran languages. The directives extend the languages with useful constructs for parallelizing applications. Further control of the runtime environment is possible through the library \cite{openmp_spec, openacc_spec}.
 
 OpenMP and OpenACC allow for quick adaptation of existing single threaded code into a parallel execution model. This work requires a compiler which supports the standard, meaning that it is able to handle the directives and generate multithreaded code automatically. 
 
