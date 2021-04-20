@@ -47,6 +47,34 @@
 \usepackage[T1]{fontenc} 
 \usepackage[latin1,utf8]{inputenc}
 
+% For code samples
+\usepackage{xcolor}
+\usepackage{listings}
+\definecolor{cBlue}{rgb}{0.3,0.141,0.232}
+\definecolor{cGreen}{rgb}{0,0.6,0}
+\definecolor{cGray}{rgb}{0.5,0.5,0.5}
+\definecolor{cPurple}{rgb}{0.58,0,0.82}
+\definecolor{cBackgroundColour}{rgb}{0.98,0.98,0.98}
+\lstdefinestyle{CStyle}{
+    backgroundcolor=\color{cBackgroundColour},   
+    commentstyle=\color{cGreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{cGray},
+    stringstyle=\color{cPurple},
+    showstringspaces=false,
+    %breakatwhitespace=false,         
+    %breaklines=true,                 
+    %captionpos=b,                    
+    %keepspaces=true,                 
+    %numbers=left,                    
+    %numbersep=5pt,                  
+    %showspaces=false,                
+    %showtabs=false,                  
+    %tabsize=2,
+    basicstyle=\ttfamily\small,
+    language=C++
+}
+
 %% \hyphenation{} is used to force the 
 \hyphenation{}
 

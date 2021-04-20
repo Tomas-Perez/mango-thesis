@@ -9,3 +9,5 @@
 *.blg 
 *.aux 
 *.txt
+*.fls
+*.synctex.gz
