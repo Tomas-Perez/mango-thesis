@@ -96,6 +96,16 @@
 	note = {\url{https://www.techpowerup.com/gpu-specs/geforce-256-sdr.c731}, Accessed: Apr 2021}
 }
 
+@misc{ati_9700_pro,
+	title = {{TechPowerUp: ATI Radeon 9700 PRO}},
+	note = {\url{https://www.techpowerup.com/gpu-specs/radeon-9700-pro.c50}, Accessed: Apr 2021}
+}
+
+@misc{geforcefx,
+	title = {{TechPowerUp: NVIDIA GeForceFX}},
+	note = {\url{https://www.techpowerup.com/gpu-specs/radeon-9700-pro.c50}, Accessed: Apr 2021}
+}
+
 @misc{opengl,
 	title = {{OpenGL}},
 	note = {\url{https://www.opengl.org/}, Accessed: Apr 2021}
@@ -104,6 +114,16 @@
 @misc{opengl_fixed_function_pipeline,
 	title = {{OpenGL Wiki: Fixed Function Pipeline}},
 	note = {\url{https://www.khronos.org/opengl/wiki/Fixed_Function_Pipeline}, Accessed: Apr 2021}
+}
+
+@misc{nvidia_nfinitefx_pixel,
+	title = {{NVIDIA nfiniteFX Engine: Programmable Pixel Shaders}},
+	year = {2001}
+}
+
+@misc{nvidia_nfinitefx_vertex,
+	title = {{NVIDIA nfiniteFX Engine: Programmable Vertex Shaders}},
+	year = {2001}
 }
 
 @inproceedings{transparent_cpu_gpu_collaboration,
@@ -428,4 +448,56 @@
 	numpages = {10},
 	keywords = {voronoi diagrams, proximity query, interpolation, medial axis, OpenGL, motion planning, framebuffer techniques, polygon rasterization, graphics hardware},
 	series = {SIGGRAPH '99}
+}
+
+@inproceedings{physics_simulations_gpgpu,
+	author = {Harris, Mark J. and Coombe, Greg and Scheuermann, Thorsten and Lastra, Anselmo},
+	title = {Physically-Based Visual Simulation on Graphics Hardware},
+	year = {2002},
+	isbn = {1581135807},
+	publisher = {Eurographics Association},
+	address = {Goslar, DEU},
+	abstract = {In this paper, we present a method for real-time visual simulation of diverse dynamic phenomena using programmable graphics hardware. The simulations we implement use an extension of cellular automata known as the coupled map lattice (CML). CML represents the state of a dynamic system as continuous values on a discrete lattice. In our implementation we store the lattice values in a texture, and use pixel-level programming to implement simple next-state computations on lattice nodes and their neighbors. We apply these computations successively to produce interactive visual simulations of convection, reaction-diffusion, and boiling. We have built an interactive framework for building and experimenting with CML simulations running on graphics hardware, and have integrated them into interactive 3D graphics applications.},
+	booktitle = {Proceedings of the ACM SIGGRAPH/EUROGRAPHICS Conference on Graphics Hardware},
+	pages = {109–118},
+	numpages = {10},
+	keywords = {coupled map lattice, CML, visual simulation, reaction-diffusion, multipass rendering, graphics hardware},
+	location = {Saarbrucken, Germany},
+	series = {HWWS '02}
+}
+
+@article{ray_tracing_gpgpu,
+	author = {Purcell, Timothy J. and Buck, Ian and Mark, William R. and Hanrahan, Pat},
+	title = {Ray Tracing on Programmable Graphics Hardware},
+	year = {2002},
+	issue_date = {July 2002},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {21},
+	number = {3},
+	issn = {0730-0301},
+	url = {https://doi.org/10.1145/566654.566640},
+	doi = {10.1145/566654.566640},
+	abstract = {Recently a breakthrough has occurred in graphics hardware: fixed function pipelines have been replaced with programmable vertex and fragment processors. In the near future, the graphics pipeline is likely to evolve into a general programmable stream processor capable of more than simply feed-forward triangle rendering.In this paper, we evaluate these trends in programmability of the graphics pipeline and explain how ray tracing can be mapped to graphics hardware. Using our simulator, we analyze the performance of a ray casting implementation on next generation programmable graphics hardware. In addition, we compare the performance difference between non-branching programmable hardware using a multipass implementation and an architecture that supports branching. We also show how this approach is applicable to other ray tracing algorithms such as Whitted ray tracing, path tracing, and hybrid rendering algorithms. Finally, we demonstrate that ray tracing on graphics hardware could prove to be faster than CPU based implementations as well as competitive with traditional hardware accelerated feed-forward triangle rendering.},
+	journal = {ACM Trans. Graph.},
+	month = jul,
+	pages = {703–712},
+	numpages = {10},
+	keywords = {ray tracing, programmable graphics hardware}
+}
+
+@inproceedings{photon_mapping_gpgpu,
+	author = {Purcell, Timothy J. and Donner, Craig and Cammarano, Mike and Jensen, Henrik Wann and Hanrahan, Pat},
+	title = {Photon Mapping on Programmable Graphics Hardware},
+	year = {2003},
+	isbn = {1581137397},
+	publisher = {Eurographics Association},
+	address = {Goslar, DEU},
+	abstract = {We present a modified photon mapping algorithm capable of running entirely on GPUs. Our implementation uses breadth-first photon tracing to distribute photons using the GPU. The photons are stored in a grid-based photon map that is constructed directly on the graphics hardware using one of two methods: the first method is a multipass technique that uses fragment programs to directly sort the photons into a compact grid. The second method uses a single rendering pass combining a vertex program and the stencil buffer to route photons to their respective grid cells, producing an approximate photon map. We also present an efficient method for locating the nearest photons in the grid, which makes it possible to compute an estimate of the radiance at any surface location in the scene. Finally, we describe a breadth-first stochastic ray tracer that uses the photon map to simulate full global illumination directly on the graphics hardware. Our implementation demonstrates that current graphics hardware is capable of fully simulating global illumination with progressive, interactive feedback to the user.},
+	booktitle = {Proceedings of the ACM SIGGRAPH/EUROGRAPHICS Conference on Graphics Hardware},
+	pages = {41–50},
+	numpages = {10},
+	keywords = {programmable graphics hardware, global illumination, photon mapping},
+	location = {San Diego, California},
+	series = {HWWS '03}
 }
