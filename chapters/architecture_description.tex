@@ -300,8 +300,34 @@ Before returning, we perform the resource deallocation of the TaskGraph, and fre
 
 \section{HHAL}
 
+\begin{itemize}
+    \item heterogeneous hardware abstraction layer
+    \item module of the mango system that communicates with accelerator libraries
+    \item abstracts accelerator specific information in a way that allows the resource manager to still fully exploit architecture specific features while freeing libmango from the complexity of handling multiple architectures.
+    \item exposes an architecture-agnostic API with the necessary functionalities to manage kernels, buffers and events on any of the supported architectures.
+    \item HHAL works in a client-server manner. The server is run as a daemon and the client is used by other modules to communicate with it. In this way both BarbecueRTRM and Libmango can make use of a common instance of the HHAL module.
+    \item functionalities
+    \begin{itemize}
+        \item resource assignation
+        \item resource allocation/deallocation
+        \item buffer: read/write
+        \item event: read/write
+        \item kernel: multisource, running, arguments
+    \end{itemize}
+    \item - API function to function description (maybe include the functions in the previous section and dont do this one)
+    \item dynamic compiler (can be explained in functionalities, under kernel->multisource, or reference from there to this section)
+    \item Architecture managers
+
+    In order to work with each supported architecture, an architecture manager is required. Each architecture manager provides an implementation of the HHAL API for their respective architecture, defining architecture specific data types for each of the core elements (kernel, buffer, event). 
+    \begin{itemize}
+        \item NVIDIA
+        \item GN 
+    \end{itemize}
+\end{itemize}
+
 \section{CUDA Manager}
 
-\section{HN}
-
 \section{GN}
+
+%TODO move somewhwere else
+\section{HN}
