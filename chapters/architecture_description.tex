@@ -300,6 +300,152 @@ Before returning, we perform the resource deallocation of the TaskGraph, and fre
 
 \section{HHAL}
 
+%TODO add a graph showing hhal: client, server, api, managers, dycomp
+
+The Heterogeneous Hardware Abstraction Layer (HHAL) is the module of the MANGO system that takes care of the communication with the multiple accelerator libraries.
+As such, HHAL abstracts accelerator specific information in a manner that allows the resource manager to fully exploit architecture specific features, while freeing libmango from the inherent complexity of handling multiple architectures.
+
+Due to the fact that multiple modules running as independent processes need to make use of the Heterogeneous Hardware Abstraction Layer, HHAL works in a client-server manner. The server is run as a daemon, or background process \cite{daemon_wikipedia}, and the client is used by other modules to interact with it. In this way, both BarbecueRTRM and Libmango can make use of a common instance of the HHAL module.
+
+HHAL exposes an architecture-agnostic API with the necessary functionalities to permit the managing of kernels, buffers and events on any of the supported architectures. The module is structured as a front-facing API and a set of architecture specific managers that implement the API functionalities for their specific architecture.
+
+\subsection{Abstracting architecture-specific information}
+
+Due to the fact that a single API is utilized for interacting with every supported architecture, underlying architecture managers require a mechanism that allows the description of architecture specific information by external modules, specifically the resource manager.
+
+For each resource, there is a base structure that contains the minimal information required by the front-facing API, namely the resource's identification integer. 
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Base structures]
+typedef struct hhal_kernel_t {
+    int id;
+} hhal_kernel;
+
+typedef struct hhal_buffer_t {
+    int id;
+} hhal_buffer;
+
+typedef struct hhal_event_t {
+    int id;
+} hhal_event;
+\end{lstlisting}
+
+Architecture managers can expand these base structures to add architecture specific information that they may require. For example, the following are the structures used by the Nvidia Manager.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Extended structures]
+typedef struct nvidia_kernel_t {
+    int id;
+    int gpu_id;
+    int mem_id;
+    uint32_t grid_dim_x;
+    uint32_t grid_dim_y;
+    uint32_t grid_dim_z;
+    uint32_t block_dim_x;
+    uint32_t block_dim_y;
+    uint32_t block_dim_z;
+    int termination_event;
+} nvidia_kernel;
+
+typedef struct nvidia_buffer_t {
+    int id;
+    int gpu_id;
+    int mem_id;
+    size_t size;
+    std::vector<int> kernels_in;
+    std::vector<int> kernels_out;
+} nvidia_buffer;
+
+typedef struct nvidia_event_t {
+    int id;
+} nvidia_event;
+\end{lstlisting}
+
+The general API essentially acts as a dispatcher, and passes the casted structure pointer when calling the corresponding manager function. 
+
+The following code snippet is for example purposes and not part of the final implementation.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API Example - Dispatching architecture-specific structures]
+void HHAL::example_function(Unit unit, hhal_kernel *info) {
+    switch (unit) {
+        case Unit::GN:
+            GN_MANAGER.example_function((gn_kernel *) info);
+            break;
+        case Unit::NVIDIA:
+            NVIDIA_MANAGER.example_function((nvidia_kernel *)info);
+            break;
+    }
+}
+\end{lstlisting}
+
+\subsection{HHAL API}
+
+The API exposed by HHAL provides a set of functionalities for managing resources. Here we explain in detail each functionality and how they relate to each component of the user's application: kernels, buffers and events.
+
+\subsubsection{Resource Assignation}
+
+Each resource composing the overall user application is assigned to an architecture by the resource manager. The resource assignation takes place before the allocation in its assigned target accelerator, and its the step in which the resource's information is made known to HHAL.
+
+In the assignation process, an identification integer is provided for the resource being assigned. This same id is utilized in successive operations to map a resource with the information provided at assignation time.
+
+To assign a resource, a supported unit where the resource is to be assigned is provided in the function call. Further usage of the resource will automatically be handled by the corresponding architecture manager.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Assign functions]
+    HHALExitCode assign_kernel(Unit unit, hhal_kernel *info);
+    HHALExitCode assign_buffer(Unit unit, hhal_buffer *info);
+    HHALExitCode assign_event (Unit unit, hhal_event *info);
+
+    HHALExitCode deassign_kernel(int kernel_id);
+    HHALExitCode deassign_buffer(int buffer_id);
+    HHALExitCode deassign_event(int event_id);
+\end{lstlisting}
+
+Once a resource is no longer required by the application, it may be deassigned and thus removed from the HHAL module.
+
+\subsubsection{Resource Allocation}
+
+Every assigned resource has to eventually be allocated in its target accelerator in order for their associated kernel/s to be able to run.
+
+Both allocation and release (deallocation) function calls are simple, due to the fact that the required information regarding the resources is provided beforehand at assignation time. Thus, only the resource's identification integer is needed.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Allocation functions]
+    HHALExitCode allocate_kernel(int kernel_id);
+    HHALExitCode release_kernel(int kernel_id);
+
+    HHALExitCode allocate_memory(int buffer_id);
+    HHALExitCode release_memory(int buffer_id);
+
+    HHALExitCode allocate_event(int event_id);
+    HHALExitCode release_event(int event_id);
+\end{lstlisting}
+
+The resource's target architecture manager is dispatched the allocation/deallocation action and it takes care of the accelerator specific requirements for allocating resources.
+
+\subsubsection{Buffer Actions}
+
+Memory Buffers that are allocated in an accelerator have to be capable of being written and read. The HHAL API provides write and read functions that take the buffer's id, a pointer to a source/destination buffer in the host memory space and the size of the buffer.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Buffer actions]
+    HHALExitCode write_to_memory(int buffer_id, const void *source, size_t size);
+    HHALExitCode read_from_memory(int buffer_id, void *dest, size_t size);
+\end{lstlisting}
+
+Communication with the corresponding accelerator is handled by the architecture's manager.
+
+\subsubsection{Event Actions}
+Events that are allocated in an accelerator require the capability of being written and read. The HHAL API provides write function that takes the event's id and the data to write. And a read function that takes the event's id and a pointer to host memory where to read the data into.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Buffer actions]
+    HHALExitCode write_sync_register(int event_id, uint32_t data);
+    HHALExitCode read_sync_register(int event_id, uint32_t *data);
+\end{lstlisting}
+
+Once again, accelerator specifics are handled by the architecture's manager. In some cases (like Nvidia), events are handled entirely on the Nvidia Manager, as the Nvidia Architecture Node does not provide events support.
+
+\subsubsection{Kernel Actions}
+
+
+
+
+
 \begin{itemize}
     \item heterogeneous hardware abstraction layer
     \item module of the mango system that communicates with accelerator libraries
@@ -315,6 +461,7 @@ Before returning, we perform the resource deallocation of the TaskGraph, and fre
         \item kernel: multisource, running, arguments
     \end{itemize}
     \item - API function to function description (maybe include the functions in the previous section and dont do this one)
+    \item step by step of how an application would run: assign stuff, allocate stuff, write buffers, start kernel
     \item dynamic compiler (can be explained in functionalities, under kernel->multisource, or reference from there to this section)
     \item Architecture managers
 
