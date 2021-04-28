@@ -17,7 +17,11 @@ Other types of models which focus on scalability, but not covered \cite{survey_p
     \item MPI
 \end{itemize}
 
-\section{GPGPU}
+Section \ref{sect:history-gpgpu} covers the history of advancements in GPGPU technology and is based on \cite{brief_history_gpgpu}, a talk by NVIDIA Software Engineer Mark Harris. 
+
+\section{The History of GPGPU} \label{sect:history-gpgpu}
+
+\subsection{Inception}
 The first documented case of computation on a graphics processor dates to June 1985, when Tim Van Hook implemented the world's first GPU ray-tracing on the Ikonas RDS-3000 \cite{ikonas}. Van Hook followed this up the next year with a paper on solid modelling with the Ikonas \cite{solid_modeling_ikonas}.
 
 In August 1999, Kedem et al. \cite{unix_passwords_gpgpu} published a paper where they used experimental graphics engine PixelFlow to perform a brute force attack on Unix passwords. PixelFlow was a heterogeneous parallel machine used for high-speed and high-quality image generation. For their research, PixelFlow was setup with 18 SIMD arrays, each one with 8K processing elements (PE) for a total of 144K (147,456) PEs running at 100Mhz. The machine had some performance problems for this application due to the limited instruction set, which was focused on image computations. Due to this, the results were poorer than expected. It was calculated that the machine would be able to check all lowercase passwords (28.9\% of passwords at the time) in 3.19 hours.
@@ -31,6 +35,7 @@ In August 1999, Kedem et al. \cite{unix_passwords_gpgpu} published a paper where
 
 Also in 1999, Hoff et al. \cite{voronoi_diagrams_gpgpu} managed to perform computations of generalized Voronoi diagrams using graphics accelerators, such as the NVIDIA TNT2, connected to a PC \cite{brief_history_gpgpu}, as opposed to the specialized hardware in the PixelFlow. This was achieved by using the OpenGL API \cite{opengl}. However, at that time GPUs were not programmable. The hardware exposed what is known as a Fixed Function Pipeline which the user could configure according to their needs. With that configuration, the GPU would execute a series of built in math functions which were focused on rendering, not on computation \cite{opengl_fixed_function_pipeline}.
 
+\subsection{Programmable GPUs}
 Programmable GPUs did not come until 2001, as NVIDIA introduced GeForce series 3. This replaced the fixed functions in the previous model with programmable shaders which could be controlled by the developers \cite{nvidia_nfinitefx_pixel, nvidia_nfinitefx_vertex}. These features were, of course, aimed at game developers and 3D designers, but they also allowed for new applications of GPU technology.
 
 Using a GeForce 3, Larsen and McAllister achieved the first matrix multiplication done on a GPU \cite{early_matrix_multiplication_gpgpu}. Their work had to be done by mapping the matrices into textures that could be manipulated with the OpenGL API. This textures would be transferred to the GPU, rendered and then copied back to CPU memory to be mapped again to a matrix format so results could be read. Incidentally, the resulting "matrix texture" would be shown on screen. There is no explicit mention of the use of programmable shaders in this work, however this would not have changed the study drastically as the fixed functions of the previous model could handle the operations required. The main problem Larsen and McAllister found was the 8 bit fixed point precision and saturation arithmetic used by the hardware. Saturation arithmetic, although very useful in graphics, makes it harder to design a higher precision fixed-point implementation.
@@ -58,7 +63,44 @@ The main bottleneck that Purcell et al. faced in their paper stemmed from the la
 
 All the kernels were written in Cg, a general purpose language for GPUs released by NVIDIA at the start of 2003 \cite{nvidia_cg}. The design of Cg was inspired by the C language to provide a high level language that is still close to the underlying hardware. The syntax of C served as a starting point which was then extended and modified as necessary to support GPU architectures effectively. The general purpose nature of the language allows the programmer to use very similar code to program the vertex and fragment stages of the rendering pipeline. This also simplifies programming for GPGPU applications, an aspect that was taken into account when designing the language due to the rising popularity of the field.
 
-In November 2005, Microsoft launched the XBOX 360 console. A noteworthy aspect of this launch is that the console used the first unified shader architecture GPU on the market, the ATI Xenos \cite{xbox_360_specs}. Previously, GPUs had different shader units which either handled vertex or fragment shader computations. In the unified shader model, there is a single type of unit, called shader core, which can handle both type of operations. The main selling point of this change is that this greater flexibility allowed for all the units to be used during rendering, no matter the type of workload. With the classical fixed shader model, heavy polygon scenes would leave the fragment units idle, while heavy pixel scenes would underutilize the vertex units. This issue is illustrated in figure \ref{fig:gpu-fixed-shader-perf}. Figure \ref{fig:gpu-unified-shader-perf} shows how the unified shader model is able to better utilize the available resources.
+\subsection{Brook}
+Languages like Cg, Microsoft's HLSL and OpenGL's GLslang allowed for shaders to be written in C-like syntax. However, they still required the programmer to express GPU applications in terms of graphics primitives and to use the existing graphics APIs to control the rest of the graphics pipeline, such as memory allocation and loading programs. In August 2004 researchers at Stanford University present Brook \cite{brook}, a programming environment that provides developers with a view of the GPU as a streaming coprocessor.
+
+Instead of working with textures and shaders, the Brook language allows the programmer to think in terms of streams and kernels. A stream is a collection of records (elements) and is denoted by angle-brackets, i.e. \texttt{float x<100>}. Access to streams is limited to kernels and the \texttt{streamRead} and \texttt{streamWrite} operators, which transfer memory between memory and streams. A kernel is a function that performs parallel operations over one or more streams. Calling a kernel on a stream performs an implicit loop over the elements of the stream, invoking the body of the kernel for each element. An example Brook snippet can be seen below.
+
+\begin{lstlisting}[style=BrookStyle, caption=Brook saxpy example]
+kernel void saxpy(float a, float4 x<>, float4 y<>, out float4 result<>) {
+    result = a*x + y;
+}
+
+void main(void) {
+    float a;
+    float4 X[100], Y[100], Result[100];
+    float4 x<100>, y<100>, result<100>;
+    // ... initialize a, X, Y ...
+    streamRead(x, X);               // copy data from mem to stream
+    streamRead(y, Y);
+    saxpy(a, x, y, result);         // execute kernel on all elements
+    streamWrite(result, Result);    // copy data from stream to mem
+}   
+\end{lstlisting}
+
+A kernel accepts different types of arguments:
+
+\begin{itemize}
+    \item Input streams that contain read-only data for kernel processing.
+    \item Output streams (marked with the \texttt{out} keyword) that store the result of a kernel computation.
+    \item Gather streams which are declared as a C array with brackets, i.e. \texttt{gather[]}. A gather stream allows for arbitrary indexing of its elements.
+    \item Non-stream arguments, which are read-only constants.
+\end{itemize}
+
+Due to the same GPU limitations experienced by Purcell et al., Brook does not provide arbitrary writes, only arbitrary reads with the gather streams.
+
+The Brook compilation and runtime system maps the language onto existing programmable GPU APIs, including OpenGL and DirectX. The system consists of two components: \texttt{brcc}, a source-to-source compiler and the Brook Runtime (BRT), a library that provides runtime support for kernel execution. \texttt{brcc} maps Brook kernels into Cg shaders which are then translated into GPU assembly by vendor-provided shader compilers. Additionally, it emits C++ code which uses BRT to invoke the kernels. 
+
+\subsection{The Unified Shader Model}
+
+In November 2005, Microsoft launched the XBOX 360 console. A noteworthy aspect of this launch is that the console used the first unified shader architecture GPU on the market, the ATI Xenos \cite{xbox_360_specs}. Previously, GPUs had different processing units which either handled vertex or fragment shader operations. In the unified shader model, there is a single type of unit, called shader core, which can handle both type of operations. The main selling point of this change is that greater flexibility allowed for all the units to be used during rendering, no matter the type of workload. With the classical fixed shader model, heavy polygon scenes would leave the fragment units idle, while heavy pixel scenes would underutilize the vertex units. This issue is illustrated in figure \ref{fig:gpu-fixed-shader-perf}. Figure \ref{fig:gpu-unified-shader-perf} shows how the unified shader model is able to better utilize the available resources.
 
 \begin{figure}[ht]
     \centering
@@ -76,9 +118,9 @@ In November 2005, Microsoft launched the XBOX 360 console. A noteworthy aspect o
     \label{fig:gpu-unified-shader-perf}
 \end{figure}
 
-While ATI produced the first unified shader GPU, the model did not reach PCs until NVIDIA released the GeForce 8800 in November 2006. DirectX 10 had introduced Shader Model 4.0 which included a unified shader instruction set. Although a unified architecture was not a requirement to use DirectX 10, it provided better efficiency, load-balancing and power utilization \cite{geforce_8800_architecture}. A block diagram of the GeForce 8800 can be seen in figure \ref{fig:8800-arch}
+While ATI produced the first unified shader GPU for the XBOX 360, NVIDIA was the one  to release the model in PCs with the GeForce 8800 in November 2006. DirectX 10 had introduced Shader Model 4.0 which included a unified shader instruction set. Even though a unified architecture was not a requirement to use DirectX 10, it provided better efficiency, load-balancing and power utilization \cite{geforce_8800_architecture}. A block diagram of the GeForce 8800 can be seen in figure \ref{fig:8800-arch}. The streaming processors (SP) marked in green are the units in charge of all the shader processing (the shader cores).
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{img/geforce-8800-block-diagram.png}
     \captionsetup{justification=centering}
@@ -86,9 +128,26 @@ While ATI produced the first unified shader GPU, the model did not reach PCs unt
     \label{fig:8800-arch}
 \end{figure}
 
-GPGPU finally became a first class citizen with the introduction of NVIDIA CUDA in June of 2007 \cite{cuda_toolkit_archive}. The significant redesign that came with the adoption of unified shaders, as well as the flexibility achieved by the final model allowed NVIDIA to develop a hardware and software solution for data-intensive computing. By providing a first party computing model, CUDA eliminates the need for developers to work with graphics APIs and deal with a rendering pipeline. Instead of having to adapt algorithms work with textures, vertices, pixels and shaders, the developer can work using threads, arrays and pointers, just like in a regular CPU. In order to program a GPU, NVIDIA provides the CUDA C++ language which is a minimal extension over C++ adding parallelism features.
+\subsection{GPGPU Vendor Support}
 
-Thanks to CUDA significantly reducing the programming hurdle in order to perform GPGPU, a surge in GPGPU development started in 2007. Today, over six hundred applications utilize GPU acceleration across a broad range of industries including: finance, design for manufacturing/construction, artificial intelligence, medical imaging and more.
+ATI (from here on out referred to as AMD due to their acquisition in 2006) was also the first vendor to release direct support for GPGPU with its CTM or "Close to To The Metal" system in late 2006. CTM provides raw assembly level access with its hardware abstraction layer (HAL). The compute abstraction layer (CAL) adds higher level constructs and a C API, however this only covers context, memory management and kernel execution, the kernel itself must still be written in a low level AMD intermediate representation \cite{amd_ctm_programming_guide}. For higher level programming, AMD also supported compilation of Brook programs directly to the hardware \cite{gpu_computing}.
+
+By providing a first party computing model, CTM eliminates the need for developers to work with graphics APIs and deal with a rendering pipeline. Instead of having to adapt algorithms work with textures, vertices, pixels and shaders, the developer can perform computation by binding memory as inputs and outputs to the stream processors directly. This includes Brook, which no longer has the requirement to work on top of a graphics API backend.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/cuda-logo.png}
+    \captionsetup{justification=centering}
+    \caption{NVIDIA CUDA logo (Credit: NVIDIA)}
+\end{figure}
+
+In June of 2007, NVIDIA introduced CUDA \cite{cuda_toolkit_archive}. The significant redesign that came with the adoption of unified shaders for the GeForce 8800 GTX, as well as the flexibility achieved by the final model, allowed NVIDIA to develop a hardware and software solution for data-intensive computing. 
+
+The CUDA C++ language which is a minimal extension over C++ adding parallelism features. As opposed to AMD CTM, which combined the CAL C API with a low level kernel language, this programming model is single source. CPU (host) code and GPU (kernel) code are written in the same language and can be contained in the same file. 
+
+CUDA is a higher level interface than AMD's CAL, but it also provides more hardware access than Brook. In exchange for requiring more hardware knowledge, CUDA exposes multiple levels of memory hierarchy, per-thread registers, fast shared memory between threads in a block, board memory and host memory. In addition, while Brook only exposes a single dimension of parallelism, data parallelism via streaming, CUDA provides data parallelism and multithreading. CUDA kernels are also more flexible, as they allow the use of pointers, arbitrary writes and thread synchronization between threads in a single block \cite{gpu_computing}.
+
+Today, over six hundred applications utilize GPU acceleration across a broad range of industries including: finance, design for manufacturing/construction, artificial intelligence, medical imaging and more.
 
 \section{OpenCL}
 
@@ -99,7 +158,7 @@ Thanks to CUDA significantly reducing the programming hurdle in order to perform
     \caption{OpenCL logo (Credit: Khronos Group)}
 \end{figure}
 
-OpenCL \cite{opencl_spec} is an open industry standard for programming a heterogeneous collection of CPUs, GPUs and other discrete computing devices organized into a single platform. It provides a framework for parallel programming and includes a language, API, libraries and a runtime system to support software development. By leveraging OpenCL, an application can use a host and one or more OpenCL devices as a single heterogeneous parallel computer system.
+Released in December 2008, OpenCL \cite{opencl_spec} is an open industry standard for programming a heterogeneous collection of CPUs, GPUs and other discrete computing devices organized into a single platform. It provides a framework for parallel programming and includes a language, API, libraries and a runtime system to support software development. By leveraging OpenCL, an application can use a host and one or more OpenCL devices as a single heterogeneous parallel computer system.
 
 The framework is comprised by the following components:
 \begin{itemize}
@@ -153,19 +212,26 @@ Up until version 4.0, OpenMP only allowed for this code to be compiled for and e
 
 Finally, the possibility to use both models at the same time exists. Works like \cite{openmp_openacc_multigpus} exploit parallelism on the CPU with OpenMP to schedule code to run on multiple GPUs. \cite{openmp_openacc_molecular_docking} also leverages this hybrid approach to run kernels which are more GPU friendly on the GPU using OpenACC while running less friendly kernels with OpenMP CPU parallelization. 
 
-\section{CUDA}
-
-\section{HIP}
-
 \section{SYCL}
+
+
 \subsection{Celerity}
 
 \section{Kokkos}
 \cite{kokkos}
 
-\section{C++ AMP}
-Appears dead. Stack overflow post by one of the authors \url{https://stackoverflow.com/a/38604348/7983805}
+\section{Other Programming Models}
 
+\subsection{AMD ROCm}
+AMD ROCm is an open-source software development platform for HPC GPU computing. It is AMD's latest competitor to NVIDIA's CUDA. 
+
+During the 
+
+
+HIP is a C++ Runtime API and kernel language very similar to CUDA that is portable across NVIDIA and AMD GPUs. It is a part of the AMD ROCm ecosystem, an open source project led by AMD. Supporting both vendors and being open source gives it an advantage over CUDA, however the high level of CUDA adoption has slowed down support for HIP in accelerated applications.
+
+\subsection{C++ AMP}
+Appears dead. Stack overflow post by one of the authors \url{https://stackoverflow.com/a/38604348/7983805}
 
 \section{Standalone works}
 

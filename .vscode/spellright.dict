@@ -9,3 +9,6 @@ bitonic
 shaders
 Shader
 Xenos
+GLslang
+brcc
+saxpy
