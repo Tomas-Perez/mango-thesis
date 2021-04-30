@@ -12,3 +12,6 @@ Xenos
 GLslang
 brcc
 saxpy
+inlined
+sycl
+idx
