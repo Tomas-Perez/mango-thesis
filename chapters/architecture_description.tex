@@ -75,10 +75,10 @@ The Context is the main class in the Libmango module, it holds the state informa
 
 Once the application is specified, the task graph information is sent to the BarbecueRTRM for the resource allocation. After a successful resource allocation, the application is now ready to run.
 
-\subsection{Kernel management}
+\subsection{Kernel management} \label{Libmango:KernelManagement}
 Libmango exposes functionalities and data structures that can be used to represent and manipulate kernels.
 
-Kernels are identified by an user-provided integer. For a single kernel, multiple implementations can be specified, each one targeting a different supported accelerator and thus provided in their respective architecture's requirements - a kernel implementation targeting an NVIDIA GPGPU would require a CUDA implementation.
+Kernels are identified by an user-provided integer. For a single kernel, multiple implementations can be specified, each one targeting a different supported accelerator and thus provided in their respective architecture's requirements - a kernel implementation targeting an Nvidia GPGPU would require a CUDA implementation.
 Kernel versions (implementations) are stored either in memory or in external files. According to the targeted architecture, multiple source types are supported. The kernel source can be a pre-compiled binary file or code in accelerator-supported language, provided via a string stored in memory or a source file, to be dynamically compiled if required.
 The resource manager will rely on the available options in the assignation of kernels to accelerators.
 
@@ -88,7 +88,7 @@ Libmango supports three types of Kernel arguments: Scalar arguments, Buffer argu
 These essentially act as wrappers of the HHAL kernel arguments.
 
 \subsubsection{Scalar argument}
-A Scalar argument consists of a scalar value. The types supported by Libmango are signed and unsigned integers of sizes 8, 16, 32 and 64; as well as float values.
+A Scalar argument consists of a scalar value. The types supported by Libmango are signed and unsigned integers of sizes 8, 16 and 32 bits, as well as long and float values.
 When a Scalar argument is created, the provided value is copied and stored in memory, and later sent to the HHAL module when their respective kernel is ran. 
 
 \subsubsection{Buffer argument}
@@ -201,7 +201,7 @@ Then, the three buffers we need for the operation are declared. \textbf{x} and \
 \begin{lstlisting}[style=CStyle, caption=Sample - Kernel loading]
     char kernel_path[] = "/opt/mango/usr/local/share/cuda_simple/saxpy";
     auto kf = std::make_shared<mango::KernelFunction>();
-    kf->load(kernel_path, mango::UnitType::NVIDIA, mango::FileType::BINARY);
+    kf->load(kernel_path, mango::UnitType::Nvidia, mango::FileType::BINARY);
 \end{lstlisting}
 
 To load the saxpy kernel binary file, we create a \textbf{KernelFunction} object, and then load the kernel through the \textbf{load()} function, specifying the target architecture and file type.
@@ -431,7 +431,7 @@ Memory Buffers that are allocated in an accelerator have to be capable of being 
 Communication with the corresponding accelerator is handled by the architecture's manager.
 
 \subsubsection{Event Actions}
-Events that are allocated in an accelerator require the capability of being written and read. The HHAL API provides write function that takes the event's id and the data to write. And a read function that takes the event's id and a pointer to host memory where to read the data into.
+Events that are allocated in an accelerator require the capability of being written and read. The HHAL API provides a write function that takes the event's id and the data to write, and a read function that takes the event's id and a pointer to host memory where to read the data into.
 
 \begin{lstlisting}[style=CStyle, caption=HHAL API - Buffer actions]
     HHALExitCode write_sync_register(int event_id, uint32_t data);
@@ -440,7 +440,107 @@ Events that are allocated in an accelerator require the capability of being writ
 
 Once again, accelerator specifics are handled by the architecture's manager. In some cases (like Nvidia), events are handled entirely on the Nvidia Manager, as the Nvidia Architecture Node does not provide events support.
 
-\subsubsection{Kernel Actions}
+\subsubsection{Kernel Actions} \label{HHAL:KernelActions}
+Before a Kernel is ran, its source first has to be written into the accelerator's memory. The HHAL API provides a kernel write function that takes the kernel's id and a map of unit to sources, out of which the previously assigned unit's source is taken.
+
+Multiple kernel's source types are supported by HHAL, this is further explained in the Dynamic Compiler \ref{HHAL:DynamicCompiler} subsection.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Kernel actions]
+    HHALExitCode kernel_write(int kernel_id, const std::map<Unit, hhal_kernel_source> &kernel_sources);
+    HHALExitCode kernel_start(int kernel_id, const Arguments &arguments);
+\end{lstlisting}
+
+After a Kernel is written and it's dependencies are correctly set up, it can be ran, or "started" via the kernel start function. As kernels require argument support, this function not only takes the kernel's id but also an \textbf{Arguments} object which consists of a vector of kernel arguments.
+
+Three types of arguments are supported by HHAL: Scalar arguments, Buffer arguments and Event arguments. These are the arguments wrapped by Libmango for the user to provide. \ref{Libmango:KernelManagement} 
+
+Scalar arguments consist of a scalar value belonging to one of the supported types. These are signed and unsigned integers of sizes 8, 16, 32 bits as well as long and float values.
+
+The Buffer and Event arguments consist of the respective's Buffer or Event id, which is used to pass the corresponding structure information to the Kernel.
+
+\subsection{Dynamic Compiler} \label{HHAL:DynamicCompiler}
+
+In previous implementations of the MANGO system, an user provided Kernel had to be pre-compiled into a binary file (or the format required by the target accelerator) before its utilization in the MANGO system. Despite the optimalilty of this process, it puts limits on the agile and iterative nature of the development of software solutions.
+
+Giving developers the ability to work directly with kernel source code greatly facilitates the development process. Ideally, once a solution is in place, kernels would be pre-compiled for optimal perfomance.
+
+The Dynamic Compiler included in the HHAL module offers the functionality of "dynamic" compilation of kernels. That is, the developer provides a kernel's source code to be compiled as required before being written into its target accelerator's memory.
+
+\subsubsection{Usage and Implementation}
+
+As previously mentioned, HHAL supports multiple types of kernel sources: 
+
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Kernel source types]
+    enum class source_type {
+        BINARY,
+        SOURCE,
+        STRING
+    };
+\end{lstlisting}
+
+The \textbf{BINARY} type is for pre-compiled kernels in binary format. While \textbf{SOURCE} and \textbf{STRING} refer to source code in a file or in a string in memory respectively.
+
+The Dynamic Compiler is automatically used by HHAL when either a SOURCE or a STRING source type is provided in the kernel write function call. \ref{HHAL:KernelActions}
+
+The usage of the Dynamic Compiler is simple, requiring only the instantiation of a \textbf{Compiler} object, and a single \textbf{get\_binary()} function call to obtain a kernel's binary from its source.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Dynamic Compiler - Compiler class]
+    class Compiler {
+        public:
+            Compiler();
+            const std::string get_binary(const std::string source, hhal::Unit arch);
+
+            [...]
+    };
+\end{lstlisting}
+
+Internally, the Dynamic Compiler has a set of alternatives to work with, depending on its configuration and the target architecture of a specific source.
+
+For kernel sources belonging to the C family, the Clang frontend for the LLVM project \cite{clang_llvm} is utilized if enabled and installed in the user's machine.
+
+Otherwise, compilation is done through system calls as specified in the configuration, utilizing a compiler tool installed in the user's machine.
+
+In the case of CUDA kernels (targeting Nvidia accelerators), the CUDA Compiler tool \ref{Nvidia:CudaCompiler} from the Nvidia Architecture Node is utilized for compilation. This tool exploits the CUDA runtime compilation library NVRTC to compile CUDA kernels into a ptx format as required by the Nvidia Architecture Node.
+
+\subsubsection{Configuration}
+
+On initialization, the Dynamic Compiler reads a configuration file located in its installation directory. Through this configuration, the user can specify the tools to utilize for the compilation process.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Dynamic Compiler - Configuration example]
+    [compiler]
+    expiration=86400
+
+    [GN]
+    libclang=false
+    path=cc
+
+    // Syntax
+    [ARCHITECTURE_NAME]
+    libclang=true_or_false
+    path=path_to_compiler
+\end{lstlisting}
+
+In the previous configuration example, under \textbf{[compiler]}, the \textbf{expiration} time for a compiled kernel binary file is specified in seconds, this parameter is further explained in the Binary Caching subsection \ref{HHAL:BinaryCaching}.
+
+Then, for each supported architecture (\textbf{[ARCHITECTURE\_NAME]}), two parameters can be specified:
+\begin{itemize}
+    \item \textbf{libclang:} Whether the Clang compiler should be used when compiling kernels for this architecture.
+    \item \textbf{path:} The path to a compiler tool installed in the user's machine to be used when compiling kernels for this architecture. Also works as a fallback option if libclang is not available in the system.
+\end{itemize}
+
+\subsubsection{Caching} \label{HHAL:BinaryCaching}
+
+
+\subsubsection{Kernel entry generation}
+
+For Kernels that fall under the GN architecture group...
+%#pragma mango_gen_entrypoint
+
+
+
+
+\subsection{Manager example: NVIDIA Manager}
+
 
 
 
@@ -473,6 +573,12 @@ Once again, accelerator specifics are handled by the architecture's manager. In 
 \end{itemize}
 
 \section{CUDA Manager}
+
+- ptx format 
+%https://docs.nvidia.com/cuda/inline-ptx-assembly/index.html#:~:text=The%20NVIDIA%C2%AE%20CUDA%C2%AE,the%20PTX%20ISA%20reference%20document.
+
+\subsection{CUDA Compiler} \label{Nvidia:CudaCompiler}
+
 
 \section{GN}
 
