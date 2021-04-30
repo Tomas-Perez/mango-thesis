@@ -19,6 +19,9 @@ Other types of models which focus on scalability, but not covered \cite{survey_p
 
 Section \ref{sect:history-gpgpu} covers the history of advancements in GPGPU technology and is based on \cite{brief_history_gpgpu}, a talk by NVIDIA Software Engineer Mark Harris. 
 
+% TODO somewhere around here?
+Today, over six hundred applications utilize GPU acceleration across a broad range of industries including: finance, design for manufacturing/construction, artificial intelligence, medical imaging and more.
+
 \section{The History of GPGPU} \label{sect:history-gpgpu}
 
 \subsection{Inception}
@@ -40,9 +43,9 @@ Programmable GPUs did not come until 2001, as NVIDIA introduced GeForce series 3
 
 Using a GeForce 3, Larsen and McAllister achieved the first matrix multiplication done on a GPU \cite{early_matrix_multiplication_gpgpu}. Their work had to be done by mapping the matrices into textures that could be manipulated with the OpenGL API. This textures would be transferred to the GPU, rendered and then copied back to CPU memory to be mapped again to a matrix format so results could be read. Incidentally, the resulting "matrix texture" would be shown on screen. There is no explicit mention of the use of programmable shaders in this work, however this would not have changed the study drastically as the fixed functions of the previous model could handle the operations required. The main problem Larsen and McAllister found was the 8 bit fixed point precision and saturation arithmetic used by the hardware. Saturation arithmetic, although very useful in graphics, makes it harder to design a higher precision fixed-point implementation.
 
-Approximate simulations of natural phenomena were achieved on the GPU by Harris et al. \cite {physics_simulations_gpgpu}. This included interactive visualizations of convection, reaction-diffusion and boiling. As the end effect of the simulation was to display visuals, this application had the advantage that data did not need to be transferred back to the CPU once results were computed. Again, during these experiments the most problematic aspect was the precision of the fixed-point operations. This contributed to more difficult programmability and arithmetic errors. During this work, the researchers exploited the programming capabilities of the GeForce 3 and, at the time, newly released GeForce 4. ATI had also released a programmable GPU, in the form of the Radeon 8500, which promised to add more power to the simulations, however the system was not ported to it at the time of publication. 
+Approximate simulations of natural phenomena were achieved on the GPU by Harris et al. \cite {physics_simulations_gpgpu}. This included interactive visualizations of convection, reaction-diffusion and boiling. As the end effect of the simulation was to display visuals, this application had the advantage that data did not need to be transferred back to the CPU once results were computed. Again, during these experiments the most problematic aspect was the precision of the fixed-point operations. This contributed to more difficult programmability and arithmetic errors. During this work, the researchers exploited the programming capabilities of the GeForce 3 and, at the time, newly released GeForce 4. ATI had also released a programmable GPU in the form of the Radeon 8500, which promised to add more power to the simulations, however the system was not ported to it at the time of publication. 
 
-In late 2002, after seeing the growing trend in general purpose computation on GPUs, Harris coined the term GPGPU, an acronym for "General Purpose computing on Graphics Processing Units" \cite{brief_history_gpgpu}. GPGPU.org, a website dedicated to news on GPGPU research, would go live August 2003.
+In late 2002, after seeing the growing trend in general purpose computation on GPUs, Harris coined the term GPGPU, an acronym for "General Purpose computing on Graphics Processing Units" \cite{brief_history_gpgpu}. GPGPU.org, a website dedicated to news and resources on GPGPU research, would go live August 2003.
 
 DirectX 9 (DX9) introduced the Shader Model 2.0 and with it support for floating-point operations. In July 2002, ATI released the first DirectX 9 capable graphics card in the form of the Radeon 9700 PRO \cite{ati_9700_pro}. NVIDIA followed up with their own DX9 GPU, the GeForceFX, in January 2003 \cite{geforcefx}. 
 
@@ -134,31 +137,17 @@ ATI (from here on out referred to as AMD due to their acquisition in 2006) was a
 
 By providing a first party computing model, CTM eliminates the need for developers to work with graphics APIs and deal with a rendering pipeline. Instead of having to adapt algorithms work with textures, vertices, pixels and shaders, the developer can perform computation by binding memory as inputs and outputs to the stream processors directly. This includes Brook, which no longer has the requirement to work on top of a graphics API backend.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.5\textwidth]{img/cuda-logo.png}
-    \captionsetup{justification=centering}
-    \caption{NVIDIA CUDA logo (Credit: NVIDIA)}
-\end{figure}
-
 In June of 2007, NVIDIA introduced CUDA \cite{cuda_toolkit_archive}. The significant redesign that came with the adoption of unified shaders for the GeForce 8800 GTX, as well as the flexibility achieved by the final model, allowed NVIDIA to develop a hardware and software solution for data-intensive computing. 
 
 The CUDA C++ language which is a minimal extension over C++ adding parallelism features. As opposed to AMD CTM, which combined the CAL C API with a low level kernel language, this programming model is single source. CPU (host) code and GPU (kernel) code are written in the same language and can be contained in the same file. 
 
 CUDA is a higher level interface than AMD's CAL, but it also provides more hardware access than Brook. In exchange for requiring more hardware knowledge, CUDA exposes multiple levels of memory hierarchy, per-thread registers, fast shared memory between threads in a block, board memory and host memory. In addition, while Brook only exposes a single dimension of parallelism, data parallelism via streaming, CUDA provides data parallelism and multithreading. CUDA kernels are also more flexible, as they allow the use of pointers, arbitrary writes and thread synchronization between threads in a single block \cite{gpu_computing}.
 
-Today, over six hundred applications utilize GPU acceleration across a broad range of industries including: finance, design for manufacturing/construction, artificial intelligence, medical imaging and more.
+Overall, CUDA's advantages over AMD's CTM gave NVIDIA the upper hand in the GPGPU field and it is still in use to this day. By contrast, in 2008, AMD's CTO of graphics announced that the company was shifting its focus away from CTM and into the upcoming OpenCL standard \cite{amd_ctm_ditch}, detailed in the following section.
 
 \section{OpenCL}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{img/opencl-logo.png}
-    \captionsetup{justification=centering}
-    \caption{OpenCL logo (Credit: Khronos Group)}
-\end{figure}
-
-Released in December 2008, OpenCL \cite{opencl_spec} is an open industry standard for programming a heterogeneous collection of CPUs, GPUs and other discrete computing devices organized into a single platform. It provides a framework for parallel programming and includes a language, API, libraries and a runtime system to support software development. By leveraging OpenCL, an application can use a host and one or more OpenCL devices as a single heterogeneous parallel computer system.
+Released in December 2008, Open Compute Language or OpenCL \cite{opencl_spec} is an open industry standard for programming a heterogeneous collection of CPUs, GPUs and other discrete computing devices organized into a single platform. It provides a framework for parallel programming and includes a language, API, libraries and a runtime system to support software development. By leveraging OpenCL, an application can use a host and one or more OpenCL devices as a single heterogeneous parallel computer system.
 
 The framework is comprised by the following components:
 \begin{itemize}
@@ -169,7 +158,7 @@ The framework is comprised by the following components:
 
 OpenCL C \cite{opencl_c_spec} is the programming language provided by the standard to write kernels that execute on an OpenCL device. OpenCL C is based on the \textit{ISO/IEC 9899:1999 - Programming languages - C} specification (also referred to as C99) \cite{c99}, with the addition of some \textit{ISO/IEC 9899:2011 - Information technology - Programming languages - C} specification (also referred to as C11) \cite{c11} features, plus some extensions and restrictions to support parallel kernels.
 
-This dedicated kernel language allows the developer to write a single code base and execute it in different devices. This ensures the \textit{functional} portability of code across devices, eliminating the need for applications to be re-coded on a per-device or per-programming toolkit basis \cite{performance_portability_2013}. However, portability issues may still arise if the hardware supports different versions of the standard. In addition, there can also be issues in terms of performance portability due to architecture differences and compiler optimizations available on each platform \cite{performance_portability_2013, performance_portability_2019, performance_portability_2020}. For maximum performance, some tweaking of the source code may still be necessary depending on which device is being targeted \cite{optimizing_opencl_fpga_integer, optimizing_opencl_fpga_automata}.
+This dedicated kernel language allows the developer to write a single kernel code base and execute it in different devices. This ensures the \textit{functional} portability of code across devices, eliminating the need for applications to be re-coded on a per-device or per-programming toolkit basis \cite{performance_portability_2013}. However, portability issues may still arise if the hardware supports different versions of the standard. In addition, there can also be issues in terms of performance portability due to architecture differences and compiler optimizations available on each platform \cite{performance_portability_2013, performance_portability_2019, performance_portability_2020}. For maximum performance, some tweaking of the source code may still be necessary depending on which device is being targeted \cite{optimizing_opencl_fpga_integer, optimizing_opencl_fpga_automata}.
 
 SPIR-V is an intermediate language which is also supported as an input language for OpenCL. Instead of distributing and ingesting OpenCL C in the host, developers can precompile their kernels into SPIR-V, allowing for faster kernel load times and avoiding directly exposed source code \cite{spir_overview}. While SPIR-V is also supported by the Vulkan \cite{vulkan} graphics API, it uses a different execution mode of the language (\textbf{GLCompute} versus \textbf{Kernel} for OpenCL), so compute codes are not interchangeable \cite{spir_spec}. Another caveat is that SPIR-V support is only mandatory for OpenCL 2.1 and 2.2 devices, support was made optional for OpenCL 3.0 devices \cite{opencl_spec}.
 
@@ -213,7 +202,56 @@ Up until version 4.0, OpenMP only allowed for this code to be compiled for and e
 Finally, the possibility to use both models at the same time exists. Works like \cite{openmp_openacc_multigpus} exploit parallelism on the CPU with OpenMP to schedule code to run on multiple GPUs. \cite{openmp_openacc_molecular_docking} also leverages this hybrid approach to run kernels which are more GPU friendly on the GPU using OpenACC while running less friendly kernels with OpenMP CPU parallelization. 
 
 \section{SYCL}
+SYCL \cite{sycl_2020_standard} is a C++ programming model for heterogeneous computing. It builds on the underlying concepts, portability and flexibility of parallel APIs or standards like OpenCL while adding the ease of use and flexibility of single-source C++. Device and host code live on the same file and can be written in C++ according to the C++17 standard (ISO/IEC 14882:2017 Programming languages — C++) \cite{cpp17} and also the newest C++20 standard (ISO/IEC 14882:2020 Programming languages — C++) \cite{cpp20}. 
 
+For compatibility reasons, the entire set of C++ features is not available in device code. In particular, SYCL device code does not support virtual function calls, function pointers, exceptions, runtime type information and dynamic memory allocation.  This still leaves a big portion of the standard which is compatible with host and device code alike, allowing the reuse of types, library code, templates and abstractions. In addition, the programmer does not need to switch between languages depending which part of the code base they are modifying. It is also important to note that, as long as there is no dependence created with the underlying SYCL implementation, a standard C++ compiler can compile SYCL programs to run directly on the host CPU, without any external accelerator.
+
+To allow for easy integration, SYCL is designed to allow each source file to be passed through multiple different compilers, the outputs of which will be combined into a single source file. The programmer can then add SYCL code to an existing project and continue using their preferred host compiler while the SYCL tools handle compilation for the device code.
+
+An example SYCL code snippet can be seen below. 
+
+\begin{lstlisting}[style=CStyle, caption=SYCL saxpy example]
+using namespace sycl;
+float A;
+float h_X[100], h_Y[100], h_Z[100];
+
+// ... initialize A, h_X, h_Y ...
+
+queue q; // Queue to enqueue work to the default device
+
+// Wrap the arrays in buffers
+buffer<float,1> d_X { h_X, range<1>(100) };
+buffer<float,1> d_Y { h_Y, range<1>(100) };
+buffer<float,1> d_Z { h_Z, range<1>(100) };
+
+q.submit([&](handler& h) {
+    auto X = d_X.get_access<access::mode::read>(h);
+    auto Y = d_Y.get_access<access::mode::read>(h);
+    auto Z = d_Z.get_access<access::mode::read_write>(h);
+
+    // Enqueue a parallel_for task with 100 work-items executing the saxpy kernel
+    h.parallel_for(100, [=] (id<1> idx) {
+        Z[idx] = A * X[idx] + Y[idx];
+    });
+});
+q.wait();
+\end{lstlisting}
+
+The code within the the lambda argument to the \texttt{parallel\_for} is the device kernel. This code will be compiled using the device compiler and executed on the device.
+
+SYCL can be laid out on top of multiple backends. A backend exposes one or multiple SYCL platforms (collections of devices). For example, implementations can expose an OpenCL backend to give access to OpenCL devices, or a CUDA backend to give access to NVIDIA GPUs. Apart from the generic API that all backends must implement in order to provide the basic device functionality, each backend can expose their specific features through interoperability headers to provide the developer with more control at the expense of portability.
+
+When building a SYCL application, the user can choose the backends which will be used. This is the set of \textit{active backends} for the application. The application can then be run on any host platform that supports at least one of the active backends. The subset of active backends which are supported by the host platform at runtime are called the \textit{available backends}.
+
+A diagram with the SYCL implementations in development and their provided backends can be seen in figure \ref{fig:sycl-implementations}. As shown, the available SYCL implementations cover a wide range of hardware. As long as the programmer does not use any backend-specific feature, their application can be executed in any available implementation without modifications.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/sycl-implementations.png}
+    \captionsetup{justification=centering}
+    \caption{SYCL implementations in development (Credit: Khronos Group)}
+    \label{fig:sycl-implementations}
+\end{figure}
 
 \subsection{Celerity}
 
