@@ -69,9 +69,9 @@ All the kernels were written in Cg, a general purpose language for GPUs released
 \subsection{Brook}
 Languages like Cg, Microsoft's HLSL and OpenGL's GLslang allowed for shaders to be written in C-like syntax. However, they still required the programmer to express GPU applications in terms of graphics primitives and to use the existing graphics APIs to control the rest of the graphics pipeline, such as memory allocation and loading programs. In August 2004 researchers at Stanford University present Brook \cite{brook}, a programming environment that provides developers with a view of the GPU as a streaming coprocessor.
 
-Instead of working with textures and shaders, the Brook language allows the programmer to think in terms of streams and kernels. A stream is a collection of records (elements) and is denoted by angle-brackets, i.e. \texttt{float x<100>}. Access to streams is limited to kernels and the \texttt{streamRead} and \texttt{streamWrite} operators, which transfer memory between memory and streams. A kernel is a function that performs parallel operations over one or more streams. Calling a kernel on a stream performs an implicit loop over the elements of the stream, invoking the body of the kernel for each element. An example Brook snippet can be seen below.
+Instead of working with textures and shaders, the Brook language allows the programmer to think in terms of streams and kernels. A stream is a collection of records (elements) and is denoted by angle-brackets, i.e. \texttt{float x<100>}. Access to streams is limited to kernels and the \texttt{streamRead} and \texttt{streamWrite} operators, which transfer memory between memory and streams. A kernel is a function that performs parallel operations over one or more streams. Calling a kernel on a stream performs an implicit loop over the elements of the stream, invoking the body of the kernel for each element. An example Brook snippet can be seen in listing \ref{lst:brook_saxpy}.
 
-\begin{lstlisting}[style=BrookStyle, caption=Brook saxpy example]
+\begin{lstlisting}[style=BrookStyle, caption=Brook saxpy example, float, floatplacement=H, label={lst:brook_saxpy}]
 kernel void saxpy(float a, float4 x<>, float4 y<>, out float4 result<>) {
     result = a*x + y;
 }
@@ -202,15 +202,15 @@ Up until version 4.0, OpenMP only allowed for this code to be compiled for and e
 Finally, the possibility to use both models at the same time exists. Works like \cite{openmp_openacc_multigpus} exploit parallelism on the CPU with OpenMP to schedule code to run on multiple GPUs. \cite{openmp_openacc_molecular_docking} also leverages this hybrid approach to run kernels which are more GPU friendly on the GPU using OpenACC while running less friendly kernels with OpenMP CPU parallelization. 
 
 \section{SYCL}
-SYCL \cite{sycl_2020_standard} is a C++ programming model for heterogeneous computing. It builds on the underlying concepts, portability and flexibility of parallel APIs or standards like OpenCL while adding the ease of use and flexibility of single-source C++. Device and host code live on the same file and can be written in C++ according to the C++17 standard (ISO/IEC 14882:2017 Programming languages — C++) \cite{cpp17} and also the newest C++20 standard (ISO/IEC 14882:2020 Programming languages — C++) \cite{cpp20}. 
+SYCL \cite{sycl_2020_standard} is a C++ programming model for heterogeneous computing. It builds on the underlying concepts, portability and flexibility of parallel APIs or standards like OpenCL while adding the ease of use and flexibility of single-source C++. Initially, SYCL was released as OpenCL SYCL with a provisional specification in 2014 and acted as a higher level API to interact with OpenCL devices. Since the newest SYCL 2020 standard the model has become more generalized, making OpenCL just one of the different potential programming models SYCL can be based upon \cite{sycl_faq}.
 
-For compatibility reasons, the entire set of C++ features is not available in device code. In particular, SYCL device code does not support virtual function calls, function pointers, exceptions, runtime type information and dynamic memory allocation.  This still leaves a big portion of the standard which is compatible with host and device code alike, allowing the reuse of types, library code, templates and abstractions. In addition, the programmer does not need to switch between languages depending which part of the code base they are modifying. It is also important to note that, as long as there is no dependence created with the underlying SYCL implementation, a standard C++ compiler can compile SYCL programs to run directly on the host CPU, without any external accelerator.
+In SYCL, device and host code live on the same file and can be written in C++ according to the C++17 standard (ISO/IEC 14882:2017 Programming languages — C++) \cite{cpp17} and also the newest C++20 standard (ISO/IEC 14882:2020 Programming languages — C++) \cite{cpp20}. For compatibility reasons, the entire set of C++ features is not available in device code. In particular, SYCL device code does not support virtual function calls, function pointers, exceptions, runtime type information and dynamic memory allocation.  This still leaves a big portion of the standard which is compatible with host and device code alike, allowing the reuse of types, library code, templates and abstractions. In addition, the programmer does not need to switch between languages depending which part of the code base they are modifying. It is also important to note that, as long as there is no dependence created with the underlying SYCL implementation, a standard C++ compiler can compile SYCL programs to run directly on the host CPU, without any external accelerator.
 
 To allow for easy integration, SYCL is designed to allow each source file to be passed through multiple different compilers, the outputs of which will be combined into a single source file. The programmer can then add SYCL code to an existing project and continue using their preferred host compiler while the SYCL tools handle compilation for the device code.
 
-An example SYCL code snippet can be seen below. 
+An example SYCL code snippet can be seen in listing \ref{lst:sycl_saxpy}. 
 
-\begin{lstlisting}[style=CStyle, caption=SYCL saxpy example]
+\begin{lstlisting}[style=CStyle, caption=SYCL saxpy example, float, floatplacement=H, label={lst:sycl_saxpy}]
 using namespace sycl;
 float A;
 float h_X[100], h_Y[100], h_Z[100];
@@ -252,6 +252,17 @@ A diagram with the SYCL implementations in development and their provided backen
     \caption{SYCL implementations in development (Credit: Khronos Group)}
     \label{fig:sycl-implementations}
 \end{figure}
+
+In \cite{performance_portability_multimaterial_kernels} Reguly studies the performance of multiple different programming models on both CPUs and GPUs. These programming models include: OpenMP, OpenACC, CUDA, SYCL and Kokkos (covered in the following section). In the paper, two multi-material simulation problems are used as benchmarks. In multi-material simulations, each cell in the simulation domain can have one or multiple different materials. Given these multi-material cells, the three algorithms used to solve the proposed benchmark problems compute the density and pressure of each material over each cell and their neighboring cells. Performance is measured in terms of fraction of peak performance, where peak performance is the theoretical maximum memory bandwidth possible for each device. In GPUs, SYCL (in particular the hipSYCL implementation) is able to achieve very similar results to pure CUDA kernels, the best performing model, in both problems. The story is different when looking at CPUs, where SYCL implementations are 5-15\% slower than OpenMP ones.
+
+\cite{sycl_hpc_applications} presents a more recent survey of SYCL performance. It evaluates the memory bandwidth achieved by three different applications: 
+\begin{itemize}
+    \item BabelStream: a popular measure of memory transfer speeds to and from global device memory.
+    \item Heat: 5-point stencil which computes the weighted average between a cell and their four neighbors.
+    \item CloverLeaf: largest application in the group, measuring at about 8,000 lines of code. It is composed of around 11 routines, each one performing either point-wise or stencil updates over a 2D grid.
+\end{itemize}
+All these applications are memory bandwidth bound, as it is common in HPC applications today.
+In this study SYCL proved to incur in very little overhead over the underlying implementations. Any performance problems shown in the applications were also reproduced in the direct implementations for the underlying programming models, so they are not SYCL level issues. What this study shows is that there is a clear need for better vendor support. All GPU implementations rely on open source projects which do not offer commercial support from the hardware vendors. Also, as SYCL is currently mostly built on top of other programming models, it requires the maturity and support of their implementations as well.
 
 \subsection{Celerity}
 
