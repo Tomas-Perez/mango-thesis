@@ -265,27 +265,18 @@ All these applications are memory bandwidth bound, as it is common in HPC applic
 In this study SYCL proved to incur in very little overhead over the underlying implementations. Any performance problems shown in the applications were also reproduced in the direct implementations for the underlying programming models, so they are not SYCL level issues. What this study shows is that there is a clear need for better vendor support. All GPU implementations rely on open source projects which do not offer commercial support from the hardware vendors. Also, as SYCL is currently mostly built on top of other programming models, it requires the maturity and support of their implementations as well.
 
 \subsection{Celerity}
+Celerity \cite{celerity} is an API for programing distributed memory accelerator clusters. It is built on top of SYCL and extends its programming model, allowing the user to distribute the work and data across multiple nodes in an automatic way. Celerity also leverages MPI (Message Passing Interface) \cite{mpi} to enable inter-node communication.
+
+The Celerity extensions act as a wrapper over the SYCL runtime, handling inter-node communication and scheduling while each individual node executes the SYCL kernel in parallel. In order to enable this, Celerity introduces a global distributed queue, replacing the device local queues of SYCL. It also adds the requirement to specify the data access of each kernel, for reading and writing to the buffers. This allows Celerity to know before hand which pieces of data need to be present at each node when distributing the work and also to reconstruct the output buffer when the execution finishes.
+
+The execution model of Celerity is arranged in a master/worker fashion. Each worker node encapsulates the available accelerator hardware and receives commands coming from a master node, which is responsible for scheduling the work. In order to construct a dependency graph of the kernels to execute, the Celerity runtime executes the programs twice. First, in the \textit{pre-pass}, information about the kernel is collected, this includes buffer accesses, how these accesses are mapped into outputs, and the global size of the kernel. With this data, the master can construct the graph and generate commands to distribute to the workers. These commands not only contain buffer data and the kernel function but also dependency information, allowing the workers, during the \textit{live-pass}, to perform peer-to-peer communication as necessary and start execution as soon as their dependencies are fulfilled, instead of requiring communication with the master at each instance. This means that Celerity does not induce any extra bandwidth overhead compared to a fully decentralized approach.
 
 \section{Kokkos}
 \cite{kokkos}
 
-\section{Other Programming Models}
-
-\subsection{AMD ROCm}
+\section{AMD ROCm}
 AMD ROCm is an open-source software development platform for HPC GPU computing. It is AMD's latest competitor to NVIDIA's CUDA. 
 
 During the 
 
-
 HIP is a C++ Runtime API and kernel language very similar to CUDA that is portable across NVIDIA and AMD GPUs. It is a part of the AMD ROCm ecosystem, an open source project led by AMD. Supporting both vendors and being open source gives it an advantage over CUDA, however the high level of CUDA adoption has slowed down support for HIP in accelerated applications.
-
-\subsection{C++ AMP}
-Appears dead. Stack overflow post by one of the authors \url{https://stackoverflow.com/a/38604348/7983805}
-
-\section{Standalone works}
-
-Here goes what we don't where to put. Also may be deleted entirely.
-
-\subsection{Kernel scheduling}
-
-\cite{dynamic_self_scheduling} presents HDSS, a Heterogeneous Dynamic Self Scheduler, which can reschedule at runtime how the workload is partitioned across the devices. This is achieved by a two phase approach. First, in the adaptive phase, the scheduling algorithm will measure the relative performance across devices by dispatching increasing block sizes. Once an accurate performance approximation for each device is calculated, the completion phase starts. Here the scheduler assigns the largest possible block size to each device, according to its calculated performance, in order to minimize data transfer overhead. The approach presented not only keeps all devices busy during the entire execution, but also fully utilizes them by providing appropriate block sizes. 
