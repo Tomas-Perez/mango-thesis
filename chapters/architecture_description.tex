@@ -23,7 +23,7 @@ The user-facing module (Libmango), therefore, needs to operate in a way that is 
 \section{Core elements}
 Throughout the multiple MANGO modules, there are a few core elements often present in each module. These are the components necessary to specify and control an user application and its execution. Although their names may vary from module to module, here they are defined as Kernel, Memory Buffer, Event and Task graph.
 
-\subsubsection{Kernel}
+\subsection{Kernel}
 In computing, a compute kernel is a routine compiled for high throughput accelerators (such as graphics processing units (GPUs), digital signal processors (DSPs) or field-programmable gate arrays (FPGAs)), separate from but used by a main program (typically running on a central processing unit). \cite{kernel_wikipedia}
 
 The MANGO system manages user defined Kernels and their execution. For a particular Kernel, multiple sources (accelerator specific implementations of the kernel) can be specified. The architectures for which an implementation is available are considered in the kernel-accelerator assignation process by the resource manager. 
@@ -38,9 +38,15 @@ Three types of kernel arguments are supported:
     \item Event Argument: A pointer to an Event data type.
 \end{itemize}
 
-\subsubsection{Memory Buffer}
+\subsection{Memory Buffer}
 %TODO better diagram
-\includegraphics[scale=0.5]{img/kernel_buffer.png}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/kernel_buffer.png}
+    \captionsetup{justification=centering}
+    \caption{Input and Output Buffers}
+    \label{fig:in_out_buffers}
+\end{figure}
 
 In computer science, a data buffer (or just buffer) is a region of a physical memory storage used to temporarily store data while it is being moved from one place to another. \cite{buffer_wikipedia}
 
@@ -48,7 +54,7 @@ Kernels read from Input Buffers and write to Output Buffers for inter-kernel and
 
 A Memory Buffer is defined by the user and allocated by MANGO at the target architectures, where a Kernel that makes use of said Buffer (as either input or output) is assigned.
 
-\subsubsection{Event}
+\subsection{Event}
 
 An event is a data structure utilized for communication and synchronization of different parts of the system.
 
@@ -56,7 +62,7 @@ User defined events can be accessed by Kernels through Event Arguments, providin
 
 By default, MANGO utilizes kernel termination events for both internal and host synchronization.
 
-\subsubsection{Task Graph}
+\subsection{Task Graph}
 
 The Task Graph gives a global picture of the application's behaviour and represents data and control dependencies between Kernels, Memory Buffers and Events. The Task Graph provides the resource manager with the information needed to generate the best feasible resource allocation for the requested QoS. \cite{mango_exploring_manycore_architectures}
 
@@ -331,7 +337,7 @@ typedef struct hhal_event_t {
 
 Architecture managers can expand these base structures to add architecture specific information that they may require. For example, the following are the structures used by the Nvidia Manager.
 
-\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Extended structures]
+\begin{lstlisting}[style=CStyle, label={HHAL:NvidiaStructs}, caption=HHAL Nvidia Manager - Extended structures]
 typedef struct nvidia_kernel_t {
     int id;
     int gpu_id;
@@ -375,6 +381,15 @@ void HHAL::example_function(Unit unit, hhal_kernel *info) {
     }
 }
 \end{lstlisting}
+
+%TODO better diagram
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/hhal_dispatcher.png}
+    \captionsetup{justification=centering}
+    \caption{HHAL API dispatching flow}
+    \label{fig:hhal_dispatcher}
+\end{figure}
 
 \subsection{HHAL API}
 
@@ -433,7 +448,7 @@ Communication with the corresponding accelerator is handled by the architecture'
 \subsubsection{Event Actions}
 Events that are allocated in an accelerator require the capability of being written and read. The HHAL API provides a write function that takes the event's id and the data to write, and a read function that takes the event's id and a pointer to host memory where to read the data into.
 
-\begin{lstlisting}[style=CStyle, caption=HHAL API - Buffer actions]
+\begin{lstlisting}[style=CStyle, caption=HHAL API - Event actions]
     HHALExitCode write_sync_register(int event_id, uint32_t data);
     HHALExitCode read_sync_register(int event_id, uint32_t *data);
 \end{lstlisting}
@@ -450,7 +465,7 @@ Multiple kernel's source types are supported by HHAL, this is further explained 
     HHALExitCode kernel_start(int kernel_id, const Arguments &arguments);
 \end{lstlisting}
 
-After a Kernel is written and it's dependencies are correctly set up, it can be ran, or "started" via the kernel start function. As kernels require argument support, this function not only takes the kernel's id but also an \textbf{Arguments} object which consists of a vector of kernel arguments.
+After a Kernel is written and its dependencies are correctly set up, it can be ran, or "started" via the kernel start function. As kernels require argument support, this function not only takes the kernel's id but also an \textbf{Arguments} object which consists of a vector of kernel arguments.
 
 Three types of arguments are supported by HHAL: Scalar arguments, Buffer arguments and Event arguments. These are the arguments wrapped by Libmango for the user to provide. \ref{Libmango:KernelManagement} 
 
@@ -471,11 +486,11 @@ The Dynamic Compiler included in the HHAL module offers the functionality of "dy
 As previously mentioned, HHAL supports multiple types of kernel sources: 
 
 \begin{lstlisting}[style=CStyle, caption=HHAL API - Kernel source types]
-    enum class source_type {
-        BINARY,
-        SOURCE,
-        STRING
-    };
+enum class source_type {
+    BINARY,
+    SOURCE,
+    STRING
+};
 \end{lstlisting}
 
 The \textbf{BINARY} type is for pre-compiled kernels in binary format. While \textbf{SOURCE} and \textbf{STRING} refer to source code in a file or in a string in memory respectively.
@@ -485,13 +500,13 @@ The Dynamic Compiler is automatically used by HHAL when either a SOURCE or a STR
 The usage of the Dynamic Compiler is simple, requiring only the instantiation of a \textbf{Compiler} object, and a single \textbf{get\_binary()} function call to obtain a kernel's binary from its source.
 
 \begin{lstlisting}[style=CStyle, caption=HHAL Dynamic Compiler - Compiler class]
-    class Compiler {
-        public:
-            Compiler();
-            const std::string get_binary(const std::string source, hhal::Unit arch);
+class Compiler {
+    public:
+        Compiler();
+        const std::string get_binary(const std::string source, hhal::Unit arch);
 
-            [...]
-    };
+        [...]
+};
 \end{lstlisting}
 
 Internally, the Dynamic Compiler has a set of alternatives to work with, depending on its configuration and the target architecture of a specific source.
@@ -502,25 +517,25 @@ Otherwise, compilation is done through system calls as specified in the configur
 
 In the case of CUDA kernels (targeting Nvidia accelerators), the CUDA Compiler tool \ref{Nvidia:CudaCompiler} from the Nvidia Architecture Node is utilized for compilation. This tool exploits the CUDA runtime compilation library NVRTC to compile CUDA kernels into a ptx format as required by the Nvidia Architecture Node.
 
-\subsubsection{Configuration}
+\subsubsection{Configuration} \label{HHAL:DynamicCompilerConfiguration}
 
 On initialization, the Dynamic Compiler reads a configuration file located in its installation directory. Through this configuration, the user can specify the tools to utilize for the compilation process.
 
 \begin{lstlisting}[style=CStyle, caption=HHAL Dynamic Compiler - Configuration example]
-    [compiler]
-    expiration=86400
+[compiler]
+expiration=86400
 
-    [GN]
-    libclang=false
-    path=cc
+[GN]
+libclang=false
+path=cc
 
-    // Syntax
-    [ARCHITECTURE_NAME]
-    libclang=true_or_false
-    path=path_to_compiler
+// Syntax
+[ARCHITECTURE_NAME]
+libclang=true_or_false
+path=path_to_compiler
 \end{lstlisting}
 
-In the previous configuration example, under \textbf{[compiler]}, the \textbf{expiration} time for a compiled kernel binary file is specified in seconds, this parameter is further explained in the Binary Caching subsection \ref{HHAL:BinaryCaching}.
+In the previous configuration example, under \textbf{[compiler]}, the \textbf{expiration} time for compilation related kernel files is specified in seconds, this parameter is further explained in the Caching subsection \ref{HHAL:DynamicCompilerBinaryCaching}.
 
 Then, for each supported architecture (\textbf{[ARCHITECTURE\_NAME]}), two parameters can be specified:
 \begin{itemize}
@@ -528,51 +543,218 @@ Then, for each supported architecture (\textbf{[ARCHITECTURE\_NAME]}), two param
     \item \textbf{path:} The path to a compiler tool installed in the user's machine to be used when compiling kernels for this architecture. Also works as a fallback option if libclang is not available in the system.
 \end{itemize}
 
-\subsubsection{Caching} \label{HHAL:BinaryCaching}
+\subsubsection{Caching} \label{HHAL:DynamicCompilerBinaryCaching}
 
+The Dynamic Compiler implements a caching mechanism to avoid the re-compilation of previously used kernels, exchanging disk space for processing time.
+
+When a kernel is compiled, the compilation output is saved into a file under the caching directory specified at installation. Each time a kernel is sent to the Dynamic Compiler for compilation, an internal check is performed to see whether the source file has already been compiled. This is done by checking if there is a compiled kernel file with the same name as the source file, and if the source file has been modified since.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Dynamic Compiler - Save kernel string to file]
+const std::string save_to_file(const std::string kernel_string);
+\end{lstlisting}
+
+If the kernel was loaded as a memory string, HHAL first calls the \textbf{save\_to\_file()} utility function, provided by the Dynamic Compiler, which saves the kernel string as a source file, and then uses this file for compilation. The saved source file is named with the hash of the input string, which allows for fast checking if a kernel source has already been saved.
+
+To prevent the problem of ever-growing disk space usage, every time a kernel is sent for compilation, the Dynamic Compiler runs a procedure to delete unused (expired) files from the caching directory. The \textbf{expiration} time can be specified in the Dynamic Compiler configuration file \ref{HHAL:DynamicCompilerConfiguration}, defaulting to three days.
 
 \subsubsection{Kernel entry generation}
 
-For Kernels that fall under the GN architecture group...
-%#pragma mango_gen_entrypoint
+For Kernels that fall under the GN architecture group, an entry point (main function) receiving the kernel's arguments as string values is required, since kernels are executed through a system call.
 
+The Dynamic Compiler is capable of automatically generating the GN entry point, given that the user annotates the source kernel code accordingly, like in the following sample.
 
+\begin{lstlisting}[style=CStyle, caption=HHAL Dynamic Compiler - Kernel source annotation sample]
+#include "dev/mango_hn.h"
+#include "dev/debug.h"
+#include <stdlib.h>
 
+#pragma mango_gen_entrypoint
+
+#pragma mango_kernel
+void kernel_function(int a, float *x, float *y, float *out, int n) {
+    for (int i=0; i<n; i++) {
+	    out[i] = a * x[i] + y[i];
+    }
+}
+\end{lstlisting}
+
+Two pragmas are required for the entry point generation. 
+
+The first \textbf{\#pragma mango\_gen\_entrypoint} indicates that the entry point is to be generated. The second, \textbf{\#pragma mango\_kernel} must be placed a line before the function to be called by the generated entry point, as its arguments are the ones received by the main function.
+
+%TODO include result of entrypoint generation here
+<RESULT OF ENTRYPOINT GENERATION EXAMPLE HERE>
 
 \subsection{Manager example: NVIDIA Manager}
 
+HHAL was developed from the ground up with the goal of facilitating its extension via the addition of support for new architectures.
 
+Each new architecture requires a manager that implements the HHAL API function calls for that architecture, acting as a bridge between the MANGO system and the particular target accelerator's library.
 
+Modifications to the existing HHAL code resolve to the addition of the new architecture type and calls to the manager when dispatching the multiple API actions.
 
+In this section, we will go over the Nvidia Manager to exemplify the implementation of an HHAL Manager. The Nvidia Manager communicates with the Nvidia Architecture Node \ref{NvidiaArchitectureNode}, referenced in code as \textbf{CudaApi}, which is the library implemented for launching kernels in Nvidia GPUs.
 
+\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Manager Class]
+class NvidiaManager {
+    public:
+        NvidiaManagerExitCode assign_kernel(nvidia_kernel *info);
+        NvidiaManagerExitCode assign_buffer(nvidia_buffer *info);
+        NvidiaManagerExitCode assign_event(nvidia_event *info);
 
-\begin{itemize}
-    \item heterogeneous hardware abstraction layer
-    \item module of the mango system that communicates with accelerator libraries
-    \item abstracts accelerator specific information in a way that allows the resource manager to still fully exploit architecture specific features while freeing libmango from the complexity of handling multiple architectures.
-    \item exposes an architecture-agnostic API with the necessary functionalities to manage kernels, buffers and events on any of the supported architectures.
-    \item HHAL works in a client-server manner. The server is run as a daemon and the client is used by other modules to communicate with it. In this way both BarbecueRTRM and Libmango can make use of a common instance of the HHAL module.
-    \item functionalities
-    \begin{itemize}
-        \item resource assignation
-        \item resource allocation/deallocation
-        \item buffer: read/write
-        \item event: read/write
-        \item kernel: multisource, running, arguments
-    \end{itemize}
-    \item - API function to function description (maybe include the functions in the previous section and dont do this one)
-    \item step by step of how an application would run: assign stuff, allocate stuff, write buffers, start kernel
-    \item dynamic compiler (can be explained in functionalities, under kernel->multisource, or reference from there to this section)
-    \item Architecture managers
+        NvidiaManagerExitCode deassign_kernel(int kernel_id);
+        NvidiaManagerExitCode deassign_buffer(int buffer_id);
+        NvidiaManagerExitCode deassign_event(int event_id);
 
-    In order to work with each supported architecture, an architecture manager is required. Each architecture manager provides an implementation of the HHAL API for their respective architecture, defining architecture specific data types for each of the core elements (kernel, buffer, event). 
-    \begin{itemize}
-        \item NVIDIA
-        \item GN 
-    \end{itemize}
-\end{itemize}
+        NvidiaManagerExitCode kernel_write(int kernel_id, std::string image_path);
+        NvidiaManagerExitCode kernel_start(int kernel_id, const Arguments &arguments);
 
-\section{CUDA Manager}
+        NvidiaManagerExitCode allocate_memory(int buffer_id);
+        NvidiaManagerExitCode allocate_kernel(int kernel_id);
+        NvidiaManagerExitCode allocate_event(int event_id);
+        
+        NvidiaManagerExitCode release_memory(int buffer_id);
+        NvidiaManagerExitCode release_kernel(int kernel_id);
+        NvidiaManagerExitCode release_event(int event_id);
+
+        NvidiaManagerExitCode write_to_memory(int buffer_id, const void *source, size_t size);
+        NvidiaManagerExitCode read_from_memory(int buffer_id, void *dest, size_t size);
+        NvidiaManagerExitCode write_sync_register(int event_id, uint32_t data);
+        NvidiaManagerExitCode read_sync_register(int event_id, uint32_t *data);
+       
+    private:
+        void launch_kernel(int kernel_id, char *arg_array, int arg_count, char* scalar_allocations);
+
+        std::map<int, nvidia_kernel> kernel_info;
+        std::map<int, nvidia_buffer> buffer_info;
+        std::map<int, nvidia_event> event_info;
+
+        std::map<int, std::string> kernel_function_names;
+        ThreadPool thread_pool;
+        EventRegistry registry;
+        CudaApi cuda_api;
+};
+\end{lstlisting}
+
+The public function definitions mirror the HHAL API functions, which delegate the execution to the indicated manager. 
+
+Observing the assignation functions, the received arguments are pointers to structures defined by the Nvidia Manager. As mentioned in the HHAL API section \ref{HHAL:NvidiaStructs}, these structures are extensions of the base structures used in the HHAL API, and they represent the three core elements of the MANGO system (kernels, buffers and events) with the addition of the information required by the Nvidia Architecture Node.
+
+The Manager keeps track of the assigned elements in three different maps, one for each element, mapping the element's id to their respective extended data structure.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Kernel assignation]
+NvidiaManagerExitCode NvidiaManager::assign_kernel(nvidia_kernel *info) 
+{
+    kernel_info[info->id] = *info;
+    return NvidiaManagerExitCode::OK;
+}
+\end{lstlisting}
+
+In assign/deassign functions, elements get added or removed from the maps respectively.
+
+\subsubsection{Buffers}
+
+Buffer allocation follows a simple procedure. The Nvidia Architecture Node takes a buffer id and size as parameters for the memory allocation call, so the manager just delegates the allocation given the information received at assignation time.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Kernel assignation]
+NvidiaManagerExitCode NvidiaManager::allocate_memory(int buffer_id) {
+    nvidia_buffer &info = buffer_info[buffer_id];
+    CudaApiExitCode err = cuda_api.allocate_memory(info.mem_id, info.size);
+    //error handling...
+}
+\end{lstlisting}
+
+A similar course of action is followed in memory read and write operations, delegating their execution to the architecture library.
+
+\subsubsection{Events}
+
+Since the Nvidia Architecture Node does not support events, the Nvidia Manager handles them internally. This is carried out using an event registry, which implements the basic event functionalities.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Event registry]
+class EventRegistry {
+    public:
+        EventRegistryExitCode add_event(int event_id);
+        EventRegistryExitCode remove_event(int event_id);
+        EventRegistryExitCode read_event(int event_id, uint32_t *data);
+        EventRegistryExitCode write_event(int event_id, uint32_t data);
+    private:
+        std::mutex registers_mtx;
+        std::map<int, uint32_t> registers;
+};
+\end{lstlisting}
+
+Since event arguments are not supported for Nvidia kernels, only kernel termination events are handled.
+
+\subsubsection{Kernels}
+
+Aside from assignation and allocation, there are two main actions the manager must implement regarding kernels: write and start. 
+
+\textbf{kernel\_write()} writes the kernel image in the accelerator's memory space. The Nvidia Manager also extracts the function name from the provided kernel, as it is required when on kernel launch.
+
+\textbf{kernel\_start()} starts kernel execution in the target accelerator, with two relevant considerations: argument handling and non-blocking kernel launch.
+
+The target architecture's library likely define their own kernel arguments, as is the case for the Nvidia Architecture Node, so they must be translated from the HHAL version into their Nvidia Architecture Node counterpart.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Kernel arguments translation]
+NvidiaManagerExitCode NvidiaManager::kernel_start(int kernel_id, const Arguments &arguments) {
+    //...
+    char *current_arg = arg_array; //Base of arguments array to be sent to NAN
+    for(auto &arg: args) {
+        switch (arg.type) {
+            case ArgumentType::BUFFER: {
+                auto &b_info = buffer_info[arg.buffer.id];
+                // Omitted: Check if buffer is an input buffer...
+                auto *arg_x = (cuda_manager::BufferArg *) current_arg;
+                *arg_x = {cuda_manager::BUFFER, b_info.id, is_in};
+                current_arg += sizeof(cuda_manager::BufferArg);
+                break;
+            } 
+            case ArgumentType::SCALAR: {
+                hhal::scalar_arg scalar = arg.scalar;
+                auto *arg_a = (cuda_manager::ScalarArg *) current_arg;
+                // Omitted: Allocate scalar value locally so it's not deallocated until kernel terminates...
+                *arg_a = {cuda_manager::SCALAR, (void *)allocated_scalar};
+                current_arg += sizeof(cuda_manager::ScalarArg);
+                break;
+            }
+            //...
+}
+\end{lstlisting}
+
+Since the nature of MANGO requires kernel launching to be non-blocking, for each kernel start action a task executing the private \textbf{launch\_kernel()} procedure is added to an internal thread pool.
+
+\begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Kernel launch]
+NvidiaManagerExitCode NvidiaManager::kernel_start(int kernel_id, const Arguments &arguments) {
+    // Omitted: Argument translation...
+
+    // Push launch_kernel task
+    thread_pool.push_task(std::bind(&NvidiaManager::launch_kernel, this, kernel_id, arg_array, arg_count, scalar_allocations));
+
+    return NvidiaManagerExitCode::OK;
+}
+
+void NvidiaManager::launch_kernel(int kernel_id, char *arg_array, int arg_count, char* scalar_allocations) {
+    nvidia_kernel &info = kernel_info[kernel_id];
+
+    CudaResourceArgs r_args = {info.gpu_id, 
+                    {info.grid_dim_x, info.grid_dim_y, info.grid_dim_z, 
+                    {info.block_dim_x, info.block_dim_y, info.block_dim_z}};
+
+    auto &termination_event = event_info[info.termination_event];
+    CudaApiExitCode err = cuda_api.launch_kernel(kernel_id, kernel_function_names[kernel_id].c_str(), r_args, arg_array, arg_count);
+
+    // Omitted: Deallocation and error handling...
+
+    // Notify kernel termination
+    write_sync_register(termination_event.id, 1); 
+}
+\end{lstlisting}
+
+Worker threads continuously execute pending tasks from the tasks queue managed by the thread pool. 
+The \textbf{launch\_kernel()} function calls the Nvidia Architecture Node (blocking) procedure to execute the kernel and passes the necessary arguments.
+Once the execution finishes, the kernel's termination event is notified.
+
+\section{Nvidia Architecture Node} \label{NvidiaArchitectureNode}
 
 - ptx format 
 %https://docs.nvidia.com/cuda/inline-ptx-assembly/index.html#:~:text=The%20NVIDIA%C2%AE%20CUDA%C2%AE,the%20PTX%20ISA%20reference%20document.
