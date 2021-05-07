@@ -171,22 +171,34 @@ Today, OpenCL is at the forefront of heterogeneous architecture programming. Sev
     \caption{OpenCL accelerated applications (Credit: Khronos Group)}
 \end{figure}
 
-Due to its popularity, a significant amount papers have been published looking into different types of extensions on the framework. We will focus on the extensions that are particularly relevant to our work. Section \ref{sub-sect:abstraction-layers} covers abstraction layers on top of OpenCL and section \ref{sub-sect:kernel_scheduling} covers kernel scheduling algorithms.
-
-\subsection{Abstraction Layers} \label{sub-sect:abstraction-layers}
-Even though OpenCL simplifies a big part of heterogeneous systems programming by providing a common API across devices, it still is a complex task. 
-The articles presented in this section focus on simplifying the problem further by adding an abstraction layer on top of OpenCL.
-
+\subsection{EngineCL}
 In EngineCL \cite{enginecl}, a new object-oriented API is introduced. The EngineCL class provides a higher level view of the OpenCL context and management of the available devices. The engine in turn uses a Program object which internally manages all the data transfers between the device buffers, the user only needs to provide host input and output buffers, as well as the kernel arguments in order to begin execution. In addition, multiple devices can be used during a single run, the scheduling of which is handled by a Scheduler object. Different scheduling strategies are tested by the paper, with the best results achieved by the HGuided algorithm. HGuided is a dynamic algorithm which starts by assigning big block sizes to all devices and reducing the size of subsequent ones as the execution progresses. This reduces data transfer and synchronization overhead while allowing devices to finish simultaneously towards the end of the execution.
 
+\subsection{FluidiCL}
 A different approach is presented by FluidiCL \cite{fluidicl}, where the OpenCL API is maintained but implemented in such a way that the user can treat multiple devices as a single entity. Thus, it is very easy to adapt an existing OpenCL application to run using FluidiCL, as all function calls are maintained. The paper considers the implementation running on an experimental system with a single GPU and CPU. At the time of setup, both kernel compilation and buffer writes are broadcasted to both devices. That is, the kernel is compiled for both and, likewise, the input data is transferred to the both of their buffers. When the execution starts, the GPU starts running the kernel with a decreasing order of work-group IDs, meanwhile the CPU executes smaller sub-kernels in increasing order of work-group IDs. At some point, when the work-groups IDs handled by both cross over, the work is finished and the results are merged on the GPU.
 
-\subsection{Kernel Scheduling} \label{sub-sect:kernel_scheduling}
-Multiple different techniques are discussed in order to optimize the scheduling of the kernels on the devices available on the platform. The overall objective always being minimizing the turnaround time of a kernel or group of kernels.
+\section{AMD ROCm}
+Initially announced in November 2015 as the "Boltzmann Initiative", AMD ROCm is an open-source software development platform for HPC GPU computing \cite{boltzmann_initiative}. It is AMD's latest competitor to NVIDIA's CUDA. 
 
-\cite{transparent_cpu_gpu_collaboration} proposes the SKMD (Single Kernel Multiple Devices) system, where the workload of a single kernel can be split among all the available devices. At runtime, a partitioning algorithm will determine how to make this split, based on memory access pattern analysis of the kernel and previous profiling data. An effective partitioning makes sure that the performance improvements outweigh the overhead of extra memory transfers to the different devices. 
+Since shifting their focus away from CTM in 2008 and mainly supporting the OpenCL standard, AMD still lost a significant market share to NVIDIA in the GPGPU market \cite{amd_as_alternative}. Developers preferred the CUDA approach which, although constrained them to NVIDIA products, provided a more convenient programming experience by following a single source model.
 
-Machine learning is an alternative used to forgo the need of profiling the kernels before scheduling. \cite{smart_multitasking_scheduling} achieves this by implementing a model to predict the kernel speedup on a particular device based on static analysis of the code. Also, instead of focusing on a single kernel, it manages scheduling of multiple kernels, possibly belonging to different applications. A very similar approach is also proposed by \cite{load_balance_model_opencl_integrated_cluster}.
+In order to tap more into the GPGPU market, mostly filled by CUDA developers, AMD implemented ROCm and, being more specific, HIP. HIP is a C++ Runtime API and kernel language very similar to CUDA that is portable across NVIDIA and AMD GPUs. Porting a CUDA application to HIP does not involve much more than replacing all instances of \textbf{cuda} in the file with \textbf{hip}. AMD also provides the \textit{Hipify} tool, which performs these operations automatically. 
+
+HIP code can be compiled for either AMD or NVIDIA GPUs. Compilation was previously handled by \texttt{hcc} and \texttt{nvcc} respectively, but these tools have been replaced in ROCm v3.5 by the HIP-Clang compiler, which can compile code for both vendors.
+
+When compared to OpenCL, HIP, like CUDA, has the advantage of a single source C++ programming. Host and device code can live in the same file and use most of C++'s feature set including lambdas, templates and classes. Thus, porting CUDA code is significantly easier for HIP as mentioned previously. Porting from CUDA to OpenCL not only involves separating device code from host code, it also requires translating this device code from C++ to OpenCL C and modify all CUDA function calls and keywords to their OpenCL counter parts. 
+
+As a case study, in SC16 Ben Sander from AMD made a presentation showing the work required to port CAFFE, a popular machine learning framework with 50,000 lines of CUDA code from CUDA to HIP \cite{caffe_rocm_port}. As shown in figure \ref{fig:caffe-rocm-port}, the HIP port of CAFFE only required changing 907 lines of code (LOC), of which 688 or almost 76\% was done automatically. Manual changes to the code took a single developer less than a week to complete. By contrast the OpenCL implementation of CAFFE required changing a more than 30,000 LOC.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/caffe-rocm-port.png}
+    \captionsetup{justification=centering}
+    \caption{Complexity of porting CAFFE, OpenCL vs HIP (Credit: AMD)}
+    \label{fig:caffe-rocm-port}
+\end{figure}
+
+\cite{ginkgo_rocm_port} also presents a case of porting an application from CUDA to HIP. Tsai et al. found the process very smooth and were able to automatize most of the work by extending the initial hipify script to their needs. Although HIP allows them to run their application on both AMD and NVIDIA, they still preferred to keep native support for CUDA and maintain two versions at the same time. Still, this setup allowed them to take advantage of HIP's similarity to CUDA by sharing a third of the code base between both implementations. In the cases where they used CUDA specific functionality, they were able to replicate it in HIP and use a common API to call the appropriate implementation depending on the programming model used. Finally, they also included experiments to show the performance of HIP code compared to native CUDA on NVIDIA GPUs. These tests showed that the overhead of HIP over CUDA is negligible, with 50\% of the test cases showing less than 3\% performance difference and 90\% of the test cases showing less than 10\% of performance difference. 
 
 \section{OpenMP \& OpenACC}
 In this section we will tackle OpenMP and OpenACC in conjunction as they take very similar approaches.
@@ -283,10 +295,3 @@ To implement parallelism, Kokkos provides a set of functions which cover differe
 Kokkos is built on top of multiple backends. This means that it is not tied to any particular underlying implementation and can use the best performing programming model available on a particular platform. These backends include OpenMP, CUDA, ROCm, HPX \cite{hpx}, SYCL and pthreads.
 
 In terms of performance, the initial implementation presented in \cite{kokkos} showed it was capable to achieve at least 90\% of the performance of the architecture specific, optimized variants of the same benchmarks (i.e. comparing Kokkos against OpenMP for CPUs and CUDA for GPUs). \cite{performance_portability_multimaterial_kernels} also evaluates the performance of Kokkos. As mentioned in the SYCL section, this paper uses two different multi-material problems as benchmarks. The performance of Kokkos is overall 6\% lower for the first problem and 22\% lower for the second problem. While CUDA and OpenMP implementations have the advantage, they also require different codebases while Kokkos is completely portable across devices.
-
-\section{AMD ROCm}
-AMD ROCm is an open-source software development platform for HPC GPU computing. It is AMD's latest competitor to NVIDIA's CUDA. 
-
-During the 
-
-HIP is a C++ Runtime API and kernel language very similar to CUDA that is portable across NVIDIA and AMD GPUs. It is a part of the AMD ROCm ecosystem, an open source project led by AMD. Supporting both vendors and being open source gives it an advantage over CUDA, however the high level of CUDA adoption has slowed down support for HIP in accelerated applications.

@@ -201,6 +201,19 @@
   note  = {\url{https://www.khronos.org/blog/sycl-2020-what-do-you-need-to-know}, Accessed: May 2021}
 }
 
+@misc{caffe_rocm_port,
+  title = {{SC16: HIP and CAFFE Porting and Profiling with AMD's ROCm}},
+  year  = {2016},
+  note  = {\url{https://www.youtube.com/watch?v=I7AfQ730Zwc}, Accessed: May 2021}
+}
+
+@misc{boltzmann_initiative,
+  title = {{AMD Launches ‘Boltzmann Initiative’ to Dramatically Reduce Barriers to GPU Computing on AMD FirePro™ Graphics}},
+  month = {Nov},
+  year  = {2015},
+  note  = {\url{https://www.amd.com/en/press-releases/boltzmann-initiative-2015nov16}, Accessed: May 2021}
+}
+
 @inproceedings{transparent_cpu_gpu_collaboration,
   author    = {Lee, Janghaeng and Samadi, Mehrzad and Park, Yongjun and Mahlke, Scott},
   title     = {Transparent CPU-GPU Collaboration for Data-Parallel Kernels on Heterogeneous Systems},
@@ -711,4 +724,46 @@
   volume  = {5},
   journal = {Journal of Open Source Software},
   doi     = {10.21105/joss.02352}
+}
+
+@unknown{ginkgo_rocm_port,
+  author = {Tsai, Yuhsiang and Cojean, Terry and Ribizel, Tobias and Anzt, Hartwig},
+  year   = {2020},
+  month  = {06},
+  pages  = {},
+  title  = {Preparing Ginkgo for AMD GPUs -- A Testimonial on Porting CUDA Code to HIP}
+}
+
+@article{molecular_dynamics_rocm_port,
+  author   = {Nikolay Kondratyuk and Vsevolod Nikolskiy and Daniil Pavlov and Vladimir Stegailov},
+  title    = {GPU-accelerated molecular dynamics: State-of-art software performance and porting from Nvidia CUDA to AMD HIP},
+  journal  = {The International Journal of High Performance Computing Applications},
+  volume   = {0},
+  number   = {0},
+  pages    = {10943420211008288},
+  year     = {0},
+  doi      = {10.1177/10943420211008288},
+  url      = {https://doi.org/10.1177/10943420211008288},
+  eprint   = {https://doi.org/10.1177/10943420211008288},
+  abstract = { Classical molecular dynamics (MD) calculations represent a significant part of the utilization time of high-performance computing systems. As usual, the efficiency of such calculations is based on an interplay of software and hardware that are nowadays moving to hybrid GPU-based technologies. Several well-developed open-source MD codes focused on GPUs differ both in their data management capabilities and in performance. In this work, we analyze the performance of LAMMPS, GROMACS and OpenMM MD packages with different GPU backends on Nvidia Volta and AMD Vega20 GPUs. We consider the efficiency of solving two identical MD models (generic for material science and biomolecular studies) using different software and hardware combinations. We describe our experience in porting the CUDA backend of LAMMPS to ROCm HIP that shows considerable benefits for AMD GPUs comparatively to the OpenCL backend. }
+}
+
+
+@inproceedings{amd_as_alternative,
+  author    = {Nathan Otterness and James H. Anderson},
+  title     = {{AMD GPUs as an Alternative to NVIDIA for Supporting Real-Time Workloads}},
+  booktitle = {32nd Euromicro Conference on Real-Time Systems (ECRTS 2020)},
+  pages     = {10:1--10:23},
+  series    = {Leibniz International Proceedings in Informatics (LIPIcs)},
+  isbn      = {978-3-95977-152-8},
+  issn      = {1868-8969},
+  year      = {2020},
+  volume    = {165},
+  editor    = {Marcus V{\"o}lp},
+  publisher = {Schloss Dagstuhl--Leibniz-Zentrum f{\"u}r Informatik},
+  address   = {Dagstuhl, Germany},
+  url       = {https://drops.dagstuhl.de/opus/volltexte/2020/12373},
+  urn       = {urn:nbn:de:0030-drops-123732},
+  doi       = {10.4230/LIPIcs.ECRTS.2020.10},
+  annote    = {Keywords: real-time systems, graphics processing units, parallel computing}
 }
