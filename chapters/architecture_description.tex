@@ -134,9 +134,46 @@ All the data types in the function prototypes have been made opaque using specif
 
 The API is divided in 8 groups: initialization and shutdown, kernel loading, task graph definition, task graph registration, resource allocation, kernel launching, synchronization primitives, and data transfer. \cite{mango_exploring_manycore_architectures}
 
-%TODO
 \subsubsection{Python API Wrapper}
-TODO
+
+The Python wrapper aims at expanding MANGO accessibility onto scripting programming languages. Due to the nature of the MANGO system, scripting languages are a perfect fit, as the computation-heavy part of the user application are often the kernels executed in the available accelerators.
+
+Python's popularity as a programming/scripting language made it an ideal candidate to enable a great number of developers access to the MANGO platform. As observed in figure \ref{fig:redmonk-ranks}, Python was the second most popular programming language in the RedMonk's Programming Language Rankings \cite{redmonks_rankings}, only falling behind JavaScript.
+
+%TODO fixed location for now, check later to see what to do
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{img/redmonk-ranks.png}
+    \captionsetup{justification=centering}
+    \caption{RedMonk's January 2021 Programming Language Rankings}
+    \label{fig:redmonk-ranks}
+\end{figure}
+
+The Python API wrapper is implemented using Cython, with support for Python 3. Cython is an optimising static compiler that allows writing Python code that calls back and forth from and to C or C++ code natively at any point \cite{cython}.
+For the API user, Cython usage is completely transparent and not a requirement, so their code can be purely written in Python. 
+
+\begin{lstlisting}[style=PythonStyle, caption=Python API Example snippet]
+# Omitted: Register kernel(k), buffers(b1,b2,b3) and build task graph(tg)
+with ctx.resource_allocation(tg):
+    arg1 = BufferArg(b1)
+    arg2 = BufferArg(b2)
+    arg3 = BufferArg(b3)
+    arg4 = ScalarArg(size, ScalarType.INT)
+
+    args = KernelArguments(k, arg1, arg2, arg3, arg4)
+
+    b1.write(A.tobytes())
+    b2.write(B.tobytes())
+
+    end_event = ctx.start_kernel(k, args)
+
+    ev.wait()
+    b3.read(C)
+
+    end_event.wait()
+# Omitted: Check results
+\end{lstlisting}
+
 
 \subsection{Sample Application}
 
