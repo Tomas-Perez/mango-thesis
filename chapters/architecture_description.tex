@@ -341,6 +341,56 @@ Before returning, we perform the resource deallocation of the TaskGraph, and fre
 
 \section{BarbecueRTRM}
 
+The MANGO architecture is based on the idea of building energy efficient HPC (High Performance Computing) systems. In heterogeneous architectures, the resource management problem is especially complex due to the difficulty of scheduling tasks over multiple architectures with different instruction sets and requirements.
+
+A resource manager performs the tasks scheduling and assignation of resources to the available accelerators, according to the application's objective, like the minimization of power consumption or the minimization of execution time. \cite{mango_exploring_manycore_architectures}
+
+The framework used for resource management in the MANGO system is the Barbeque Run-Time Resource Manager (BarbecueRTRM). 
+The BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (e.g, CPU, GPU, memory, HW accelerators, etc…) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms. \cite{barbecue_1}\cite{barbecue_2}
+
+\subsection{Resource Manager Architecture}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/barbecue-arch.png}
+    \captionsetup{justification=centering}
+    \caption{Overview of the BarbequeRTRM}
+    \label{fig:barbecue-arch}
+\end{figure}
+
+In figure \ref{fig:barbecue-arch}, we can see an overview of the BarbecueRTRM framework. The interfacing with the rest of the MANGO system happens at application level, specifically Libmango natively communicates with the Application Runtime Library (RTLib) implemented in C++, which in turns acts as a client of the BarbecueRTRM Daemon running in the host system.
+
+The Programming Model Synchronization Layer in the RTLib facilitates MANGO integration with the BarbecueRTRM by working as an abstraction layer that supports the MANGO programming model for a BarbecueRTRM managed application.
+The Libmango-BarbecueRTRM interaction happens through an \textbf{Application Controller}, which is created when a Libmango \textbf{Context} is initialized.
+
+The daemon and applications communicate through a Remote Procedure Call (RPC) based protocol. Data are mainly exchanged by using named pipes; a general one for the messages coming from the application to the resource manager, plus one pipe per application for application management purposes. A further communication channel, based on shared memory, has been introduced in MANGO to enable an efficient transfer of complex data structures, like for example the task-graph representations of the applications. 
+
+Regarding hardware support, suitable system interfaces for accessing low-level mechanisms are required. The two components that create an abstraction layer on top of the platform and resource specific interfaces are the \textbf{Platform Proxy} and the \textbf{Power Manager}. Examples of such interfaces are the Linux frameworks cgroup and cpufreq, used to bound the amount of CPU time, memory and number of CPU cores assigned to an application, as well as managing the clock frequency of cores.
+There are, of course, resources out of the Linux operating system control, in these cases platform-specific libraries are used, for example the NVIDIA Management Library (NVML) \cite{nvml} is utilized for controlling and obtaining runtime data of NVIDIA GPUs. \cite{mango_exploring_manycore_architectures}
+
+The \textbf{Platform Proxy} also performs the resource assignation. This is done through functions exposed by the \textbf{HHAL API}, for which a specific Platform Proxy must have an HHAL Client.
+
+- scheduler policy
+
+
+\subsection{Integration}
+
+As previously stated, The Libmango-BarbecueRTRM communication is done through an Application Controller, which is created when a Libmango Context is initialized.
+
+%TODO update names in the diagram
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/barbeque-flow.png}
+    \captionsetup{justification=centering}
+    \caption{Flow between BarbequeRTRM and the MANGO system}
+    \label{fig:barbecue-flow}
+\end{figure}
+
+
+- recipes
+
+
+
 \section{HHAL}
 
 %TODO add a graph showing hhal: client, server, api, managers, dycomp
