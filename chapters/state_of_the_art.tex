@@ -325,7 +325,7 @@ Both projects are composed of a library and set of compiler directives that prov
 
 OpenMP and OpenACC allow for quick adaptation of existing single threaded code into a parallel execution model. This work requires a compiler which supports the standard, meaning that it is able to handle the directives and generate multithreaded code automatically.
 
-An example of offloaded OpenMP code can be seen in listing \ref{lst:openmp_saxpy}. The code looks like a regular serial implementation of SAXPY, except for the two \texttt{\#pragma}s. Very similar code can be achieved with OpenACC.
+An example of offloaded OpenMP code can be seen in listing \ref{lst:openmp_saxpy}. The code looks like a regular serial implementation of SAXPY for a general purpose processor, except for the two \texttt{\#pragma}s. The first pragma instructs OpenMP to offload the following code to an accelerator and tell it which variables must be copied \textbf{to} the accelerator when entering the scope (a, x and y) and which must be copied \textbf{from} when leaving the scope (only z). The second pragma indicates that the for loop can be executed in parallel that way the compiler can be sure that all operations are independent in order to run them in separate threads.
 
 \begin{lstlisting}[style=CStyle, caption=OpenMP saxpy example, float, floatplacement=H, label={lst:openmp_saxpy}]
 int main(void) {
