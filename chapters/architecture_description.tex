@@ -1,5 +1,11 @@
 \chapter{Architecture Description}
 
+% TODO:
+% - Citations go BEFORE the period. https://www.hamilton.edu/academics/centers/writing/style/essentials/punctuation-of-quotations
+% - Assignation -> Assignment. https://wikidiff.com/assignment/assignation
+% - Referring to objects in code looks better with \texttt{code} (monospace) instead of bold. Also it is consistent with state of the art.
+% - Use spellright, it's screaming at me everywhere lmao.
+
 % This doesnt have to be a section
 \section{Overall description}
 
@@ -64,7 +70,7 @@ By default, MANGO utilizes kernel termination events for both internal and host 
 
 \subsection{Task Graph}
 
-The Task Graph gives a global picture of the application's behaviour and represents data and control dependencies between Kernels, Memory Buffers and Events. The Task Graph provides the resource manager with the information needed to generate the best feasible resource allocation for the requested QoS. \cite{mango_exploring_manycore_architectures}
+The Task Graph gives a global picture of the application's behaviour and represents data and control dependencies between Kernels, Memory Buffers and Events. The Task Graph provides the resource manager with the information needed to generate the best feasible resource allocation for the requested QoS. \cite{mango_exploring_manycore_architectures} % TODO: define as QoS - Tomas
 
 
 \section{Libmango}
@@ -77,7 +83,7 @@ The Libmango API allows developers to indicate to the runtime the components of 
 Libmango is implemented in the C++ programming language, so its native usage is through the C++ API. However, a set of wrappers for other languages are provided, namely the C and Python API wrappers.
 
 \subsection{Context}
-The Context is the main class in the Libmango module, it holds the state information of the host side runtime for a single application, and its created by the user at the beginning of their interaction, with an application name and a recipe file needed by BarbecueRTRM for the resource allocation. Every subsequent component (kernels, buffers, events and task graph) has to be registered in the Context in order to be considered part of the application.
+The Context is the main class in the Libmango module, it holds the state information of the host side runtime for a single application, and its created by the user at the beginning of their interaction, with an application name and a recipe file needed by BarbecueRTRM for the resource allocation. Every subsequent component (kernels, buffers, events and task graph) has to be registered in the Context in order to be considered part of the application. % TODO: explain that the recipe contains resource allocation information, but is explained further in a following section - Tomas
 
 Once the application is specified, the task graph information is sent to the BarbecueRTRM for the resource allocation. After a successful resource allocation, the application is now ready to run.
 
@@ -94,7 +100,7 @@ Libmango supports three types of Kernel arguments: Scalar arguments, Buffer argu
 These essentially act as wrappers of the HHAL kernel arguments.
 
 \subsubsection{Scalar argument}
-A Scalar argument consists of a scalar value. The types supported by Libmango are signed and unsigned integers of sizes 8, 16 and 32 bits, as well as long and float values.
+A Scalar argument consists of a scalar value. The types supported by Libmango are signed and unsigned integers of sizes 8, 16 and 32 bits, as well as long and float values. % TODO: long is just a 64 or 32 bit integer depending on the architecture. I would just remove this and add 64 bit integers.  Also we are replicating this in the HHAL section, should be unified somewhere. - Tomas
 When a Scalar argument is created, the provided value is copied and stored in memory, and later sent to the HHAL module when their respective kernel is ran. 
 
 \subsubsection{Buffer argument}
@@ -128,6 +134,8 @@ As the core implementation of Libmango is in the C++ programming language, a set
 Besides the native C++ API, Libmango currently exposes C and Python API wrappers.
 
 \subsubsection{C API Wrapper}
+% TODO: this doesn't say much. The most important part of the C API is hiding the object oriented C++ and smart pointers. Also I'm pretty sure using uint32_t addressing is wrong, but a problem of the GN library. - Tomas
+
 The C language API is a wrapper around the C++ API that is provided both for compatibility with C code and for compatibility with the early version of MANGO, which was developed in C.
 
 All the data types in the function prototypes have been made opaque using specific typedef types. This hides to the application some specific types of the machine, such as the size of the memory addresses. In the current MANGO implementation, the used types are mostly uint32\_t, due to the addressing size that is of 32-bit.
@@ -141,6 +149,7 @@ The Python wrapper aims at expanding MANGO accessibility onto scripting programm
 Python's popularity as a programming/scripting language made it an ideal candidate to enable a great number of developers access to the MANGO platform. As observed in figure \ref{fig:redmonk-ranks}, Python was the second most popular programming language in the RedMonk's Programming Language Rankings \cite{redmonks_rankings}, only falling behind JavaScript.
 
 %TODO fixed location for now, check later to see what to do
+% Just changing it to [ht] should be fine, depending on what we rewrite it will probably shift positions. - Tomas. 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{img/redmonk-ranks.png}
@@ -152,6 +161,8 @@ Python's popularity as a programming/scripting language made it an ideal candida
 The Python API wrapper is implemented using Cython, with support for Python 3. Cython is an optimising static compiler that allows writing Python code that calls back and forth from and to C or C++ code natively at any point \cite{cython}.
 For the API user, Cython usage is completely transparent and not a requirement, so their code can be purely written in Python. 
 
+% TODO: where did the Event "ev" come from? Also we should choose the same notation for omitting stuff.
+% Check the snippets in state of the art. - Tomas
 \begin{lstlisting}[style=PythonStyle, caption=Python API Example snippet]
 # Omitted: Register kernel(k), buffers(b1,b2,b3) and build task graph(tg)
 with ctx.resource_allocation(tg):
@@ -191,6 +202,7 @@ void saxpy(float a, float *x, float *y, float *out, int n) {
 
 The target architecture of the sample is CUDA, hence a precompiled binary of the shown CUDA kernel that performs the SAXPY operation is used.
 
+% TODO: I would put all the sample in one listing, ommitting unnecessary stuff like includes, stdouts and buffer initialization. That way it can be compared more closely with the snippets in state of the art. - Tomas
 \begin{lstlisting}[style=CStyle, caption=Sample - Includes]
 #include <cstddef>
 #include <iostream>
@@ -346,7 +358,7 @@ The MANGO architecture is based on the idea of building energy efficient HPC (Hi
 A resource manager performs the tasks scheduling and assignation of resources to the available accelerators, according to the application's objective, like the minimization of power consumption or the minimization of execution time. \cite{mango_exploring_manycore_architectures}
 
 The framework used for resource management in the MANGO system is the Barbeque Run-Time Resource Manager (BarbecueRTRM). 
-The BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (e.g, CPU, GPU, memory, HW accelerators, etc…) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms. \cite{barbecue_1}\cite{barbecue_2}
+The BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (e.g, CPU, GPU, memory, HW accelerators, etc…) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms. \cite{barbecue_1}\cite{barbecue_2} % TODO: I think there is something missing in the first sentence, also no "..." pls. - Tomas
 
 \subsection{Resource Manager Architecture}
 
@@ -398,6 +410,8 @@ As previously stated, The Libmango-BarbecueRTRM communication is done through an
 The Heterogeneous Hardware Abstraction Layer (HHAL) is the module of the MANGO system that takes care of the communication with the multiple accelerator libraries.
 As such, HHAL abstracts accelerator specific information in a manner that allows the resource manager to fully exploit architecture specific features, while freeing libmango from the inherent complexity of handling multiple architectures.
 
+% TODO a daemon is mentioned previously in BBQUE, also maybe it is not necessary to include a definition.
+% We will probably have to add a definitions section / glossary for any definitions. - Tomas
 Due to the fact that multiple modules running as independent processes need to make use of the Heterogeneous Hardware Abstraction Layer, HHAL works in a client-server manner. The server is run as a daemon, or background process \cite{daemon_wikipedia}, and the client is used by other modules to interact with it. In this way, both BarbecueRTRM and Libmango can make use of a common instance of the HHAL module.
 
 HHAL exposes an architecture-agnostic API with the necessary functionalities to permit the managing of kernels, buffers and events on any of the supported architectures. The module is structured as a front-facing API and a set of architecture specific managers that implement the API functionalities for their specific architecture.
@@ -500,6 +514,7 @@ To assign a resource, a supported unit where the resource is to be assigned is p
     HHALExitCode deassign_event(int event_id);
 \end{lstlisting}
 
+% TODO: HHAL Module -> HHAL Runtime? - Tomas
 Once a resource is no longer required by the application, it may be deassigned and thus removed from the HHAL module.
 
 \subsubsection{Resource Allocation}
@@ -508,6 +523,7 @@ Every assigned resource has to eventually be allocated in its target accelerator
 
 Both allocation and release (deallocation) function calls are simple, due to the fact that the required information regarding the resources is provided beforehand at assignation time. Thus, only the resource's identification integer is needed.
 
+% TODO: Should group this like assignments to keep it consistent - Tomas
 \begin{lstlisting}[style=CStyle, caption=HHAL API - Allocation functions]
     HHALExitCode allocate_kernel(int kernel_id);
     HHALExitCode release_kernel(int kernel_id);
@@ -533,6 +549,7 @@ Memory Buffers that are allocated in an accelerator have to be capable of being 
 Communication with the corresponding accelerator is handled by the architecture's manager.
 
 \subsubsection{Event Actions}
+% TODO: maybe we should change the code to refer to events, or just change the names here. "sync_register" adds unnecessary confusion. - Tomas
 Events that are allocated in an accelerator require the capability of being written and read. The HHAL API provides a write function that takes the event's id and the data to write, and a read function that takes the event's id and a pointer to host memory where to read the data into.
 
 \begin{lstlisting}[style=CStyle, caption=HHAL API - Event actions]
@@ -543,6 +560,7 @@ Events that are allocated in an accelerator require the capability of being writ
 Once again, accelerator specifics are handled by the architecture's manager. In some cases (like Nvidia), events are handled entirely on the Nvidia Manager, as the Nvidia Architecture Node does not provide events support.
 
 \subsubsection{Kernel Actions} \label{HHAL:KernelActions}
+% TODO: ran -> run. - Tomas
 Before a Kernel is ran, its source first has to be written into the accelerator's memory. The HHAL API provides a kernel write function that takes the kernel's id and a map of unit to sources, out of which the previously assigned unit's source is taken.
 
 Multiple kernel's source types are supported by HHAL, this is further explained in the Dynamic Compiler \ref{HHAL:DynamicCompiler} subsection.
@@ -552,20 +570,24 @@ Multiple kernel's source types are supported by HHAL, this is further explained 
     HHALExitCode kernel_start(int kernel_id, const Arguments &arguments);
 \end{lstlisting}
 
+% TODO: ran -> run. - Tomas
 After a Kernel is written and its dependencies are correctly set up, it can be ran, or "started" via the kernel start function. As kernels require argument support, this function not only takes the kernel's id but also an \textbf{Arguments} object which consists of a vector of kernel arguments.
 
 Three types of arguments are supported by HHAL: Scalar arguments, Buffer arguments and Event arguments. These are the arguments wrapped by Libmango for the user to provide. \ref{Libmango:KernelManagement} 
 
-Scalar arguments consist of a scalar value belonging to one of the supported types. These are signed and unsigned integers of sizes 8, 16, 32 bits as well as long and float values.
+Scalar arguments consist of a scalar value belonging to one of the supported types. These are signed and unsigned integers of sizes 8, 16, 32 bits as well as long and float values. % TODO: long is just a 64 or 32 bit integer depending on the architecture. I would just remove this and add 64 bit integers, also doubles.
 
 The Buffer and Event arguments consist of the respective's Buffer or Event id, which is used to pass the corresponding structure information to the Kernel.
 
 \subsection{Dynamic Compiler} \label{HHAL:DynamicCompiler}
 
+% TODO: an user -> a user. - Tomas
 In previous implementations of the MANGO system, an user provided Kernel had to be pre-compiled into a binary file (or the format required by the target accelerator) before its utilization in the MANGO system. Despite the optimalilty of this process, it puts limits on the agile and iterative nature of the development of software solutions.
 
+% TODO: Pre-compilation wouldn't really help with performance if we take into account that the binary will be cached and the user could provide custom flags (although I think it's not implemented yet). - Tomas
 Giving developers the ability to work directly with kernel source code greatly facilitates the development process. Ideally, once a solution is in place, kernels would be pre-compiled for optimal perfomance.
 
+% TODO: Wrong paragraph order? - Tomas
 The Dynamic Compiler included in the HHAL module offers the functionality of "dynamic" compilation of kernels. That is, the developer provides a kernel's source code to be compiled as required before being written into its target accelerator's memory.
 
 \subsubsection{Usage and Implementation}
