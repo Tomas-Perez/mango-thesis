@@ -62,7 +62,7 @@ User defined events can be accessed by Kernels through Event Arguments, providin
 
 By default, MANGO utilizes kernel termination events for both internal and host synchronization.
 
-\subsection{Task Graph}
+\subsection{Task Graph} \label{arch:TaskGraph}
 
 The Task Graph gives a global picture of the application's behavior and represents data and control dependencies between Kernels, Memory Buffers and Events. The Task Graph provides the resource manager with the information needed to generate the best feasible resource allocation for the requested Quality of Service (QoS) \cite{mango_exploring_manycore_architectures}.
 
@@ -344,7 +344,7 @@ The MANGO architecture is based on the idea of building energy efficient HPC (Hi
 A resource manager performs the tasks scheduling and assignment of resources to the available accelerators, according to the application's objective, like the minimization of power consumption or the minimization of execution time \cite{mango_exploring_manycore_architectures}.
 
 The framework used for resource management in the MANGO system is the Barbeque Run-Time Resource Manager (BarbecueRTRM). 
-As described in its official documentation \cite{bosp}, BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (i.e. CPU, GPU, memory, HW accelerators, etc) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms \cite{barbecue_1}\cite{barbecue_2}.
+As described in its official documentation \cite{bosp}, BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (i.e. CPU, GPU, memory, HW accelerators, etc.) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms \cite{barbecue_1}\cite{barbecue_2}. As BarbecueRTRM is a large system with multiple applications, in this section we will focus on it's usage in the MANGO system and the relevant components involved in the process.
 
 \subsection{Resource Manager Architecture}
 
@@ -366,16 +366,14 @@ The daemon and applications communicate through a Remote Procedure Call (RPC) ba
 Regarding hardware support, suitable system interfaces for accessing low-level mechanisms are required. The two components that create an abstraction layer on top of the platform and resource specific interfaces are the \textbf{Platform Proxy} and the \textbf{Power Manager}. Examples of such interfaces are the Linux frameworks cgroup and cpufreq, used to bound the amount of CPU time, memory and number of CPU cores assigned to an application, as well as managing the clock frequency of cores.
 There are, of course, resources out of the Linux operating system control, in these cases platform-specific libraries are used, for example the NVIDIA Management Library (NVML) \cite{nvml} is utilized for controlling and obtaining runtime data of NVIDIA GPUs \cite{mango_exploring_manycore_architectures}.
 
-The \textbf{Platform Proxy} also performs the resource assignment. This is done through functions exposed by the \textbf{HHAL API}, for which a specific Platform Proxy must have an HHAL Client.
+The \textbf{Platform Proxy} also performs the resource assignment for its platform. This is done through functions exposed by the \textbf{HHAL API}, for which a specific Platform Proxy must have an HHAL Client.
 
-- scheduler policy
-
+In terms of task scheduling, the \textbf{Scheduler Manager} is responsible for loading a \textbf{Scheduling Policy} and executing the scheduling algorithm for a given task graph. Multiple resource allocation policies can be implemented to account for the specific requirements of the user's system and application, i.e. policies focusing on power and temperature control, execution time, isolation\cite{mango_exploring_manycore_architectures}, etc. The utilized resource allocation policy is selected at installation time. 
+Here its worth mentioning the \textbf{recipe} file (further explained in section \ref{bbque:recipe}), through which the user can specify the QoS required for their application.
 
 \subsection{Integration}
 
-As previously stated, The Libmango-BarbecueRTRM communication is done through an Application Controller, which is created when a Libmango Context is initialized.
-
-%TODO update names in the diagram
+%TODO redo with new notation
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{img/barbeque-flow.png}
@@ -384,9 +382,83 @@ As previously stated, The Libmango-BarbecueRTRM communication is done through an
     \label{fig:barbecue-flow}
 \end{figure}
 
+As previously stated, The Libmango-BarbecueRTRM communication is done through an Application Controller belonging to the Programming Model Synchronization Layer, which is created when a Libmango Context is initialized.
+
+When initializing an Application Controller, an application name and a recipe file are provided. The first one for identification purposes and the second one for application requirements specification \ref{bbque:recipe}.
+
+As shown in figure \ref{fig:barbecue-flow}, the next step after initialization is the resource allocation, for this, a task graph representing dependencies between the application components needs to be created and passed in the \texttt{resource\_allocation()} function call. The task graph is similar to the Libmango one \ref{arch:TaskGraph}, requiring a simple translation before being sent for resource allocation. 
+
+Once the resource allocation is completed, the \textbf{Execution Synchronizer} locks on the \texttt{onConfigure()} function, waiting for kernels to start. During this time, applications can proceed by loading kernels into their assigned devices and writing into input buffers. Once a kernel is run, the \texttt{onConfigure()} function unlocks, spawning a monitor thread for each running kernel in order to keep track of execution time and throughput of each of them. 
+For BarbecueRTRM to be up to date with the application's execution status, event notifications for events such as kernel start and stop, and buffer writes and reads are notified by Libmango.
+
+Finally, when all kernels terminate, the resource deallocation is performed and the Application Controller is deleted, releasing all the assigned resources in the \linebreak \texttt{onRelease()} function.
+
 \subsection{Recipe file} \label{bbque:recipe}
 
-- recipes
+The \textbf{Recipe} file has already been mentioned a few times in the document. A recipe file path is passed to the Application Controller at initialization, and it is used to specify the application requirements to be taken into account in the resource allocation procedure.
+
+The recipe is an XML \cite{xml} format file named with a \texttt{.recipe} extension, through which developers can request the QoS or performance level that their application can achieve when a certain set of resources is assigned by the resource manager. These requirements are internally referred to as Application Working Modes (AWM) \cite{mango_exploring_manycore_architectures}. However, to further fit MANGO requirements, a resources section was introduced.
+
+As observed in the sample \ref{bbque:recipe_example}, the \texttt{application} tag is the root tag from which the application information is defined, where a \texttt{priority} value can be specified, with \texttt{0} as the highest priority.
+
+Under the \texttt{platform} section, the \texttt{id} value identifies the architecture targeted in the enclosed specification. Specifications for multiple targets can be provided, leaving to BarbecueRTRM the decision of choosing the target to be utilized.
+
+Referring back to AWMs, in the \texttt{awm} section, the following attributes are available:
+
+%TODO styling
+\begin{itemize}
+    \item \texttt{id}: A number identifier.
+    \item \texttt{name}: A name used for logging purposes.
+    \item \texttt{value}: A performance level.
+    \item \texttt{config-time}: The configuration time profiled when the application switches to the given AWM.
+\end{itemize}
+
+The \texttt{resources} subsections contain the resource assignment configurations. Under \texttt{cpu}, the CPU time quota \texttt{pe} is expressed in percentage, the amount of memory is defined in the \texttt{mem} tag, the number of accelerator cores as \texttt{pe} under \texttt{acc} and the network bandwidth as \texttt{net}.
+
+Since due to the MANGO programming model, per-task and per-buffer resource mapping is required, the AWM specification is not enough to cover the MANGO needs. The \texttt{tg} section was introduced to allow specification of task graph related mapping information.
+As seen in the sample \ref{bbque:recipe_example}, under the \texttt{reqs} tag, \texttt{task} information is provided for each task (kernel) in the application. The attributes are:
+
+%TODO styling
+\begin{itemize}
+    \item \texttt{id}: A number identifier.
+    \item \texttt{name}: A name used for logging purposes.
+    \item \texttt{hw\_prefs}: ordered list of accelerator preferences.
+    \item \texttt{inbw\_kbps}: read bandwidth.
+    \item \texttt{outbw\_kbps}: write bandwidth.
+    \item \texttt{grid\_dim}: grid dimensions for an Nvidia kernel.
+    \item \texttt{block\_dim}: block dimensions for an Nvidia kernel.
+\end{itemize}
+
+\begin{lstlisting}[style=CStyle, label=bbque:recipe_example, caption=BarbecueRTRM Recipe file - Saxpy Sample in GN and Nvidia]
+<?xml version="1.0"?>
+<BarbequeRTRM recipe_version="0.8">
+	<application priority="4">
+		<platform id="bq.*">
+			<awms>
+				<awm id="0" name="OK" value="100">
+					<resources>
+						<cpu>
+							<pe qty="100"/>
+						</cpu>
+						<mem qty="20" units="M"/>
+					</resources>
+				</awm>
+			</awms>
+			<tg>
+				<reqs>
+					<task name="t1" id="1" hw_prefs="nvidia" grid_dim="32,1,1" block_dim="256,1,1"/>
+					<task name="t2" id="2" hw_prefs="gn"/>
+				</reqs>
+			</tg>
+		</platform>
+	</application>
+</BarbequeRTRM>
+\end{lstlisting}
+
+\subsection{Resource Scheduling and Assignment}
+
+- interaction between schedpol and platform proxy
+
 
 
 
