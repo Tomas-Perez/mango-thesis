@@ -455,14 +455,19 @@ As seen in the sample \ref{bbque:recipe_example}, under the \texttt{reqs} tag, \
 </BarbequeRTRM>
 \end{lstlisting}
 
-\subsection{Resource Scheduling and Assignment}
+\subsection{Resource Scheduling and Platform Support}
 
-- interaction between schedpol and platform proxy
+As a MANGO developer, there are two main aspects of the BarbecueRTRM to keep in mind when adding support of new architectures and extending MANGO capabilities. These are the scheduling policies and the integration with new platforms.
 
+To implement a new scheduling policy, a version of the \texttt{SchedulerPolicyIF} class must be introduced. The scheduler is in charge of the main functionality of the resource manager: allocating resources according to the application's characteristics, the current status of the system and the user requirements. 
+The central method of the scheduler is the \texttt{Schedule()} function, which receives references to the available resource interfaces, as well as information on the applications.
+Regarding QoS and task graph requirements, the user specifications loaded from the recipe file (task performed by the \texttt{RecipeLoader}) can be accessed by the scheduler to take into account in the scheduling process.
 
+To fulfill its role, the scheduler inherently needs platform-specific information upon which resource allocation decisions can be made. The \texttt{PlatformProxy} is the class that acts as an abstraction layer between a platform library and the BarbecueRTRM, providing a set of functions for the scheduler to query the available accelerators. For each supported architecture, a different \texttt{PlatformProxy} must be introduced. Optionally, a \texttt{PowerManager} that manages power related accelerator information can also be implemented for a given architecture.
 
+However, there is another primary job the \texttt{PlatformProxy} carries out. After the scheduling procedure is completed, the \texttt{MapResources()} function of each \texttt{PlatformProxy} is called. Here the assignments of kernels, buffers and events are done. Since we are particularly dealing with MANGO supported architectures, the assignments are performed through the HHAL module, covered in the following section.
 
-\section{HHAL}
+\section{HHAL} \label{HHAL}
 
 %TODO add a graph showing hhal: client, server, api, managers, dycomp
 
