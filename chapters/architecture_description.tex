@@ -373,7 +373,6 @@ Here its worth mentioning the \textbf{recipe} file (further explained in section
 
 \subsection{Integration}
 
-%TODO redo with new notation
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{img/barbeque-flow.png}
@@ -918,10 +917,101 @@ Once the execution finishes, the kernel's termination event is notified.
 
 \section{Nvidia Architecture Node} \label{NvidiaArchitectureNode}
 
-- ptx format 
-%https://docs.nvidia.com/cuda/inline-ptx-assembly/index.html#:~:text=The%20NVIDIA%C2%AE%20CUDA%C2%AE,the%20PTX%20ISA%20reference%20document.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/nan-diagram.png}
+    \captionsetup{justification=centering}
+    \caption{Nvidia Architecture Node flow}
+    \label{fig:NANDiagram}
+\end{figure}
 
-\subsection{CUDA Compiler} \label{Nvidia:CudaCompiler}
+The Nvidia Architecture Node (NAN) is the bridge between the MANGO system, specifically the HHAL module, and the low-level Nvidia libraries utilized to communicate with Nvidia GPUs.
+
+The main focus of the NAN is enabling MANGO to launch CUDA kernels in Nvidia accelerators. As shown in the diagram \ref{fig:NANDiagram}, the NAN exploits the CUDA Driver API \cite{cuda_driver_api} library, which exposes a variety of functions that allow low-level interfacing with the system-available Nvidia devices.
+
+\subsection{CUDA Kernels} \label{Nvidia:CudaCompiler}
+
+Nvidia GPUs are capable of executing kernels written in the CUDA programming language, which are compiled into the PTX \cite{ptx} format. PTX stands for Parallel Thread Execution, and is an Instruction Set Architecture (ISA) for using Nvidia GPUs as data-parallel computing devices.
+
+Naturally, users of the MANGO system targeting Nvidia GPUs must provide CUDA kernels in their PTX compiled form when loading kernels of the binary type.
+Alternatively, if kernels are loaded as source code, the Nvidia Architecture Node provides the \textbf{CUDA Compiler} tool, which makes use of the CUDA compilation library NVRTC \cite{nrvtc} to compile CUDA kernels from source into a PTX format for its later execution. The CUDA Compiler is used by the Dynamic Compiler of the HHAL Module for this very purpose.
+
+\subsection{NAN API}
+
+\begin{lstlisting}[style=CStyle, label=NAN:CudaApi, caption=Nvidia Architecture Manager - CudaApi]
+class CudaApi {
+public:
+  CudaApi();
+  ~CudaApi();
+
+  CudaApiExitCode allocate_memory(int buffer_id, size_t size);
+  CudaApiExitCode deallocate_memory(int buffer_id);
+  CudaApiExitCode write_memory(int buffer_id, const void *data, size_t size);
+  CudaApiExitCode read_memory(int buffer_id, void *dest_buffer, size_t size);
+
+  CudaApiExitCode allocate_kernel(int kernel_id, size_t size);
+  CudaApiExitCode deallocate_kernel(int kernel_id);
+  CudaApiExitCode write_kernel(int kernel_id, const void *data, size_t size);
+  
+  CudaApiExitCode launch_kernel(int kernel_id, const char *function_name, CudaResourceArgs resource_args, const char *args, int arg_count);
+};
+\end{lstlisting}
+
+The Nvidia Architecture Manager exposes its API through the CudaApi class. As observed in the listing \ref{NAN:CudaApi}, the API presents a small number of functions that directly correspond with the basic functionality needed by MANGO for a single architecture.
+
+The first four listed functions are related to memory buffers management.\linebreak
+\texttt{allocate\_memory()} and \texttt{deallocate\_memory()} perform the allocation and deallocation of a memory buffers in the target device. A buffer is identified by an user-provided id integer, from the time of a buffer's allocation this id is used for further operations regarding said buffer until deallocation. 
+
+\texttt{write\_memory()} and \texttt{read\_memory()} allow writing to and reading from an allocated buffer, in each case a source or destination memory location is required.
+
+The following functions work in a similar manner but focus on kernel allocation and writing. The \texttt{write\_kernel()} function takes a pointer to the start of the kernel PTX loaded in memory and its size.
+
+The \texttt{launch\_kernel()} function starts the execution of a kernel in the target device, taking the kernel entry function name and a set of arguments regarding both the resource requirements and the user arguments for the kernel itself. In the following subsections, resource and kernel arguments are explained in further detail.
+
+\subsubsection{Resource arguments}
+
+\begin{lstlisting}[style=CStyle, label=NAN:ResourceArguments, caption=Nvidia Architecture Manager - Resource arguments]
+// Dimensions for grid and blocks
+struct CudaDims {
+  uint32_t x;
+  uint32_t y;
+  uint32_t z;
+};
+
+// Resource specific arguments for kernel launch
+struct CudaResourceArgs {
+    int device_id;
+    CudaDims grid_dim;
+    CudaDims block_dim;
+};
+\end{lstlisting}
+
+Resource arguments, grouped in the \texttt{CudaResourceArgs} structure as shown in listing \ref{NAN:ResourceArguments}, allow the specification of thread block and grid dimensions when launching a kernel, as well as the target device's id. An explanation of the execution configuration of CUDA kernels is available in the Nvidia CUDA section of the State of the Art chapter \ref{STATE:cuda}.
+
+\subsubsection{Kernel arguments}
+
+\begin{lstlisting}[style=CStyle, label=NAN:ResourceArguments, caption=Nvidia Architecture Manager - Kernel arguments]
+enum ArgType {
+  BUFFER,
+  SCALAR
+};
+
+struct Arg {
+  ArgType type;
+};
+
+struct ScalarArg {
+  ArgType type;
+  void *ptr;
+};
+
+struct BufferArg {
+  ArgType type;
+  int id;
+};
+\end{lstlisting}
+
+The \texttt{const char *args} argument of the \texttt{launch\_kernel()} API function is a pointer to an array of kernel arguments in the order the kernel receives them. Two types of kernel arguments are supported by the NAN, \texttt{BUFFER} and \texttt{SCALAR} arguments. Scalar arguments contain a reference to the scalar value allocated in host memory, while buffer arguments consist of the integer id of an allocated memory buffer. When parsing arguments before being sent to the GPU, arguments are interpreted as the base struct \texttt{Arg}, and then casted to either \texttt{ScalarArg} or \texttt{BufferArg} depending on their type.
 
 
 \section{GN}
