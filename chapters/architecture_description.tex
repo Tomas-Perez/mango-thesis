@@ -527,7 +527,7 @@ typedef struct nvidia_event_t {
 } nvidia_event;
 \end{lstlisting}
 
-The general API essentially acts as a dispatcher, and passes the casted structure pointer when calling the corresponding manager function. 
+The general API essentially acts as a dispatcher, and passes the casted structure pointer when calling the corresponding manager function. A diagram of the dispatcher flow is shown in figure \ref{fig:hhal_dispatcher}.
 
 The following code snippet is for example purposes and not part of the final implementation.
 
@@ -540,16 +540,18 @@ void HHAL::example_function(Unit unit, hhal_kernel *info) {
         case Unit::NVIDIA:
             NVIDIA_MANAGER.example_function((nvidia_kernel *)info);
             break;
+        case Unit::TEST:
+            TEST_MANAGER.example_function((test_kernel *));
+            break;
     }
 }
 \end{lstlisting}
 
-%TODO better diagram
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\textwidth]{img/hhal_dispatcher.png}
+    \includegraphics[width=\textwidth]{img/hhal-dispatcher.png}
     \captionsetup{justification=centering}
-    \caption{HHAL API dispatching flow}
+    \caption{HHAL API dispatching flow (test manager added for example purposes)}
     \label{fig:hhal_dispatcher}
 \end{figure}
 
@@ -742,6 +744,8 @@ void kernel_function(int a, float *x, float *y, float *out, int n) {
 Two pragmas are required for the entry point generation. 
 
 The first \texttt{\#pragma mango\_gen\_entrypoint} indicates that the entry point is to be generated. The second, \texttt{\#pragma mango\_kernel} must be placed a line before the function to be called by the generated entry point, as its arguments are the ones received by the main function.
+
+The final result is shown in the following listing.
 
 %TODO include result of entrypoint generation here
 <RESULT OF ENTRYPOINT GENERATION EXAMPLE HERE>
