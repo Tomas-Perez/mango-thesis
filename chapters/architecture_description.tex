@@ -39,10 +39,10 @@ Three types of kernel arguments are supported:
 \end{itemize}
 
 \subsection{Memory Buffer}
-%TODO better diagram
+
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\textwidth]{img/kernel_buffer.png}
+    \includegraphics[width=\textwidth]{img/kernel-buffer.png}
     \captionsetup{justification=centering}
     \caption{Input and Output Buffers}
     \label{fig:in_out_buffers}
@@ -50,7 +50,7 @@ Three types of kernel arguments are supported:
 
 In computer science, a data buffer (or just buffer) is a region of a physical memory storage used to temporarily store data while it is being moved from one place to another \cite{buffer_wikipedia}.
 
-Kernels read from Input Buffers and write to Output Buffers for inter-kernel and host-kernel data transferring.
+As depicted in figure \ref{fig:in_out_buffers}, Kernels read from Input Buffers and write to Output Buffers for inter-kernel and host-kernel data transferring.
 
 A Memory Buffer is defined by the user and allocated by MANGO at the target architectures, where a Kernel that makes use of said Buffer (as either input or output) is assigned.
 
@@ -100,9 +100,9 @@ When a Scalar argument is created, the provided value is copied and stored in me
 \subsubsection{Buffer argument}
 A Buffer argument consists of a Buffer integer identifier. The corresponding memory pointer in the accelerator's memory space is passed as an argument to the Kernel at execution time.
 
-%TODO better explain how the kernel function receives the event argument depending on the architecture
 \subsubsection{Event argument}
 An Event argument consists of an Event integer identifier. The corresponding Event is passed as an argument to the Kernel at execution time.
+Event implementation is architecture dependent, hence the data structure received by the kernel may vary for each architecture.
 
 \subsection{Buffer management}
 Libmango exposes functionalities and data structures that can be used to represent and manipulate Memory Buffers. Buffers are the main data communication instruments between the host and the executing Kernels. 
