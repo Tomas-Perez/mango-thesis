@@ -42,3 +42,4 @@ deassign
 cgroup
 cpufreq
 QoS
+entrypoints

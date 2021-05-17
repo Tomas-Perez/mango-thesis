@@ -3,22 +3,24 @@
 % This doesn't have to be a section
 \section{Overall description}
 
-The MANGO project aims at allowing developers to easily develop applications that target different types of accelerator architectures. In particular,  three types of accelerators are considered: symmetric multiprocessors, which are characterized by good capabilities in terms of OS support and execution flexibility (i.e., they are able to run a POSIX-compliant runtime); GPGPU-like accelerators, which are programmable but are not able to run a fully compliant POSIX runtime; and hardware accelerators, which do not need or support any kind  of software runtime. Applications, on the other hand, may be developed either by domain experts with limited knowledge of parallel computing and programming models, or by more experienced programmers. 
+The MANGO project aims at allowing developers to easily develop applications that target different types of accelerator architectures. In particular, three types of accelerators are considered: symmetric multiprocessors, which are characterized by good capabilities in terms of OS support and execution flexibility (i.e. they are able to run a POSIX-compliant runtime); GPGPU-like accelerators, which are programmable but are not able to run a fully compliant POSIX runtime; and hardware accelerators, which do not need or support any kind  of software runtime. Applications, on the other hand, may be developed either by domain experts with limited knowledge of parallel computing and programming models, or by more experienced programmers. 
 
-Thus, the following requirements arise:
-\begin{itemize}
-    \item 
-    Supporting the use of industry-standard programming models for heterogeneous systems, such as OpenCL, while guaranteeing functional portability across different programmable accelerators, as well as host-side compatibility for all accelerators and automated resource management;
-    \item 
-    Supporting a simple fork-join model, on which application developers not willing to use OpenCL can map their applications;
-    \item
-    Supporting future extensions of the MANGO software stack to support skeleton-based programming.
-\end{itemize}
+The user-facing module (Libmango), therefore, needs to operate in a way that is akin to an intermediate language in a compiler: it must allow the software stack developers to easily map high-level programming models on the range of supported accelerators, while providing functional compatibility \cite{mango_exploring_manycore_architectures}. 
 
-The user-facing module (Libmango), therefore, needs to operate in a way that is akin to an intermediate language in a compiler: it must allow the software stack developers to easily map high-level programming models on the range of supported accelerators, while providing at least functional compatibility. Depending on the individual capabilities of each accelerator, the low-level runtime system should also introduce optimizations or additional features; this would indeed cause compatibility issues, but it would also allow developers to implement specialized versions of their applications for any given accelerator \cite{mango_exploring_manycore_architectures}. 
+Depending on the individual capabilities of each accelerator, the accelerator-facing section of the system should also introduce optimizations and/or additional features. And allow developers to easily expand the MANGO system by adding support of other architectures. The HHAL module, along with platform libraries (NAN, HN and GN), take care of these requirements.
+
+User applications, however complex, must be scheduled to run on the system-available resources. This task, also involving the resource allocation, can be performed with multiple optimization goals in mind. This job is carried out by the Resource Manager: BarbecueRTRM.
 
 %TODO better diagram
-\includegraphics[scale=0.5]{img/architecture.png}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/architecture.png}
+    \captionsetup{justification=centering}
+    \caption{MANGO system - complete overview}
+    \label{fig:mango_system_overview}
+\end{figure}
+
+In figure \ref{fig:mango_system_overview}, a complete overview of the MANGO system is presented, featuring the Libmango, BarbecueRTRM and HHAL modules, and platform libraries.
 
 \section{Core elements}
 Throughout the multiple MANGO modules, there are a few core elements often present in each module. These are the components necessary to specify and control an user application and its execution. Although their names may vary from module to module, here they are defined as Kernel, Memory Buffer, Event and Task graph.
@@ -747,8 +749,25 @@ The first \texttt{\#pragma mango\_gen\_entrypoint} indicates that the entry poin
 
 The final result is shown in the following listing.
 
-%TODO include result of entrypoint generation here
-<RESULT OF ENTRYPOINT GENERATION EXAMPLE HERE>
+\begin{lstlisting}[style=CStyle, caption=HHAL Dynamic Compiler - Entrypoint generation result]
+#include "dev/mango_hn.h"
+#include <stdlib.h>
+extern void kernel_function(int a, float *x, float *y, float *out, int n);
+
+int main(int argc, char **argv){
+	mango_init(argv);
+	int a = strtol(argv[6],NULL,16);
+	float * x = (float *)mango_memory_map(strtol(argv[7],NULL,16));
+	float * y = (float *)mango_memory_map(strtol(argv[8],NULL,16));
+	float * out = (float *)mango_memory_map(strtol(argv[9],NULL,16));
+	int n = strtol(argv[10],NULL,16);
+
+	kernel_function(a, x, y, out, n);
+
+	mango_close(42);
+}
+\end{lstlisting}
+
 
 \subsection{Manager example: NVIDIA Manager}
 
@@ -1018,7 +1037,73 @@ struct BufferArg {
 The \texttt{const char *args} argument of the \texttt{launch\_kernel()} API function is a pointer to an array of kernel arguments in the order the kernel receives them. Two types of kernel arguments are supported by the NAN, \texttt{BUFFER} and \texttt{SCALAR} arguments. Scalar arguments contain a reference to the scalar value allocated in host memory, while buffer arguments consist of the integer id of an allocated memory buffer. When parsing arguments before being sent to the GPU, arguments are interpreted as the base struct \texttt{Arg}, and then casted to either \texttt{ScalarArg} or \texttt{BufferArg} depending on their type.
 
 
-\section{GN}
+\section{HN and GN}
 
-%TODO move somewhere else
-\section{HN}
+In previous versions of MANGO, the HN module acted as the hardware abstraction layer akin to the current HHAL module.
+
+The HN module consists of an HN library that exposes the HN API, and an HN daemon that manages the concurrent access to the HN supported platforms and provides the physical connection the the HN system. Other modules of the MANGO system that interact with HN must link to the HN library, which acts as a client of the daemon.
+
+\subsection{Supported architectures}
+
+HN was developed to support heterogeneous systems consisting of FPGA clusters containing PEAK, nu+ and DCT accelerators.
+
+\subsubsection{PEAK}
+
+PEAK stands for Partitioned Enabled Architecture for Kilocores and it is a research manycore prototype for generic computing. The main goal of PEAK within MANGO is to offer a conﬁgurable processor able to be adapted to different conﬁgurations and capabilities, thus enabling exploration of adaptations to the different target applications in the project \cite{exploring_manycore_architectures_through_the_mango_approach}.
+The processor has the following key characteristics:
+
+\begin{itemize}
+    \item Runs a large set of MIPS R32 ISA instructions.
+    \item Can be instantiated to any given number of cores, restricted only to the resources available in the targetFPGA.
+    \item Implements private L1 caches to each core and a shared bank set of L2 caches.
+    \item Supports shared memory by implementing an invalidation-based coherence protocol (MESI).
+    \item Implements a sophisticated Network-on-Chip enabling communication between cores, L1 caches, L2 banks, conﬁguration registers, and memory.
+    \item Supports exceptions and interrupts.
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/peak.png}
+    \captionsetup{justification=centering}
+    \caption{peak architecture (credit: \cite{exploring_manycore_architectures_through_the_mango_approach})}
+    \label{fig:peak}
+\end{figure}
+
+\subsubsection{nu+}
+
+As described in \cite{exploring_manycore_architectures_through_the_mango_approach}, nu+ is a complex and configurable GPU-like accelerator core, allowing flexible customization driven by application requirements. It is designed to support the exploration of advanced architecture features deviating from current general-purpose heterogeneous architectures. In particular, it offers the following key characteristics:
+
+\begin{itemize}
+    \item Data-level parallelism through large-size vector/SIMD support.
+    \item Multi-core organization allowing non-SIMT execution.
+    \item Advanced mesh-based Network-on-Chip.
+    \item Lightweight control flow constructs exposed to the programmer.
+    \item Hybrid memory hierarchy providing both coherent caches and non-coherent scratchpad memory.
+    \item Non-standard floating-point precision values as well as dedicated functions like fused operators.
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/nu+.png}
+    \captionsetup{justification=centering}
+    \caption{nu+ architecture (credit: \cite{exploring_manycore_architectures_through_the_mango_approach})}
+    \label{fig:nu_arch}
+\end{figure}
+
+A nu+ compiler based on the LLVM project was developed from scratch, as explored in \cite{mango_exploring_manycore_architectures_2.1}.
+
+\subsubsection{DCT}
+
+DCT accelerators are passive accelerators designed to run a single kernel, so their initialization and usage differ from the other supported accelerators. Because of its passive nature, the accelerator requires input and output buffers, as well as memory locations for synchronization to start at a pre-defined virtual memory address, which has to be retrieved through the HN API \cite{mango_exploring_manycore_architectures_2.1}.
+
+\subsection{Hardware Emulation}
+
+The GN library emulates the presence of hardware accelerators by running kernels in the host CPU.
+GN was developed as an HN emulator, so it respects the same API as the HN library, which allows to use them interchangeably.
+
+Kernels targeting the GN platform require binaries compiled for the system's CPU architecture, so their implementation language is irrelevant as long as a working binary is generated. 
+
+Furthermore, kernel execution is performed through system calls. As a consequence, the kernel entry function must receive its parameters as an array of characters.
+
+As previously covered, the Dynamic Compiler of the HHAL module is capable of generating kernel entrypoints for kernels written in the C language \ref{HHAL:DynamicCompiler}.
+
