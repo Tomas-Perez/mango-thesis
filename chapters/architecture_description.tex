@@ -1,4 +1,4 @@
-\chapter{Architecture Description}
+\chapter{Architecture Description} \label{ch:ArchitectureDescription}
 
 % This doesn't have to be a section
 \section{Overall description}
@@ -137,7 +137,7 @@ All the data types in the function prototypes have been made opaque using specif
 
 The API is divided in 8 groups: initialization and shutdown, kernel loading, task graph definition, task graph registration, resource allocation, kernel launching, synchronization primitives, and data transfer \cite{mango_exploring_manycore_architectures}.
 
-\subsubsection{Python API Wrapper}
+\subsubsection{Python API Wrapper} \label{python_wrapper}
 
 The Python wrapper aims at expanding MANGO accessibility onto scripting programming languages. Due to the nature of the MANGO system, scripting languages are a perfect fit, as the computation-heavy part of the user application are often the kernels executed in the available accelerators.
 
@@ -373,7 +373,7 @@ The \textbf{Platform Proxy} also performs the resource assignment for its platfo
 In terms of task scheduling, the \textbf{Scheduler Manager} is responsible for loading a \textbf{Scheduling Policy} and executing the scheduling algorithm for a given task graph. Multiple resource allocation policies can be implemented to account for the specific requirements of the user's system and application, i.e. policies focusing on power and temperature control, execution time, isolation\cite{mango_exploring_manycore_architectures}, etc. The utilized resource allocation policy is selected at installation time. 
 Here its worth mentioning the \textbf{recipe} file (further explained in section \ref{bbque:recipe}), through which the user can specify the QoS required for their application.
 
-\subsection{Integration}
+\subsection{Integration} \label{bbque:integration}
 
 \begin{figure}[ht]
     \centering
@@ -473,7 +473,7 @@ However, there is another primary job the \texttt{PlatformProxy} carries out. Af
 %TODO add a graph showing hhal: client, server, api, managers, dycomp
 
 The Heterogeneous Hardware Abstraction Layer (HHAL) is the module of the MANGO system that takes care of the communication with the multiple accelerator libraries.
-As such, HHAL abstracts accelerator specific information in a manner that allows the resource manager to fully exploit architecture specific features, while freeing libmango from the inherent complexity of handling multiple architectures.
+As such, HHAL abstracts accelerator specific information in a manner that allows the resource manager to fully exploit architecture specific features, while freeing Libmango from the inherent complexity of handling multiple architectures.
 
 Due to the fact that multiple modules running as independent processes need to make use of the Heterogeneous Hardware Abstraction Layer, HHAL works in a client-server manner. The server is run as a daemon, and the client is used by other modules to interact with it. In this way, both BarbecueRTRM and Libmango can make use of a common instance of the HHAL module.
 
