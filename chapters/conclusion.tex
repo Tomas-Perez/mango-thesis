@@ -4,8 +4,32 @@
 
 \section{Future Work}
 \subsection{Task Graph Automatic Execution}
-\subsection{GPU Kernel Parallelism Optimization}
-\subsection{Host HHAL Manager}
-\subsection{HNlib integration}
 
+In the search of making MANGO's usage as seamless and easy for developers as possible, a great addition to the framework would be the automatic execution of task graphs. 
+
+By automatic execution, we refer to the execution of the entirety of an application's task graph from a single start signal, leaving to MANGO the responsibility of handling buffer data transference and kernel execution from their dependencies.
+
+All the necessary information to make this happen is already being provided by users of Libmango through the task graph definition. As a result, the only Libmango API change this might entail is the addition of a start task graph call.
+
+This functionality can be fully implemented in the Libmango module, which based on its task graph knowledge, is capable of keeping track of kernel dependencies and perform buffer read/write and kernel start calls to the HHAL module as required.
+
+\subsection{GPU Kernel Parallelism Optimization}
+
+When it comes to optimization, there is an endless number of approaches to investigate with the goal of achieving a higher level of system efficiency, as seen in the multiple resource allocation policies that were already implemented in the BarbecueRTRM module.
+
+Focusing on the GPU landscape, optimizing the use of their parallelization capabilities is the key to achieve better results. In 2019, a prototype for workload-aware efficient multiprocessing for modern GPGPUS \cite{slate}: Slate, was presented.
+In this work, the authors introduce the idea of modifying kernels source code to allow for control of their parallelization extent at all times, while also maintaining their correct functionality. This way, the GPU resources (i.e. number of cores) an executing kernel is using can be modified "on the go", allowing the reconfiguration of allocated GPU resources to either reduce or augment the number of running tasks at any certain time. This job is carried out by a system-aware resource manager akin to MANGO's BarbecueRTRM.
+
+Since BarbecueRTRM does not currently support reconfiguration of allocated resources once an application is running, there is clearly a great amount of work to be done on this front before a Slate-type optimization could be implemented.
+
+\subsection{Native CPU Support}
+
+In the current implementation, the GN module is used to run kernels in the user's host system CPU. The GN module was developed as an HN emulator, so its working method is therefore not optimized for efficiently running kernels on CPU devices, as its API is limited to that of HN.
+
+To properly support CPUs as target accelerators, a new architecture node must be introduced, along with an HHAL manager that interacts with it.
+
+\subsection{HNlib Integration}
+
+The restructuring of the MANGO software stack, centered around the introduction of the Heterogeneous Hardware Abstraction Layer, forced a rework of the Libmango module. This entailed the removal of the Libmango-HNlib interaction, hence effectively eliminating the HN accelerators from the pool of MANGO supported architectures.
+With accelerator communication now taking place through the HHAL module, an HN Manager should be added to HHAL in order to reestablish that communication.
 
