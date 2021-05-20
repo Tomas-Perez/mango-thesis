@@ -66,8 +66,18 @@ By default, MANGO utilizes kernel termination events for both internal and host 
 
 \subsection{Task Graph} \label{arch:TaskGraph}
 
-The Task Graph gives a global picture of the application's behavior and represents data and control dependencies between Kernels, Memory Buffers and Events. The Task Graph provides the resource manager with the information needed to generate the best feasible resource allocation for the requested Quality of Service (QoS) \cite{mango_exploring_manycore_architectures}.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/taskgraph.png}
+    \captionsetup{justification=centering}
+    \caption{Task Graph example}
+    \label{fig:TaskGraph}
+\end{figure}
 
+The Task Graph gives a global picture of the application's behavior and represents data and control dependencies between Kernels, Memory Buffers and Events. 
+Through the Task Graph, the resource manager obtains the necessary information to formulate the best possible resource allocation, also taking into account the requested performance and Quality of Service (QoS) levels.
+
+The example in figure \ref{fig:TaskGraph} demonstrates the Task Graph of an application consisting of four Kernels, their respective termination Events, and data dependencies among Kernels in the form of Buffers.
 
 \section{Libmango}
 Libmango is the front-facing module of the MANGO system, hence providing the system's API for user interaction with the underlying components, and acting as an abstraction layer between user defined models and module specific requirements.
@@ -86,14 +96,15 @@ Once the application is specified, the task graph information is sent to the Bar
 \subsection{Kernel management} \label{Libmango:KernelManagement}
 Libmango exposes functionalities and data structures that can be used to represent and manipulate kernels.
 
-Kernels are identified by an user-provided integer. For a single kernel, multiple implementations can be specified, each one targeting a different supported accelerator and thus provided in their respective architecture's requirements - a kernel implementation targeting an Nvidia GPGPU would require a CUDA implementation.
-Kernel versions (implementations) are stored either in memory or in external files. According to the targeted architecture, multiple source types are supported. The kernel source can be a pre-compiled binary file or code in accelerator-supported language, provided via a string stored in memory or a source file, to be dynamically compiled if required.
-The resource manager will rely on the available options in the assignment of kernels to accelerators.
+Kernels are identified by an user-provided integer. For a single kernel, multiple implementations can be specified, each one targeting a different supported accelerator and thus provided in their respective architecture's requirements. I.e. a kernel targeting an Nvidia GPU would require a CUDA implementation.
+
+Kernel versions (implementations) are stored either in memory or in external files. According to the targeted architecture, multiple source types are supported. The kernel source can be a pre-compiled binary file or code in accelerator-supported language, provided via a memory-stored string or a source file, to be dynamically compiled as required.
+The resource manager relies on the available options for the assignment of kernels to accelerators.
 
 Kernels can be manually started by the developer once the resource allocation is successfully completed.
 
 Libmango supports three types of Kernel arguments: Scalar arguments, Buffer arguments and Event arguments.
-These essentially act as wrappers of the HHAL kernel arguments.
+These act as wrappers of the HHAL kernel arguments.
 
 \subsubsection{Scalar argument}
 A Scalar argument consists of a scalar value. The types supported by Libmango are signed and unsigned integers of sizes 8, 16 and 32 bits, as well as long and float values. 
