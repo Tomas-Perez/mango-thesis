@@ -481,7 +481,13 @@ However, there is another primary job the \texttt{PlatformProxy} carries out. Af
 
 \section{HHAL} \label{HHAL}
 
-%TODO add a graph showing hhal: client, server, api, managers, dycomp
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/hhal.png}
+    \captionsetup{justification=centering}
+    \caption{HHAL module overview}
+    \label{fig:hhal}
+\end{figure}
 
 The Heterogeneous Hardware Abstraction Layer (HHAL) is the module of the MANGO system that takes care of the communication with the multiple accelerator libraries.
 As such, HHAL abstracts accelerator specific information in a manner that allows the resource manager to fully exploit architecture specific features, while freeing Libmango from the inherent complexity of handling multiple architectures.
