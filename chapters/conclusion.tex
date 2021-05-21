@@ -15,12 +15,12 @@ This functionality can be fully implemented in the Libmango module, which based 
 
 \subsection{GPU Kernel Parallelism Optimization}
 
-When it comes to optimization, there is an endless number of approaches to investigate with the goal of achieving a higher level of system efficiency, as seen in the multiple resource allocation policies that were already implemented in the BarbecueRTRM module.
+When it comes to optimization, there is an endless number of approaches to investigate with the goal of achieving a higher level of system efficiency, as seen in the multiple resource allocation policies that were already implemented in the BarbequeRTRM module.
 
 Focusing on the GPU landscape, optimizing the use of their parallelization capabilities is the key to achieve better results. In 2019, a prototype for workload-aware efficient multiprocessing for modern GPGPUS \cite{slate}: Slate, was presented.
-In this work, the authors introduce the idea of modifying kernels source code to allow for control of their parallelization extent at all times, while also maintaining their correct functionality. This way, the GPU resources (i.e. number of cores) an executing kernel is using can be modified "on the go", allowing the reconfiguration of allocated GPU resources to either reduce or augment the number of running tasks at any certain time. This job is carried out by a system-aware resource manager akin to MANGO's BarbecueRTRM.
+In this work, the authors introduce the idea of modifying kernels source code to allow for control of their parallelization extent at all times, while also maintaining their correct functionality. This way, the GPU resources (i.e. number of cores) an executing kernel is using can be modified "on the go", allowing the reconfiguration of allocated GPU resources to either reduce or augment the number of running tasks at any certain time. This job is carried out by a system-aware resource manager akin to MANGO's BarbequeRTRM.
 
-Since BarbecueRTRM does not currently support reconfiguration of allocated resources once an application is running, there is clearly a great amount of work to be done on this front before a Slate-type optimization could be implemented.
+Since BarbequeRTRM does not currently support reconfiguration of allocated resources once an application is running, there is clearly a great amount of work to be done on this front before a Slate-type optimization could be implemented.
 
 \subsection{Native CPU Support}
 
