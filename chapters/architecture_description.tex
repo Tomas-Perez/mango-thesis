@@ -957,7 +957,7 @@ The main focus of the NAN is enabling MANGO to launch CUDA kernels in Nvidia acc
 Nvidia GPUs are capable of executing kernels written in the CUDA programming language, which are compiled into the PTX \cite{ptx} format. PTX stands for Parallel Thread Execution, and is an Instruction Set Architecture (ISA) for using Nvidia GPUs as data-parallel computing devices.
 
 Naturally, users of the MANGO system targeting Nvidia GPUs must provide CUDA kernels in their PTX compiled form when loading kernels of the binary type.
-Alternatively, if kernels are loaded as source code, the Nvidia Architecture Node provides the \textbf{CUDA Compiler} tool, which makes use of the CUDA compilation library NVRTC \cite{nrvtc} to compile CUDA kernels from source into a PTX format for its later execution. The CUDA Compiler is used by the Dynamic Compiler of the HHAL Module for this very purpose.
+Alternatively, if kernels are loaded as source code, the Nvidia Architecture Node provides the \textbf{CUDA Compiler} tool, which makes use of the CUDA compilation library NVRTC \cite{nvrtc} to compile CUDA kernels from source into a PTX format for its later execution. The CUDA Compiler is used by the Dynamic Compiler of the HHAL Module for this very purpose.
 
 \subsection{NAN API}
 

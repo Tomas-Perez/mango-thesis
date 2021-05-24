@@ -1,0 +1,45 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+tick align=outside,
+tick pos=left,
+title={Buffer reads},
+x grid style={white!69.0196078431373!black},
+xmin=-0.54, xmax=2.54,
+xtick style={color=black},
+xtick={0,1,2},
+xticklabels={CUDA,MANGO,OPENCL},
+y grid style={white!69.0196078431373!black},
+ylabel={Transfer time DtoH (ms)},
+ymajorgrids,
+ymin=0, ymax=125.150330663325,
+ytick style={color=black},
+yticklabel style={/pgf/number format/fixed},
+]
+\draw[draw=none,fill=green!50.1960784313725!black,fill opacity=0.5] (axis cs:-0.4,0) rectangle (axis cs:0.4,65.76414157);
+\draw[draw=none,fill=color0,fill opacity=0.5] (axis cs:0.6,0) rectangle (axis cs:1.4,109.746946745);
+\draw[draw=none,fill=red,fill opacity=0.5] (axis cs:1.6,0) rectangle (axis cs:2.4,66.05377953);
+\draw (axis cs:0,69.79022270075) node[
+  scale=1,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{65.76};
+\draw (axis cs:1,113.77302787575) node[
+  scale=1,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{109.75};
+\draw (axis cs:2,70.07986066075) node[
+  scale=1,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{66.05};
+\end{axis}
+
+\end{tikzpicture}

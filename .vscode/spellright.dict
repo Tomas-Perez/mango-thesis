@@ -43,3 +43,6 @@ cgroup
 cpufreq
 QoS
 entrypoints
+Rodinia
+Ti
+cuda

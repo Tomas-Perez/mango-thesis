@@ -1,0 +1,71 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=1,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.91,0.5)},
+  anchor=east,
+  draw=white!80!black
+},
+tick align=outside,
+tick pos=left,
+title={Kernel executions (min)},
+x grid style={white!69.0196078431373!black},
+xlabel={Input size (grid size)},
+xmin=-550.4, xmax=17190.4,
+xtick style={color=black},
+y grid style={white!69.0196078431373!black},
+ylabel={Kernel execution time (ms)},
+ymajorgrids,
+ymin=2.29999999999987e-05, ymax=0.16,
+ytick style={color=black},
+scaled x ticks = false,
+scaled y ticks = false,
+xtick={0, 4000, 8000, 12000, 16000},
+ytick={0, 0.05, 0.1, 0.15, 0.2},
+ticklabel style={
+/pgf/number format/fixed,
+/pgf/number format/precision=5
+}, scaled ticks=false 
+]
+\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+table {%
+256 0.011924
+512 0.010761
+1024 0.006711
+2048 0.009254
+4096 0.014497
+8192 0.0134
+16384 0.008626
+};
+\addlegendentry{CUDA}
+\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
+table {%
+256 0.136179
+512 0.140471
+1024 0.128692
+2048 0.127033
+4096 0.130072
+8192 0.130367
+16384 0.13795
+};
+\addlegendentry{MANGO}
+\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
+table {%
+256 0.012901
+512 0.01182
+1024 0.007888
+2048 0.010449
+4096 0.015589
+8192 0.014153
+16384 0.009771
+};
+\addlegendentry{OPENCL}
+\end{axis}
+
+\end{tikzpicture}

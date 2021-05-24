@@ -1,0 +1,86 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=1,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=white!80!black
+},
+tick align=outside,
+tick pos=left,
+title={Buffer writes (min)},
+x grid style={white!69.0196078431373!black},
+xlabel={Buffer size (megabytes)},
+xmin=-51.195849609375, xmax=1075.13432617188,
+xtick style={color=black},
+y grid style={white!69.0196078431373!black},
+ylabel={Buffer write time (ms)},
+ymajorgrids,
+ymin=-20.87728815, ymax=438.56587515,
+ytick style={color=black},
+yticklabel style={/pgf/number format/fixed},
+]
+\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 0.006492
+0.001953125 0.006755
+0.00390625 0.008035
+0.0078125 0.008076
+0.015625 0.009497
+0.03125 0.011857
+0.0625 0.018875
+0.2490234375 0.025938
+0.998046875 0.088613
+3.99609375 0.449539
+15.9921875 1.750324
+63.984375 7.037796
+255.96875 27.824273
+1023.9375 110.900091
+};
+\addlegendentry{CUDA}
+\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 0.057045
+0.001953125 0.059976
+0.00390625 0.063211
+0.0078125 0.062814
+0.015625 0.098816
+0.03125 0.103994
+0.0625 0.127019
+0.2490234375 0.087831
+0.998046875 0.239715
+3.99609375 1.019533
+15.9921875 4.551944
+63.984375 29.173601
+255.96875 112.814873
+1023.9375 417.682095
+};
+\addlegendentry{MANGO}
+\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 0.186774
+0.001953125 0.189
+0.00390625 0.202739
+0.0078125 0.195498
+0.015625 0.193317
+0.03125 0.19991
+0.0625 0.204992
+0.2490234375 0.061932
+0.998046875 0.188762
+3.99609375 0.605261
+15.9921875 1.940336
+63.984375 7.088069
+255.96875 30.388083
+1023.9375 102.447598
+};
+\addlegendentry{OPENCL}
+\end{axis}
+
+\end{tikzpicture}

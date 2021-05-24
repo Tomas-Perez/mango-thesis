@@ -214,6 +214,12 @@
   note  = {\url{https://www.amd.com/en/press-releases/boltzmann-initiative-2015nov16}, Accessed: May 2021}
 }
 
+@misc{ptx_isa,
+  title = {{Parallel Thread Execution ISA Version 7.3}},
+  note  = {\url{https://docs.nvidia.com/cuda/parallel-thread-execution/index.html}}
+}
+
+
 @inproceedings{transparent_cpu_gpu_collaboration,
   author    = {Lee, Janghaeng and Samadi, Mehrzad and Park, Yongjun and Mahlke, Scott},
   title     = {Transparent CPU-GPU Collaboration for Data-Parallel Kernels on Heterogeneous Systems},
@@ -483,9 +489,25 @@
   note = {\url{https://docs.nvidia.com/cuda/parallel-thread-execution/index.html}, Accessed: May 2021}
 }
 
-@misc{nrvtc,
+@misc{nvrtc,
   title= {{CUDA Toolkit Documentation - NVRTC}},
   note = {\url{https://docs.nvidia.com/cuda/nvrtc/index.html}, Accessed: May 2021}
+}
+
+@misc{stream,
+  title = {{Sustainable Memory Bandwidth in Current High Performance Computers}},
+  author = {John D. McCalpin },
+  month = {Oct},
+  year = {1995},
+  note = {\url{http://www.cs.virginia.edu/~mccalpin/papers/bandwidth/bandwidth.html}, Accessed: May 2021}
+}
+
+@misc{perf_metrics_cuda,
+  title = {{How to Implement Performance Metrics in CUDA C/C++}},
+  author = {Mark Harris},
+  month = {Nov},
+  year = {2012},
+  note = {\url{https://developer.nvidia.com/blog/how-implement-performance-metrics-cuda-cc/}, Accessed: May 2021}
 }
 
 @article{kokkos,
@@ -845,3 +867,39 @@
   doi       = {10.4230/LIPIcs.ECRTS.2020.10},
   annote    = {Keywords: real-time systems, graphics processing units, parallel computing}
 }
+
+@inproceedings{rodinia,
+  author    = {Che, Shuai and Boyer, Michael and Meng, Jiayuan and Tarjan, David and Sheaffer, Jeremy W. and Lee, Sang-Ha and Skadron, Kevin},
+  booktitle = {2009 IEEE International Symposium on Workload Characterization (IISWC)},
+  title     = {Rodinia: A benchmark suite for heterogeneous computing},
+  year      = {2009},
+  volume    = {},
+  number    = {},
+  pages     = {44-54},
+  doi       = {10.1109/IISWC.2009.5306797}
+}
+
+@article{hotspot,
+  author  = {Wei Huang and Ghosh, S. and Velusamy, S. and Sankaranarayanan, K. and Skadron, K. and Stan, M.R.},
+  journal = {IEEE Transactions on Very Large Scale Integration (VLSI) Systems},
+  title   = {HotSpot: a compact thermal modeling methodology for early-stage VLSI design},
+  year    = {2006},
+  volume  = {14},
+  number  = {5},
+  pages   = {501-513},
+  doi     = {10.1109/TVLSI.2006.876103}
+}
+
+@inproceedings{babelstream,
+  author    = {Deakin, Tom and Price, James and Martineau, Matt and McIntosh-Smith, Simon},
+  editor    = {Taufer, Michela and Mohr, Bernd and Kunkel, Julian M.},
+  title     = {GPU-STREAM v2.0: Benchmarking the Achievable Memory Bandwidth of Many-Core Processors Across Diverse Parallel Programming Models},
+  booktitle = {High Performance Computing},
+  year      = {2016},
+  publisher = {Springer International Publishing},
+  address   = {Cham},
+  pages     = {489--507},
+  abstract  = {Many scientific codes consist of memory bandwidth bound kernels --- the dominating factor of the runtime is the speed at which data can be loaded from memory into the Arithmetic Logic Units, before results are written back to memory. One major advantage of many-core devices such as General Purpose Graphics Processing Units (GPGPUs) and the Intel Xeon Phi is their focus on providing increased memory bandwidth over traditional CPU architectures. However, as with CPUs, this peak memory bandwidth is usually unachievable in practice and so benchmarks are required to measure a practical upper bound on expected performance.},
+  isbn      = {978-3-319-46079-6}
+}
+

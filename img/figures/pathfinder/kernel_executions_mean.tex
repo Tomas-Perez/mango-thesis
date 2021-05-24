@@ -1,0 +1,59 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=1, draw opacity=1, text opacity=1, draw=white!80!black},
+tick align=outside,
+tick pos=left,
+title={Kernel executions (mean)},
+x grid style={white!69.0196078431373!black},
+xlabel={Input size (grid size)},
+xmin=-550.4, xmax=17190.4,
+xtick style={color=black},
+y grid style={white!69.0196078431373!black},
+ylabel={Kernel execution time (ms)},
+ymajorgrids,
+ymin=-0.00615745730101246, ymax=0.443984208321262,
+ytick style={color=black},
+scaled x ticks = false,
+xtick={0, 4000, 8000, 12000, 16000},
+]
+\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+table {%
+256 0.0143035275
+512 0.0190845953667954
+1024 0.0173306496732026
+2048 0.017656685966634
+4096 0.0180730500490677
+8192 0.0207366837857667
+16384 0.0295047277512547
+};
+\addlegendentry{CUDA}
+\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
+table {%
+256 0.403191205928237
+512 0.423523223520249
+1024 0.254635078135259
+2048 0.217650361248761
+4096 0.213267922660099
+8192 0.197583217964668
+16384 0.214495841814159
+};
+\addlegendentry{MANGO}
+\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
+table {%
+256 0.0161839365700861
+512 0.0174985770416025
+1024 0.0181579511051574
+2048 0.0190632247081712
+4096 0.0205183282178218
+8192 0.0221790555555556
+16384 0.0302621266070773
+};
+\addlegendentry{OPENCL}
+\end{axis}
+
+\end{tikzpicture}

@@ -1,0 +1,86 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=1,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=white!80!black
+},
+tick align=outside,
+tick pos=left,
+title={Buffer writes (mean)},
+x grid style={white!69.0196078431373!black},
+xlabel={Buffer size (megabytes)},
+xmin=-51.195849609375, xmax=1075.13432617188,
+xtick style={color=black},
+y grid style={white!69.0196078431373!black},
+ylabel={Buffer write time (ms)},
+ymajorgrids,
+ymin=-21.2301063907143, ymax=446.080604551939,
+ytick style={color=black},
+yticklabel style={/pgf/number format/fixed},
+]
+\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 0.0112895612244898
+0.001953125 0.01208368
+0.00390625 0.0117242333333333
+0.0078125 0.0129084736842105
+0.015625 0.01453375
+0.03125 0.0176991
+0.0625 0.0208775
+0.2490234375 0.0286712755102041
+0.998046875 0.10126693877551
+3.99609375 0.459110655172414
+15.9921875 1.80984045
+63.984375 7.13521621052632
+255.96875 28.1117542
+1023.9375 112.2217462
+};
+\addlegendentry{CUDA}
+\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
+table {%
+0.0009765625 0.17391198989899
+0.001953125 0.17851804
+0.00390625 0.165922633333333
+0.0078125 0.1528704
+0.015625 0.1705615
+0.03125 0.1738537
+0.0625 0.7945439
+0.2490234375 0.300501707070707
+0.998046875 0.60951162
+3.99609375 1.45868382758621
+15.9921875 7.00193921052632
+63.984375 33.6318241
+255.96875 118.210402
+1023.9375 424.8392086
+};
+\addlegendentry{MANGO}
+\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
+table {%
+0.0009765625 0.21893114
+0.001953125 0.21817348
+0.00390625 0.226192172413793
+0.0078125 0.22287355
+0.015625 0.2213049
+0.03125 0.2202647
+0.0625 0.2337682
+0.2490234375 0.0643956597938144
+0.998046875 0.19593170212766
+3.99609375 0.621945551724138
+15.9921875 1.96354655
+63.984375 7.15548315
+255.96875 30.5490241
+1023.9375 102.7730812
+};
+\addlegendentry{OPENCL}
+\end{axis}
+
+\end{tikzpicture}

@@ -1,0 +1,66 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=1,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=white!80!black
+},
+tick align=outside,
+tick pos=left,
+title={Total duration (mean)},
+x grid style={white!69.0196078431373!black},
+xlabel={Input size (grid size)},
+xmin=-550.4, xmax=17190.4,
+xtick style={color=black},
+y grid style={white!69.0196078431373!black},
+ylabel={Total duration (ms)},
+ymajorgrids,
+ymin=1.06305218103449, ymax=821.428003991379,
+ytick style={color=black},
+scaled x ticks = false,
+xtick={0, 4000, 8000, 12000, 16000},
+]
+\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+table {%
+256 42.9552711
+512 41.32715138
+1024 38.3523681724138
+2048 40.43792255
+4096 49.69510795
+8192 75.8983512
+16384 175.3781874
+};
+\addlegendentry{CUDA}
+\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
+table {%
+256 101.184211525253
+512 111.13555734
+1024 116.082388233333
+2048 127.939228894737
+4096 191.4835014
+8192 335.4150991
+16384 784.138688
+};
+\addlegendentry{MANGO}
+\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
+table {%
+256 105.803828572917
+512 106.067160145833
+1024 104.400873965517
+2048 100.396111
+4096 109.2311212
+8192 145.6926093
+16384 251.2904586
+};
+\addlegendentry{OPENCL}
+\end{axis}
+
+\end{tikzpicture}

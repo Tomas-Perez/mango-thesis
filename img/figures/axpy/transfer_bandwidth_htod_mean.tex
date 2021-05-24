@@ -1,0 +1,45 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+tick align=outside,
+tick pos=left,
+title={Transfer bandwidth HtoD (mean)},
+x grid style={white!69.0196078431373!black},
+xmin=-0.54, xmax=2.54,
+xtick style={color=black},
+xtick={0,1,2},
+xticklabels={CUDA,MANGO,OPENCL},
+y grid style={white!69.0196078431373!black},
+ylabel={\% of theoretical peak PCI-E bandwidth},
+ymajorgrids,
+ymin=0, ymax=0.831661677395387,
+ytick style={color=black},
+yticklabel style={/pgf/number format/fixed},
+]
+\draw[draw=none,fill=green!50.1960784313725!black,fill opacity=0.5] (axis cs:-0.4,0) rectangle (axis cs:0.4,0.729969069349463);
+\draw[draw=none,fill=color0,fill opacity=0.5] (axis cs:0.6,0) rectangle (axis cs:1.4,0.191327388754879);
+\draw[draw=none,fill=red,fill opacity=0.5] (axis cs:1.6,0) rectangle (axis cs:2.4,0.643923602494467);
+\draw (axis cs:0,0.756056070359443) node[
+  scale=1,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{0.73};
+\draw (axis cs:1,0.217414389764859) node[
+  scale=1,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{0.19};
+\draw (axis cs:2,0.670010603504447) node[
+  scale=1,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{0.64};
+\end{axis}
+
+\end{tikzpicture}
