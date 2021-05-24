@@ -36,7 +36,7 @@ These objectives can only be achieved through the efficient integration and coop
 The MANGO software stack, at the beginning of our contribution to the project, looked as shown in figure \ref{fig:mango_initial_stack}.
 
 Starting from the top of the stack, we find the \textbf{Libmango} module, in charge of stablishing the programming model for users of the MANGO system, Libmango exposes an API that provides users with access to the functionalities of the underlying layers. 
-Libmango interacts with \textbf{BarbequeRTRM}, the resource manager, responsible for scheduling user applications and allocating system resources according to performance requirements, as well as power and thermal information. BarbecueRTRM also monitors running applications to maintain a complete view of the system, and collect profiling information.
+Libmango interacts with \textbf{BarbequeRTRM}, the resource manager, responsible for scheduling user applications and allocating system resources according to performance requirements, as well as power and thermal information. BarbequeRTRM also monitors running applications to maintain a complete view of the system, and collect profiling information.
 
 Next in the stack is the Hardware Abstraction Layer, consisting of the \textbf{HN} library and daemon. HN was designed as an abstraction layer for the MANGO custom hardware architecture, supporting PEAK, DCT and nu+ accelerators. To facilitate development and enable running MANGO applications on personal computers, the \textbf{GN} emulator was introduced. The GN library follows the same API as HN, which allows to use them interchangeably, and emulates the presence of hardware accelerators by using instead the host CPU.
 The bottom-most layers are the \textbf{Hardware} layer, containing the accelerators themselves, and the \textbf{Device Libraries/Drivers}, through which communication with the hardware is stablished.
@@ -70,14 +70,14 @@ An initial integration effort of the NAN with the Libmango module was successful
 But a problem with MANGO's structure became increasingly clear. The limited abstraction provided by HN caused the Libmango module to be closely attached to its API and working requirements. This inter-dependency was made evident by the presence of elements like a memory manager in the Libmango module, which was supposed to be architecture agnostic.
 
 A decision was made to restructure the MANGO system with the addition of a new module: HHAL. This module was developed side by side with the NAN.
-On the BarbecueRTRM forefront, GPU support involved the 
+On the BarbequeRTRM forefront, GPU support involved the 
 
 \subsection{HHAL}
 
 HHAL, which stands for Heterogeneous Hardware Abstraction Layer, was built for the ground up as a solution that enables the easy integration of accelerator architectures to the MANGO system, while freeing Libmango (and other modules) from the inherent complexity of handling multiple architectures. This would also hide the HN library behind the HHAL API.
 A detailed explanation of HHAL's implementation is given in section \ref{HHAL}.
 
-While integration of HHAL with the BarbecueRTRM was a smooth process (covered in section \ref{bbque:integration}), Libmango required considerable work.
+While integration of HHAL with the BarbequeRTRM was a smooth process (covered in section \ref{bbque:integration}), Libmango required considerable work.
 
 \subsection{Libmango rework}
 
@@ -101,7 +101,7 @@ As previously mentioned, the Dynamic Compiler was also moved from Libmango to th
     \label{fig:mango_final_stack}
 \end{figure}
 
-HHAL and NAN development, Libmango's rework and BarbecueRTRM integration, all took 10 months to complete. The implementation work was performed across all modules in an iterative manner, so time dedicated to each module was not measured.
+HHAL and NAN development, Libmango's rework and BarbequeRTRM integration, all took 10 months to complete. The implementation work was performed across all modules in an iterative manner, so time dedicated to each module was not measured.
 The resulting MANGO software stack can be seen in figure \ref{fig:mango_final_stack}.
 
 \section{Document Structure}
