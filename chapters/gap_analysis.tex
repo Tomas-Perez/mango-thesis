@@ -1,6 +1,60 @@
 \chapter{Gap Analysis} \label{ch:GapAnalysis}
 
-% TODO expand
-Using a single programming model, even open source ones does not guarantee portability due to hardware vendor's unwillingness to work together \cite{but_mummy_cuda}.
+In this chapter we will compare the programming models seen in the state-of-the-art chapter in order to analyze the present gaps in the heterogenous computing space which MANGO can fill. As MANGO is a large, still ongoing and highly experimental project, of which this thesis is merely a stepping stone, we will look at MANGO from a long term perspective. This means that we will not only look at the current state of the implementation but of what will become of the project once all of its goals are achieved.
 
-In order to squeeze all the performance out of the hardware it is necessary to use a low-level language which takes into account the specific details of the hardware \cite{cuda_open_source_compiler}.
+We are interested in looking at the following capabilities in the presented programming models:
+
+\begin{itemize}
+    \item Device support, including CPU, GPU and FPGAs.
+    \item Whether the model uses a single-source approach, where host and device code can coexist in the same source file, are written in the same programming language and can share common pieces of code.
+    \item The portability of the device kernels, as in whether it is possible for a kernel written to target a given device can be compiled for and executed in a different supported device.
+    \item Resource management capabilities, allowing efficient use of the available devices depending on their current load, power consumption and relative performance.
+    \item Support for control and distribution of the application along multiple clusters, each one with a set of diverse target devices.
+\end{itemize}
+
+A comparison of the capabilities of each programming model can be seen in table \ref{tab:progamming-model-comparison}.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l|c|c|c|c|c|c|c}
+    \textit{Model} & \textit{CPU} & \textit{GPU} & \textit{FPGA} & \makecell{\textit{Single} \\ \textit{source}} & \makecell{\textit{Kernel} \\ \textit{portability}} & \makecell{\textit{Resource} \\ \textit{management}} & \makecell{\textit{Multiple} \\ \textit{clusters}} \\ \hline
+    MANGO & Yes & Yes & Yes & No & No & Yes & Yes \\
+    CUDA & No & Yes & No & Yes & No & No & No \\
+    OpenCL & Yes & Yes & Yes & No & Yes & No & No \\
+    EngineCL & Yes & Yes & Yes & No & Yes & No & No \\
+    FluidiCL & Yes & Yes & Yes & No & Yes & No & No \\
+    ROCm & No & Yes & No & Yes & Yes & No & No \\
+    OpenMP & Yes & Yes & No & Yes & Yes & No & No  \\
+    OpenACC & Yes & Yes & No & Yes & Yes & No & No  \\
+    SYCL & Yes & Yes & Yes & Yes & Yes & No & No \\
+    Celerity & Yes & Yes & Yes & Yes & Yes & No & Yes \\
+    Kokkos & Yes & Yes & No & Yes & Yes & No & No 
+    \end{tabular}
+    \captionsetup{justification=centering}
+    \caption{Comparison of programming model capabilities}
+    \label{tab:progamming-model-comparison}
+\end{table}
+
+By analyzing the table we can see that MANGO provides all the relevant capabilities except for two important ones in terms of programmability: it is not a single source approach and also requires writing a separate kernel for each device.
+
+We argue that although at first glance introducing these capabilities would improve programmability, the performance gained by their absence is much more important to HPC.
+
+First of all, using a single kernel programming model for multiple devices, even open source, ones does not guarantee portability. We will take OpenCL as an example. As seen in section \ref{sect:opencl} with OpenCL, it is the responsibility of the hardware vendors to provide support for any new feature of the standard. This introduces version differences between different platforms, for example NVIDIA GPUs still only support OpenCL 1.2. While OpenCL 2.x introduced multiple useful features, the lack of support from NVIDIA, which is one of its main targets, slowed down 2.0 adoption. The effect was so considerable that the 3.0 standard removed the requirement for most of the features introduced in 2.x. 
+
+If a developer has two target OpenCL devices for the same kernel, one with 1.2 capabilities and one with 2.0 capabilities one of two things can happen: 
+\begin{enumerate}
+    \item they limit themselves to 1.2 features, or
+    \item they write two separate kernels and possibly two separate host side implementations to exploit all the newest features on the device that supports the latest standard while also maintaining compatibility with the 1.2 device.
+\end{enumerate}
+ 
+As such, a great hurdle for kernel portability is the hardware vendor's unwillingness to work together \cite{but_mummy_cuda}. This is perfectly reasonable, like in any other market, a company will gain an advantage over their competitors in whichever way they can and maintain it as long as possible. If NVIDIA simply releases CUDA as an open source standard for all GPUs to utilize, they will lose their upper hand over AMD in the GPGPU market.
+
+Even if, despite all their differences, all hardware vendors would work together on a single project, the differences in the hardware architecture will still be present. Indeed, the purpose of Heterogeneous Computing is to handle multiple devices with different memory access requirements, levels of parallelism, instruction sets and more. Although it may be possible to abstract all this away from the kernel programmer, it will not come without a cost in performance.
+
+In order to squeeze all the performance out of the devices it is necessary to use a low-level language which takes into account the specific details of the hardware \cite{cuda_open_source_compiler}. This does not mean that all kernels have to be written in assembly, but in a language that makes it possible to utilize all the capabilities offered by the target device. In consequence, it is inevitable that one or more of the available devices do not present a given capability. Thus, in today's world, achieving complete portability of a kernel while also maintaining peak performance is impossible.
+
+MANGO's plan is to embrace these differences in kernel implementations, allowing the developers to write their device code in the best suited programming language or framework available. Our programming model will abstract away all the \textit{host side} code to be able to handle multiple different platforms, allowing for different types of implementations to coexist and communicate with each other, no matter what the chosen model for the device kernel is.
+
+Another key advantage of MANGO over the other mentioned programming models is its integration with a resource manager, namely BarbequeRTRM. While the previous models focus on executing a single kernel or set of kernels as fast as possible on a given platform, they do not take into account the current state of the machine that they are running on. If multiple applications could be running at the same time, there is a chance that the device most suitable for a given application is currently busy serving something else. Depending on what other devices are available, their relative performance for the kernel, power consumption and other aspects it may be more efficient to execute the work on a different device or just wait for the preferred one to be available. In addition, it could also be advantageous to suspend the execution of a given application in order to give priority to another which is more time sensitive.
+
+Last but not least, no other model except Celerity offers distributed execution of an application over multiple clusters. Since its inception, one of the goals of MANGO was to provide this capability, allowing it to exploit the heterogeneity of a large number of different machines. In conjunction with Barbeque, which also provides the capability to manage resources in a distributed system, it would be possible to launch a number of different applications on a multitude of computers and achieve an efficient and performant execution of all tasks.
