@@ -1,7 +1,7 @@
 \chapter{Experimental Results} \label{ch:ExperimentalResults}
 In this Chapter we will cover the experimental phase of our work. First comes a description of our setup and methodology, covering the hardware and software utilized as well as the chosen benchmarks and metrics. Then we will present our results and provide our analysis in order to fuel further research and development in the MANGO software stack.
 
-Our main goals during this experimental campaign were:
+During this experimental campaign, our goals were to:
 \begin{itemize}
     \item Measure the performance of MANGO with respect to other available programming models.
     \item Compare the programmability of MANGO with respect to other available programming models.
@@ -317,19 +317,17 @@ Finally, we look at the transfer times achieved between the host and the device 
 
 \subsubsection{Overall Analysis}
 
-Our initial implementation of the HHAL and restructuring of the MANGO stack is certainly not competitive with state-of-the-art programming models such as CUDA and OpenCL. 
+At first glance, our initial implementation of the HHAL and restructuring of the MANGO stack is certainly not competitive with state-of-the-art programming models such as CUDA and OpenCL. 
 
-Both kernel execution and buffer transfer overheads can be linked with our client-server approach when integrating the HHAL with the rest of the software. 
+Kernel execution and buffer transfer overheads can be linked with our client-server approach when integrating the HHAL with the rest of the software. As the entirety of the HHAL is behind a central server with a socket based connection to the different clients, this means that both kernel launches and buffer transfers need to go through the socket first.
 
-Both Barbeque and MANGO need access to the HHAL for different reasons. Barbeque needs to allocate and deallocate resources and MANGO needs to execute the kernels. As barbeque and MANGO do not co-exist in the same process (Barbeque always works as a daemon) and there is this need to give both access to the same HHAL information we moved the HHAL to its own process. This works without any problems to communicate information and maintain a consistent state across all processes. 
+This significantly reduces performance when working within the same cluster, as more efficient communication could be adopted. If the HHAL, Barbeque and the MANGO API host run on the same machine, all communication could be done through shared memory instead of a socket. In addition, kernel executions and buffer transfers could be done entirely through a library linked directly to the MANGO host, without the need of any IPC. Allowing the computer to work on in this sort of "mixed-mode" will most certainly increase the throughput of MANGO.
 
-However, as the entirety of the HHAL is behind a central server with a socket based connection to the different clients, this means that both kernel launches and buffer transfers need to go through the socket first.
+It is important to note that some IPC will still be needed within the same computer, as both Barbeque and MANGO need access to the HHAL for different reasons. Barbeque needs to allocate and deallocate resources while MANGO needs to execute the kernels with these same allocated resources. As they do not co-exist in the same process (Barbeque always works as a daemon) and need to access the same HHAL information, it is a requirement for at least some bookkeeping of the HHAL to always exist as separate server.
 
-Relying on inter-process communication (IPC) for all operations significantly decreases the performance that can be achieved by MANGO, specially when using sockets over a much more efficient alternative like shared memory.
+Although this discussed approach works for a single cluster, it is not extensible to a distributed system. If the target device runs on a separate computer from the MANGO host, there is no shared memory available and no way to directly talk with the device through a simple library like it would be possible with the device physically attached to the host. 
 
-During our development of the HHAL, our main focus was to improve the extensibility of the MANGO platform by decoupling it from the HN library, thus providing a more general internal API for communicating with each available architecture. In consequence, we opted for a faster development approach and oversaw the performance implications of excessive and inefficient IPC.
-
-Although for proper decoupling of the MANGO library from architectural changes it is necessary for at least part of the HHAL to continue existing as a separate process. Nonetheless, the HHAL API could be split to allow for the performance critical aspects of the code to be executed directly in the client process, thus forgoing the need to, for example, transfer the entirety of the buffer data through a socket.
+By creating the HHAL in a client-server fashion we followed the approach used when creating the initial HN library, this allows the HHAL server to be easily distributed and run on a separate cluster. Once the platform matures, however, the improvements mentioned previously will be very important for the cases when the MANGO host and the HHAL run on a single machine. This topic is discussed further in section \ref{sub-sect:hhal-mixed-mode}.
 
 \subsection{Programmability}
 
