@@ -1,27 +1,16 @@
 \chapter{State of the Art} \label{ch:StateOfTheArt}
 
-%TODO cleanup State of the Art intro
-Text goes here.
+This chapter covers the state of the art in heterogenous computing programming models, with a focus on Graphic Processing Units (GPUs). Today, over six hundred applications utilize GPU acceleration across a broad range of industries including: finance, design for manufacturing/construction, artificial intelligence, medical imaging and more. As such, it was a very important platform to add to the MANGO software stack, and one of the main contributions of our thesis.
 
-Focus on multiprocessing models which focus on performance improvements.
+Section \ref{sect:history-gpgpu} covers the history of advancements in GPGPU technology and is largely based on \cite{brief_history_gpgpu}, a talk by NVIDIA Software Engineer Mark Harris. This is a very interesting topic and shows the evolution in development using GPUs, culminating in the release of NVIDIA's CUDA. 
 
-\begin{itemize}
-    \item Single source kernel: OpenCL, HIP.
-    \item Language extensions for high level parallelism: OpenMP, OpenACC, SYCL, C++ AMP.
-    \item Proprietary solutions: CUDA.
-\end{itemize}
+The following sections cover other programming models starting from OpenCL in section \ref{sect:opencl}. It being the most well established programming model in GPUs after CUDA, which also provides support for programming in CPUs and FPGAs.
 
-Other types of models which focus on scalability, but not covered \cite{survey_programming_models}:
+ROCm, AMD's response to the significant adoption of CUDA, is covered in section \ref{sect:rocm}. By adopting a very similar API to CUDA, AMD is able to easily port existing CUDA applications in order to run them on their own GPUs while still being able to compile for NVIDIA's.
 
-\begin{itemize}
-    \item Actor model
-    \item MPI
-\end{itemize}
+After that, section \ref{sect:openmp-openacc} covers both OpenMP and OpenACC, which adopt very similar compiler-directive-based to programming GPUs.
 
-Section \ref{sect:history-gpgpu} covers the history of advancements in GPGPU technology and is based on \cite{brief_history_gpgpu}, a talk by NVIDIA Software Engineer Mark Harris.
-
-% TODO somewhere around here?
-Today, over six hundred applications utilize GPU acceleration across a broad range of industries including: finance, design for manufacturing/construction, artificial intelligence, medical imaging and more.
+Finally, sections \ref{sect:sycl} and \ref{sect:kokkos} cover SYCL and Kokkos respectively. SYCL being the latest open standard for heterogeneous computing, which aims at providing a higher level approach than OpenCL. On the other hand, Kokkos looks towards abstracting away the memory access patterns needed by different architectures in such a way that the same code can exhibit the best performing one depending on the target device.
 
 \section{The History of GPGPU} \label{sect:history-gpgpu}
 
@@ -188,7 +177,7 @@ int main(void) {
 
 Overall, CUDA's advantages over AMD's CTM gave NVIDIA the upper hand in the GPGPU field and it is still in use to this day. By contrast, in 2008, AMD's CTO of graphics announced that the company was shifting its focus away from CTM and into the upcoming OpenCL standard \cite{amd_ctm_ditch}, detailed in the following section.
 
-\section{OpenCL}
+\section{OpenCL} \label{sect:opencl}
 
 Released in December 2008, Open Compute Language or OpenCL \cite{opencl_spec} is an open industry standard for programming a heterogeneous collection of CPUs, GPUs and other discrete computing devices organized into a single platform. It provides a framework for parallel programming and includes a language, API, libraries and a runtime system to support software development. By leveraging OpenCL, an application can use a host and one or more OpenCL devices as a single heterogeneous parallel computer system.
 
@@ -296,7 +285,7 @@ EngineCL \cite{enginecl}, introduces a new object-oriented API on top of OpenCL.
 \subsection{FluidiCL}
 FluidiCL \cite{fluidicl} maintains the OpenCL API but implements it in such a way that the user can treat multiple devices as a single entity. Thus, it is very easy to adapt an existing OpenCL application to run using FluidiCL, as all function calls can remain unchanged. The paper considers the implementation running on an experimental system with a single GPU and CPU. At the time of setup, both kernel compilation and buffer writes are broadcasted to both devices. That is, the kernel is compiled for both and, likewise, the input data is transferred to both of their buffers. When the execution starts, the GPU starts running the kernel with a decreasing order of work-group IDs, meanwhile the CPU executes smaller sub-kernels in increasing order of work-group IDs. At some point, when the work-groups IDs handled by both cross over, the work is finished and the results are merged on the GPU.
 
-\section{AMD ROCm}
+\section{AMD ROCm} \label{sect:rocm}
 Initially announced in November 2015 as the "Boltzmann Initiative", AMD ROCm is an open-source software development platform for HPC GPU computing \cite{boltzmann_initiative}. It is AMD's latest competitor to NVIDIA's CUDA.
 
 Since shifting their focus away from CTM in 2008 and mainly supporting the OpenCL standard, AMD still lost a significant market share to NVIDIA in the GPGPU market \cite{amd_as_alternative}. Developers preferred the CUDA approach which, although constrained them to NVIDIA products, provided a more convenient programming experience by following a single source model.
@@ -319,7 +308,7 @@ As a case study, in SC16 Ben Sander from AMD made a presentation showing the wor
 
 \cite{ginkgo_rocm_port} also presents a case of porting an application from CUDA to HIP. Tsai et al. found the process very smooth and were able to automatize most of the work by extending the initial Hipify script to their needs. Although HIP allowed them to run their application on both AMD and NVIDIA, they still preferred to keep native support for CUDA and maintain two versions at the same time. Still, this setup allowed them to take advantage of HIP's similarity to CUDA by sharing a third of the code base between both implementations. In the cases where they used CUDA specific functionality, they were able to replicate it in HIP and use a common API to call the appropriate implementation depending on the programming model used. Finally, they also included experiments to show the performance of HIP code compared to native CUDA on NVIDIA GPUs. These tests showed that the overhead of HIP over CUDA is negligible, with 50\% of the test cases showing less than 3\% performance difference and 90\% of the test cases showing less than 10\% of performance difference.
 
-\section{OpenMP \& OpenACC}
+\section{OpenMP \& OpenACC} \label{sect:openmp-openacc}
 In this section we will tackle OpenMP and OpenACC in conjunction as they take very similar approaches.
 
 Both projects are composed of a library and set of compiler directives that provide a model for parallel programming across different architectures. Support is provided for the C, C++ and Fortran languages. The directives extend the languages with useful constructs for parallelizing applications. Further control of the runtime environment is possible through the library \cite{openmp_spec, openacc_spec}.
@@ -349,7 +338,7 @@ Up until version 4.0, OpenMP only allowed this code to be compiled for and execu
 
 Finally, the possibility to use both models at the same time exists. Works like \cite{openmp_openacc_multigpus} exploit parallelism on the CPU with OpenMP to schedule code to run on multiple GPUs. \cite{openmp_openacc_molecular_docking} also leverages this hybrid approach to run kernels which are more GPU friendly on the GPU using OpenACC while running less friendly kernels with OpenMP CPU parallelization.
 
-\section{SYCL}
+\section{SYCL} \label{sect:sycl}
 SYCL \cite{sycl_2020_standard} is a C++ programming model for heterogeneous computing. It builds on the underlying concepts, portability and flexibility of parallel APIs or standards like OpenCL while adding the ease of use and flexibility of single-source C++. Initially, SYCL was released as OpenCL SYCL with a provisional specification in 2014, and acted as a higher level API to interact with OpenCL devices. Since the newest SYCL 2020 standard, the model has become more generalized, making OpenCL just one of the different potential programming models SYCL can be based upon \cite{sycl_faq}.
 
 In SYCL, device and host code live on the same file and can be written in C++ according to the C++17 standard (ISO/IEC 14882:2017 Programming languages — C++) \cite{cpp17} and also the newest C++20 standard (ISO/IEC 14882:2020 Programming languages — C++) \cite{cpp20}. For compatibility reasons, the entire set of C++ features is not available in device code. In particular, SYCL device code does not support virtual function calls, function pointers, exceptions, runtime type information or dynamic memory allocation.  This still leaves a big portion of the standard which is compatible with host and device code alike, allowing the reuse of types, library code, templates and abstractions. In addition, the programmer does not need to switch between languages depending which part of the code base they are modifying. It is also important to note that, as long as there is no dependencies created with the underlying SYCL implementation, a standard C++ compiler can compile SYCL programs to run directly on the host CPU, without any external accelerator.
@@ -419,7 +408,7 @@ The Celerity extensions act as a wrapper over the SYCL runtime, handling inter-n
 
 The execution model of Celerity is arranged in a master/worker fashion. Each worker node encapsulates the available accelerator hardware and receives commands coming from a master node, which is responsible for scheduling the work. In order to construct a dependency graph of the kernels to execute, the Celerity runtime executes the programs twice. First, in the \textit{pre-pass}, information about the kernel is collected, this includes buffer accesses, how these accesses are mapped into outputs, and the global size of the kernel. With this data, the master can construct the graph and generate commands to distribute to the workers. These commands not only contain buffer data and the kernel function but also dependency information, allowing the workers, during the \textit{live-pass}, to perform peer-to-peer communication as necessary and start execution as soon as their dependencies are fulfilled, instead of requiring communication with the master at each instance. This means that Celerity does not induce any extra bandwidth overhead compared to a fully decentralized approach.
 
-\section{Kokkos}
+\section{Kokkos} \label{sect:kokkos}
 Kokkos \cite{kokkos} is a C++ library that enables applications and domain libraries to achieve performance portability on manycore architectures by unifying abstractions for both fine-grain data parallelism and memory access patterns.
 
 As a library-only solution, Kokkos does not require external tools such as a specialized compiler or even compiler extensions. Kokkos can be linked as a regular C++ library with CMake.
