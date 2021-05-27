@@ -1,8 +1,8 @@
 \chapter{Architecture Description} \label{ch:ArchitectureDescription}
 
-% TODO: Chapter introduction
+In this chapter, we provide a detailed description of the resulting MANGO software architecture, after the completion of our work.
+First, we provide an overall description of the system, followed by an explanation of the core elements. Then, we dive deeper into the inner workings of each MANGO module and their interaction with the rest of the system.
 
-% This doesn't have to be a section
 \section{Overall description}
 
 The MANGO project aims at allowing developers to easily develop applications that target different types of accelerator architectures. In particular, three types of accelerators are considered: symmetric multiprocessors, which are characterized by good capabilities in terms of OS support and execution flexibility (i.e. they are able to run a POSIX-compliant runtime); GPGPU-like accelerators, which are programmable but are not able to run a fully compliant POSIX runtime; and hardware accelerators, which do not need or support any kind  of software runtime. Applications, on the other hand, may be developed either by domain experts with limited knowledge of parallel computing and programming models, or by more experienced programmers. 
@@ -370,7 +370,7 @@ A resource manager performs the tasks scheduling and assignment of resources to 
 The framework used for resource management in the MANGO system is the Barbeque Run-Time Resource Manager (BarbequeRTRM). 
 As described in its official documentation \cite{bosp}, BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (i.e. CPU, GPU, memory, HW accelerators, etc.) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms \cite{barbecue_1}\cite{barbecue_2}. As BarbequeRTRM is a large system with multiple applications, in this section we will focus on it's usage in the MANGO system and the relevant components involved in the process.
 
-\subsection{Resource Manager Architecture}
+\subsection{Resource Manager Architecture} \label{bbque}
 
 \begin{figure}[ht]
     \centering
