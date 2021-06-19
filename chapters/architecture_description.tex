@@ -11,7 +11,7 @@ The user-facing module (Libmango), therefore, needs to operate in a way that is 
 
 Depending on the individual capabilities of each accelerator, the accelerator-facing section of the system should also introduce optimizations and/or additional features. And allow developers to easily expand the MANGO system by adding support of other architectures. The HHAL module, along with platform libraries (NAN, HN and GN), take care of these requirements.
 
-User applications, however complex, must be scheduled to run on the system-available resources. This task, also involving the resource allocation, can be performed with multiple optimization goals in mind. This job is carried out by the Resource Manager: BarbequeRTRM.
+User applications, however complex, must be scheduled to run on the system-available resources. This task, also involving the resource allocation, can be performed with multiple optimization goals in mind, job that is carried out by the Resource Manager: BarbequeRTRM.
 
 %TODO better diagram
 \begin{figure}[ht]
@@ -100,9 +100,9 @@ The Libmango API allows developers to indicate to the runtime the components of 
 Libmango is implemented in the C++ programming language, so its native usage is through the C++ API. However, a set of wrappers for other languages are provided, namely the C and Python API wrappers.
 
 \subsection{Context}
-The Context is the main class in the Libmango module, it holds the state information of the host side runtime for a single application, and its created by the user at the beginning of their interaction, with an application name and a recipe file needed by BarbequeRTRM for the resource allocation (further explained in the BarbequeRTRM section \ref{bbque:recipe}). Every subsequent component (kernels, buffers, events and task graph) has to be registered in the Context in order to be considered part of the application.
+The Context is the main class in the Libmango module, it holds the state information of the host side runtime for a single application, and it is created by the user at the beginning of their interaction, with an application name and a recipe file needed by BarbequeRTRM for the resource allocation (further explained in the BarbequeRTRM section \ref{bbque:recipe}). Every subsequent component (kernels, buffers, events and task graph) has to be registered in the Context in order to be considered part of the application.
 
-Once the application is specified, the task graph information is sent to the BarbequeRTRM for the resource allocation. After a successful resource allocation, the application is now ready to run.
+Once the application is specified, the task graph information is sent to the BarbequeRTRM for the resource allocation. After a successful resource allocation, the application is ready to run.
 
 \subsection{Kernel management} \label{Libmango:KernelManagement}
 Libmango exposes functionalities and data structures that can be used to represent and manipulate kernels.

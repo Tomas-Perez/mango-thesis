@@ -55,7 +55,7 @@ Allowing developers to work directly with kernel's source code, instead of requi
 
 To achieve this goal, Just In Time compilation of loaded kernels was introduced, enabling developers to load kernels from source code, which are compiled as required by a configurable tool we called the Dynamic Compiler.
 
-The first implementation of the \textbf{Dynamic Compiler} was as an extension of the Libmango module, work that took four months to complete. However, as described in the next section, due to a restructuring of the MANGO system, it was later moved to the HHAL module.
+The first implementation of the \textbf{Dynamic Compiler} was as an extension of the Libmango module, work that took four months to complete. However, due to a restructuring of the MANGO system, it was later moved to the HHAL module.
 
 \subsection{GPU Support}
 
@@ -70,7 +70,6 @@ An initial integration effort of the NAN with the Libmango module was successful
 But a problem with MANGO's structure became increasingly clear. The limited abstraction provided by HN caused the Libmango module to be closely attached to its API and working requirements. This inter-dependency was made evident by the presence of elements like a memory manager in the Libmango module, which was supposed to be architecture agnostic.
 
 A decision was made to restructure the MANGO system with the addition of a new module: HHAL. This module was developed side by side with the NAN.
-On the BarbequeRTRM forefront, GPU support involved the 
 
 \subsection{HHAL}
 
@@ -112,7 +111,7 @@ First, in chapter \ref{ch:StateOfTheArt}, we present a detailed study of the Sta
 
 A thorough Architecture Description is given in chapter \ref{ch:ArchitectureDescription}, going over each module of the MANGO software stack.
 
-In chapter \ref{ch:ExperimentalResults}, Experimental Results and explanations for each of the conducted experiments are described.
+In chapter \ref{ch:ExperimentalResults}, Experimental Results and explanations of each of the conducted experiments are described.
 
 Finally, in chapter \ref{ch:Conclusions}, we draw the final conclusions, and talk about future work that may be carried out.
 
