@@ -15,7 +15,7 @@ legend style={
 },
 tick align=outside,
 tick pos=left,
-title={Kernel executions (min)},
+title={Kernel executions (mean)},
 x grid style={white!69.0196078431373!black},
 xlabel={Input size (grid size)},
 xmin=-342.4, xmax=8598.4,
@@ -23,43 +23,31 @@ xtick style={color=black},
 y grid style={white!69.0196078431373!black},
 ylabel={Kernel execution time (ms)},
 ymajorgrids,
-ymin=-7.41119, ymax=156.031276,
+ymin=-7.56409453556224, ymax=159.757092421107,
 ytick style={color=black}
 ]
-\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+\addplot [semithick, blue, mark=triangle*, mark size=3, mark options={solid}]
 table {%
-64 0.018013
-128 0.050103
-256 0.182332
-512 0.716719
-1024 2.182667
-2048 8.772553
-4096 35.083103
-8192 141.76407
+64 0.160601098734177
+128 0.169648774647887
+256 0.323446888888889
+512 0.96640755075594
+1024 3.01892553968254
+2048 10.357626175
+4096 40.811188164557
+8192 152.151583923077
 };
-\addlegendentry{CUDA}
-\addplot [semithick, red, mark=x, mark size=3, mark options={solid}]
-table {%
-64 0.019588
-128 0.052902
-256 0.189038
-512 0.739153
-1024 2.244686
-2048 8.952384
-4096 36.070207
-8192 145.821193
-};
-\addlegendentry{OPENCL}
+\addlegendentry{MANGO (+IPC)}
 \addplot [semithick, color0, mark=triangle*, mark size=3, mark options={solid,rotate=180}]
 table {%
-64 0.019792
-128 0.053412
-256 0.190597
-512 0.741725
-1024 2.299726
-2048 8.987665
-4096 38.600959
-8192 148.602073
+64 0.0414139624681934
+128 0.0703628888888889
+256 0.211658812903226
+512 0.81808229004329
+1024 2.9290935968254
+2048 10.27900955
+4096 40.7308336708861
+8192 152.061428076923
 };
 \addlegendentry{MANGO}
 \end{axis}

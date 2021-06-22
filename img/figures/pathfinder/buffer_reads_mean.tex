@@ -21,45 +21,43 @@ xlabel={Buffer size (kilobytes)},
 xmin=-2.15, xmax=67.15,
 xtick style={color=black},
 y grid style={white!69.0196078431373!black},
-ylabel={Buffer read time (ms)},
+ylabel={Buffer read time (μs)},
 ymajorgrids,
-ymin=0.00520630214285714, ymax=0.100653614183673,
-ytick style={color=black},
-yticklabel style={/pgf/number format/fixed},
+ymin=7.62755214285714, ymax=49.8073641836735,
+ytick style={color=black}
 ]
 \addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
 table {%
-1 0.00954481632653061
-2 0.0097984693877551
-4 0.0102500714285714
-8 0.01303545
-16 0.01692725
-32 0.0254355
-64 0.0431711
+1 9.54481632653061
+2 9.7984693877551
+4 10.2500714285714
+8 13.03545
+16 16.92725
+32 25.4355
+64 43.1711
 };
 \addlegendentry{CUDA}
-\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, red, mark=x, mark size=3, mark options={solid}]
 table {%
-1 0.0619118
-2 0.06359902
-4 0.0429807333333333
-8 0.0432455789473684
-16 0.04984925
-32 0.0706595
-64 0.0963151
-};
-\addlegendentry{MANGO}
-\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
-table {%
-1 0.0143187777777778
-2 0.01460112
-4 0.0148169
-8 0.01770105
-16 0.02812495
-32 0.0353335
-64 0.0478901
+1 14.3187777777778
+2 14.60112
+4 14.8169
+8 17.70105
+16 28.12495
+32 35.3335
+64 47.8901
 };
 \addlegendentry{OPENCL}
+\addplot [semithick, color0, mark=triangle*, mark size=3, mark options={solid,rotate=180}]
+table {%
+1 32.5831616161616
+2 34.40658
+4 25.3578666666667
+8 20.6947894736842
+16 23.0111052631579
+32 25.7314
+64 33.4862
+};
+\addlegendentry{MANGO}
 \end{axis}
-
 \end{tikzpicture}

@@ -1,17 +1,11 @@
 % This file was created by tikzplotlib v0.9.8.
 \begin{tikzpicture}
+
 \definecolor{color0}{rgb}{1,0.647058823529412,0}
 
 \begin{axis}[
 legend cell align={left},
-legend style={
-  fill opacity=1,
-  draw opacity=1,
-  text opacity=1,
-  at={(0.91,0.5)},
-  anchor=east,
-  draw=white!80!black
-},
+legend style={fill opacity=1, draw opacity=1, text opacity=1, draw=white!80!black},
 tick align=outside,
 tick pos=left,
 title={Kernel executions (min)},
@@ -20,52 +14,46 @@ xlabel={Input size (grid size)},
 xmin=-550.4, xmax=17190.4,
 xtick style={color=black},
 y grid style={white!69.0196078431373!black},
-ylabel={Kernel execution time (ms)},
+ylabel={Kernel execution time (μs)},
 ymajorgrids,
-ymin=2.29999999999987e-05, ymax=0.16,
+ymin=6.1825, ymax=17.8095,
 ytick style={color=black},
 scaled x ticks = false,
-scaled y ticks = false,
 xtick={0, 4000, 8000, 12000, 16000},
-ytick={0, 0.05, 0.1, 0.15, 0.2},
-ticklabel style={
-/pgf/number format/fixed,
-/pgf/number format/precision=5
-}, scaled ticks=false 
 ]
 \addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
 table {%
-256 0.011924
-512 0.010761
-1024 0.006711
-2048 0.009254
-4096 0.014497
-8192 0.0134
-16384 0.008626
+256 11.924
+512 10.761
+1024 6.711
+2048 9.254
+4096 14.497
+8192 13.4
+16384 8.626
 };
 \addlegendentry{CUDA}
-\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
+\addplot [semithick, red, mark=x, mark size=3, mark options={solid}]
 table {%
-256 0.136179
-512 0.140471
-1024 0.128692
-2048 0.127033
-4096 0.130072
-8192 0.130367
-16384 0.13795
-};
-\addlegendentry{MANGO}
-\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
-table {%
-256 0.012901
-512 0.01182
-1024 0.007888
-2048 0.010449
-4096 0.015589
-8192 0.014153
-16384 0.009771
+256 12.901
+512 11.82
+1024 7.888
+2048 10.449
+4096 15.589
+8192 14.153
+16384 9.771
 };
 \addlegendentry{OPENCL}
+\addplot [semithick, color0, mark=triangle*, mark size=3, mark options={solid,rotate=180}]
+table {%
+256 13.083
+512 13.299
+1024 9.495
+2048 11.673
+4096 17.281
+8192 16.436
+16384 11.432
+};
+\addlegendentry{MANGO}
 \end{axis}
 
 \end{tikzpicture}

@@ -8,38 +8,38 @@ tick align=outside,
 tick pos=left,
 title={Buffer writes},
 x grid style={white!69.0196078431373!black},
+xlabel={Programming Model},
 xmin=-0.54, xmax=2.54,
 xtick style={color=black},
 xtick={0,1,2},
-xticklabels={CUDA,MANGO,OPENCL},
+xticklabels={CUDA,OPENCL,MANGO},
 y grid style={white!69.0196078431373!black},
 ylabel={Transfer time HtoD (ms)},
 ymajorgrids,
-ymin=0, ymax=76.3910404992625,
-ytick style={color=black},
-yticklabel style={/pgf/number format/fixed},
+ymin=0, ymax=23.1912457264583,
+ytick style={color=black}
 ]
 \draw[draw=none,fill=green!50.1960784313725!black,fill opacity=0.5] (axis cs:-0.4,0) rectangle (axis cs:0.4,17.68977225);
-\draw[draw=none,fill=color0,fill opacity=0.5] (axis cs:0.6,0) rectangle (axis cs:1.4,67.6877919275);
-\draw[draw=none,fill=red,fill opacity=0.5] (axis cs:1.6,0) rectangle (axis cs:2.4,20.138947405);
-\draw (axis cs:0,19.448380776375) node[
+\draw[draw=none,fill=red,fill opacity=0.5] (axis cs:0.6,0) rectangle (axis cs:1.4,20.138947405);
+\draw[draw=none,fill=color0,fill opacity=0.5] (axis cs:1.6,0) rectangle (axis cs:2.4,18.81147567);
+\draw (axis cs:0,18.6337755054167) node[
   scale=1,
   anchor=south,
   text=black,
   rotate=0.0
 ]{17.69};
-\draw (axis cs:1,69.446400453875) node[
-  scale=1,
-  anchor=south,
-  text=black,
-  rotate=0.0
-]{67.69};
-\draw (axis cs:2,21.897555931375) node[
+\draw (axis cs:1,21.0829506604167) node[
   scale=1,
   anchor=south,
   text=black,
   rotate=0.0
 ]{20.14};
+\draw (axis cs:2,19.7554789254167) node[
+  scale=1,
+  anchor=south,
+  text=black,
+  rotate=0.0
+]{18.81};
 \end{axis}
 
 \end{tikzpicture}

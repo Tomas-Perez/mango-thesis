@@ -8,38 +8,38 @@ tick align=outside,
 tick pos=left,
 title={Bandwidth (max)},
 x grid style={white!69.0196078431373!black},
+xlabel={Programming Model},
 xmin=-0.54, xmax=2.54,
 xtick style={color=black},
 xtick={0,1,2},
-xticklabels={CUDA,MANGO,OPENCL},
+xticklabels={CUDA,OPENCL,MANGO},
 y grid style={white!69.0196078431373!black},
 ylabel={\% of theoretical peak bandwidth},
 ymajorgrids,
-ymin=0, ymax=1.01450522877252,
-ytick style={color=black},
-yticklabel style={/pgf/number format/fixed},
+ymin=0, ymax=1.02734953480631,
+ytick style={color=black}
 ]
 \draw[draw=none,fill=green!50.1960784313725!black,fill opacity=0.5] (axis cs:-0.4,0) rectangle (axis cs:0.4,0.87937553130392);
-\draw[draw=none,fill=color0,fill opacity=0.5] (axis cs:0.6,0) rectangle (axis cs:1.4,0.847744789949458);
-\draw[draw=none,fill=red,fill opacity=0.5] (axis cs:1.6,0) rectangle (axis cs:2.4,0.846996642648818);
-\draw (axis cs:0,0.92227748070229) node[
+\draw[draw=none,fill=red,fill opacity=0.5] (axis cs:0.6,0) rectangle (axis cs:1.4,0.846996642648818);
+\draw[draw=none,fill=color0,fill opacity=0.5] (axis cs:1.6,0) rectangle (axis cs:2.4,0.890342216051125);
+\draw (axis cs:0,0.922987437803984) node[
   scale=1,
   anchor=south,
   text=black,
   rotate=0.0
 ]{0.88};
-\draw (axis cs:1,0.890646739347828) node[
+\draw (axis cs:1,0.890608549148883) node[
   scale=1,
   anchor=south,
   text=black,
   rotate=0.0
 ]{0.85};
-\draw (axis cs:2,0.889898592047188) node[
+\draw (axis cs:2,0.933954122551189) node[
   scale=1,
   anchor=south,
   text=black,
   rotate=0.0
-]{0.85};
+]{0.89};
 \end{axis}
 
 \end{tikzpicture}

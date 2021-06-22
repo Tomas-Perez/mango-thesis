@@ -23,31 +23,20 @@ xtick style={color=black},
 y grid style={white!69.0196078431373!black},
 ylabel={Buffer read time (μs)},
 ymajorgrids,
-ymin=7.17405, ymax=48.86295,
+ymin=11.60365, ymax=71.60535,
 ytick style={color=black}
 ]
-\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+\addplot [semithick, blue, mark=triangle*, mark size=3, mark options={solid}]
 table {%
-1 9.069
-2 9.351
-4 9.779
-8 12.464
-16 16.351
-32 24.446
-64 42.538
+1 25.736
+2 29.115
+4 31.525
+8 34.785
+16 42.813
+32 50.617
+64 68.878
 };
-\addlegendentry{CUDA}
-\addplot [semithick, red, mark=x, mark size=3, mark options={solid}]
-table {%
-1 13.78
-2 14.139
-4 14.31
-8 17.189
-16 21.637
-32 30.88
-64 46.968
-};
-\addlegendentry{OPENCL}
+\addlegendentry{MANGO (+IPC)}
 \addplot [semithick, color0, mark=triangle*, mark size=3, mark options={solid,rotate=180}]
 table {%
 1 14.331

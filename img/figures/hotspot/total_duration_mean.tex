@@ -23,10 +23,8 @@ xtick style={color=black},
 y grid style={white!69.0196078431373!black},
 ylabel={Total duration (ms)},
 ymajorgrids,
-ymin=-76.746247884394, ymax=3050.06359712783,
-ytick style={color=black},
-scaled x ticks = false,
-xtick={0, 2000, 4000, 6000, 8000},
+ymin=-65.959002829394, ymax=2823.53145097283,
+ytick style={color=black}
 ]
 \addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
 table {%
@@ -40,19 +38,7 @@ table {%
 8192 2516.1915956
 };
 \addlegendentry{CUDA}
-\addplot [semithick, color0, mark=x, mark size=3, mark options={solid}]
-table {%
-64 96.4079058736842
-128 101.54462224
-256 98.3502921071428
-512 109.975305
-1024 153.2529195
-2048 272.943125684211
-4096 834.9055927
-8192 2907.9358769
-};
-\addlegendentry{MANGO}
-\addplot [semithick, red, mark=triangle*, mark size=3, mark options={solid}]
+\addplot [semithick, red, mark=x, mark size=3, mark options={solid}]
 table {%
 64 82.7704575208333
 128 82.79732128
@@ -64,6 +50,18 @@ table {%
 8192 2561.3243602
 };
 \addlegendentry{OPENCL}
+\addplot [semithick, color0, mark=triangle*, mark size=3, mark options={solid,rotate=180}]
+table {%
+64 95.13603588
+128 93.41098096
+256 96.4721031
+512 110.236007833333
+1024 139.4998439
+2048 261.1760106
+4096 787.2880039
+8192 2692.1909758
+};
+\addlegendentry{MANGO}
 \end{axis}
 
 \end{tikzpicture}

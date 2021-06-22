@@ -23,33 +23,22 @@ xtick style={color=black},
 y grid style={white!69.0196078431373!black},
 ylabel={Total duration (ms)},
 ymajorgrids,
-ymin=25.9038025360345, ymax=299.772246536379,
+ymin=66.2281451992424, ymax=656.161493704798,
 ytick style={color=black},
 scaled x ticks = false,
 xtick={0, 4000, 8000, 12000, 16000},
 ]
-\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+\addplot [semithick, blue, mark=triangle*, mark size=3, mark options={solid}]
 table {%
-256 42.9552711
-512 41.32715138
-1024 38.3523681724138
-2048 40.43792255
-4096 49.69510795
-8192 75.8983512
-16384 175.3781874
+256 95.08814335
+512 98.3987611428572
+1024 106.0719735
+2048 110.582484578947
+4096 149.39266355
+8192 260.7485585
+16384 629.3463415
 };
-\addlegendentry{CUDA}
-\addplot [semithick, red, mark=x, mark size=3, mark options={solid}]
-table {%
-256 105.803828572917
-512 106.067160145833
-1024 104.400873965517
-2048 100.396111
-4096 109.2311212
-8192 145.6926093
-16384 251.2904586
-};
-\addlegendentry{OPENCL}
+\addlegendentry{MANGO (+IPC)}
 \addplot [semithick, color0, mark=triangle*, mark size=3, mark options={solid,rotate=180}]
 table {%
 256 93.0432974040404

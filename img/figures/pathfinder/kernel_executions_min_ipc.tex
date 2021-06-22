@@ -9,54 +9,43 @@ legend style={
   fill opacity=1,
   draw opacity=1,
   text opacity=1,
-  at={(0.03,0.97)},
-  anchor=north west,
+  at={(0.91,0.5)},
+  anchor=east,
   draw=white!80!black
 },
 tick align=outside,
 tick pos=left,
-title={Buffer reads (min)},
+title={Kernel executions (min)},
 x grid style={white!69.0196078431373!black},
-xlabel={Buffer size (kilobytes)},
-xmin=-2.15, xmax=67.15,
+xlabel={Input size (grid\_size)},
+xmin=-550.4, xmax=17190.4,
 xtick style={color=black},
 y grid style={white!69.0196078431373!black},
-ylabel={Buffer read time (μs)},
+ylabel={Kernel execution time (μs)},
 ymajorgrids,
-ymin=7.17405, ymax=48.86295,
+ymin=7.37435, ymax=54.02865,
 ytick style={color=black}
 ]
-\addplot [semithick, green!50.1960784313725!black, mark=*, mark size=3, mark options={solid}]
+\addplot [semithick, blue, mark=triangle*, mark size=3, mark options={solid}]
 table {%
-1 9.069
-2 9.351
-4 9.779
-8 12.464
-16 16.351
-32 24.446
-64 42.538
+256 51.732
+512 51.295
+1024 49.789
+2048 49.642
+4096 51.908
+8192 50.453
+16384 51.721
 };
-\addlegendentry{CUDA}
-\addplot [semithick, red, mark=x, mark size=3, mark options={solid}]
-table {%
-1 13.78
-2 14.139
-4 14.31
-8 17.189
-16 21.637
-32 30.88
-64 46.968
-};
-\addlegendentry{OPENCL}
+\addlegendentry{MANGO (+IPC)}
 \addplot [semithick, color0, mark=triangle*, mark size=3, mark options={solid,rotate=180}]
 table {%
-1 14.331
-2 15.845
-4 17.151
-8 18.094
-16 20.539
-32 24.027
-64 29.663
+256 13.083
+512 13.299
+1024 9.495
+2048 11.673
+4096 17.281
+8192 16.436
+16384 11.432
 };
 \addlegendentry{MANGO}
 \end{axis}

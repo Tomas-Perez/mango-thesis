@@ -1,0 +1,66 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.12156862745098,0.466666666666667,0.705882352941177}
+\definecolor{color1}{rgb}{1,0.498039215686275,0.0549019607843137}
+\definecolor{color2}{rgb}{0.172549019607843,0.627450980392157,0.172549019607843}
+\definecolor{color3}{rgb}{0.83921568627451,0.152941176470588,0.156862745098039}
+\definecolor{color4}{rgb}{0.580392156862745,0.403921568627451,0.741176470588235}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=1,
+  draw opacity=1,
+  text opacity=1,
+  at={(1.1,0.5)},
+  anchor=west,
+  draw=white!80!black
+},
+tick align=outside,
+tick pos=left,
+title={Benchmark breakdown},
+x grid style={white!69.0196078431373!black},
+xmin=-0.2925, xmax=2.2925,
+xtick style={color=black},
+xtick={0,1,2},
+xticklabels={CUDA,OPENCL,MANGO},
+y grid style={white!69.0196078431373!black},
+ylabel={Time (ms)},
+ymajorgrids,
+ymin=0, ymax=301.689864945,
+ytick style={color=black}
+]
+\draw[draw=none,fill=color0] (axis cs:-0.175,175.3350163) rectangle (axis cs:0.175,175.3781874);
+\addlegendimage{ybar,ybar legend,draw=none,fill=color0};
+\addlegendentry{Buffer reads}
+
+\draw[draw=none,fill=color0] (axis cs:0.825,251.2425685) rectangle (axis cs:1.175,251.2904586);
+\draw[draw=none,fill=color0] (axis cs:1.825,287.2901947) rectangle (axis cs:2.175,287.3236809);
+\draw[draw=none,fill=color1] (axis cs:-0.175,63.0923926) rectangle (axis cs:0.175,175.3350163);
+\addlegendimage{ybar,ybar legend,draw=none,fill=color1};
+\addlegendentry{Buffer writes}
+
+\draw[draw=none,fill=color1] (axis cs:0.825,148.2357191) rectangle (axis cs:1.175,251.2425685);
+\draw[draw=none,fill=color1] (axis cs:1.825,172.0310368) rectangle (axis cs:2.175,287.2901947);
+\draw[draw=none,fill=color2] (axis cs:-0.175,38.8204022) rectangle (axis cs:0.175,63.0923926);
+\addlegendimage{ybar,ybar legend,draw=none,fill=color2};
+\addlegendentry{Kernel executions}
+
+\draw[draw=none,fill=color2] (axis cs:0.825,123.4029374) rectangle (axis cs:1.175,148.2357191);
+\draw[draw=none,fill=color2] (axis cs:1.825,134.9503335) rectangle (axis cs:2.175,172.0310368);
+\draw[draw=none,fill=color3] (axis cs:-0.175,38.8204022) rectangle (axis cs:0.175,38.8204022);
+\addlegendimage{ybar,ybar legend,draw=none,fill=color3};
+\addlegendentry{Resource allocation}
+
+\draw[draw=none,fill=color3] (axis cs:0.825,123.4029374) rectangle (axis cs:1.175,123.4029374);
+\draw[draw=none,fill=color3] (axis cs:1.825,72.350049) rectangle (axis cs:2.175,134.9503335);
+\draw[draw=none,fill=color4] (axis cs:-0.175,0) rectangle (axis cs:0.175,38.8204022);
+\addlegendimage{ybar,ybar legend,draw=none,fill=color4};
+\addlegendentry{Miscellaneous}
+
+\draw[draw=none,fill=color4] (axis cs:0.825,0) rectangle (axis cs:1.175,123.4029374);
+\draw[draw=none,fill=color4] (axis cs:1.825,0) rectangle (axis cs:2.175,72.350049);
+\end{axis}
+
+\end{tikzpicture}
