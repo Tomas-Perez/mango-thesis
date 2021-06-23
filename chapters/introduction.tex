@@ -36,10 +36,10 @@ These objectives can only be achieved through the efficient integration and coop
 The MANGO software stack, at the beginning of our contribution to the project, looked as shown in figure \ref{fig:mango_initial_stack}.
 
 Starting from the top of the stack, we find the \textbf{Libmango} module, in charge of stablishing the programming model for users of the MANGO system, Libmango exposes an API that provides users with access to the functionalities of the underlying layers. 
-Libmango interacts with \textbf{BarbequeRTRM}, the resource manager, responsible for scheduling user applications and allocating system resources according to performance requirements, as well as power and thermal information. BarbequeRTRM also monitors running applications to maintain a complete view of the system, and collect profiling information.
+It interacts with \textbf{BarbequeRTRM}, the resource manager, responsible for scheduling user applications and allocating system resources according to performance requirements, as well as power and thermal information. BarbequeRTRM also monitors running applications to maintain a complete view of the system, and collect profiling information.
 
-Next in the stack is the Hardware Abstraction Layer, consisting of the \textbf{HN} library and daemon. HN was designed as an abstraction layer for the MANGO custom hardware architecture, supporting PEAK, DCT and nu+ accelerators. To facilitate development and enable running MANGO applications on personal computers, the \textbf{GN} emulator was introduced. The GN library follows the same API as HN, which allows to use them interchangeably, and emulates the presence of hardware accelerators by using instead the host CPU.
-The bottom-most layers are the \textbf{Hardware} layer, containing the accelerators themselves, and the \textbf{Device Libraries/Drivers}, through which communication with the hardware is stablished.
+Next in the stack is the Hardware Abstraction Layer, consisting of the \textbf{HN} library and daemon. HN was designed as an abstraction layer for the MANGO custom hardware architecture, supporting PEAK, DCT and nu+ accelerators. To facilitate development and enable running MANGO applications on personal computers, the \textbf{GN} emulator was introduced. The GN library follows the same API as HN, which allows them to be used interchangeably, and emulates the presence of hardware accelerators by using instead the host CPU.
+The bottom-most layers are the \textbf{Device Libraries/Drivers}, through which communication with the hardware is stablished and finally the \textbf{Hardware} layer, containing the accelerators themselves.
 
 \section{Thesis Contributions}
 \subsection{Python Wrapper}

@@ -1,10 +1,33 @@
 \chapter{Conclusions and Future Work} \label{ch:Conclusions}
 
-% TODO Chapter introduction
+In this Chapter we provide a final overview of our work, as well as some future challenges for the future of MANGO according to our vision of its development.
 
-\section{Conclusions}
+Section \ref{sect:conclusions} contains our conclusions about the work on this thesis, covering our entire journey in chronological order from the initial contribution of the Python wrapper to the final experimental campaign covered in this document.
 
-\section{Future Work}
+After that, section \ref{sect:future-work} is destined to the next developers and researchers working on the system. Here we hope to communicate our vision of the future of MANGO and provide a starting point for improvements. 
+
+\section{Conclusions} \label{sect:conclusions}
+
+In this work we explored our contributions to the MANGO software stack, extending the capabilities of the platform and restructuring its design to improve its future extendibility. This covered a wide range of modifications across a big part of the MANGOLIBS codebase and the addition of multiple new libraries to the system.
+
+This started with the implementation of a Python wrapper in order to provide users with a simpler API in a language which is more widely used for data science and machine learning applications. As these are one of the main drivers for HPC development, a Python API allows our programming model to be more easily accessible and usable for new up and coming users.
+
+After that, the addition of Just-In-Time (JIT) compilation allowed users to load kernels from source code without the need of precompiling them first. This not only improves the feedback loop by decreasing the time to deploy a new kernel modification, but also will in the future allow for optimizations over the kernel code which need runtime device capability and availability information.
+
+Our main contribution however involved the extension of the platforms supported by MANGO, granting the system with the capacity to exploit GPUs as accelerators for general purpose applications. This was achieved by the implementation of the NVIDIA Architecture Node (NAN) which leverages the CUDA Driver API in order to execute kernels in any one of the connected devices. 
+
+During the integration of the NAN with the existing MANGO stack, there was a significant hurdle in order to adapt the libmango code to support this new platform. A hurdle that was a clear symptom of the dependence of the host API to the underlying architectures running the kernels. Even though the initial abstraction layer of the HN library and daemon allowed for abstraction over the custom MANGO hardware, it was not easily extendable to other devices, such as a GPUs.
+
+This finally concluded in our implementation of the Heterogeneous Hardware Abstraction Library (HHAL), which also involved an internal restructuring of the libmango library. With the new HHAL library, we aimed to allow for simple extension of the software stack to support new devices, while also maximizing the performance that can be extracted from each individual architecture. By keeping the abstractions of the hardware at the appropriate level, platform specific improvements can be made without affecting the rest of the interconnected libraries, but still achieving greater performance benefits. What is more, the client-server approach used when designing the HHAL will allow for a straightforward adaptation of MANGO to a distributed system, spanning multiple clusters.
+
+Closing out our thesis, we moved forward with a experimental campaign in order to evaluate the new capabilities added by the NAN and the HHAL library, as well as how the MANGO project itself compares with other more established programming models in terms of performance and application programmability. Even though maximizing performance was not our main priority for this initial implementation, the results of our experiments show a promising outline for the future of the project. 
+
+The performance overheads found in MANGO when compared to other programming models were not negligible, but also easily identifiable and, in principle, solvable thanks to the final state of the software stack. To facilitate this, and also to further improve the ease of use and programmability of the system, we include our suggestions and vision for future work in the following section.
+
+\section{Future Work} \label{sect:future-work}
+
+During our work on the system we thought of many different ideas that could be implemented but we were not able to cover ourselves in order to keep a reasonable scope for this thesis. Here we detail these ideas, in hope that they can be used by up and coming students, looking to delve into the software stack and make MANGO an even greater platform that we could ever achieve on our own.
+
 \subsection{Task Graph Automatic Execution}
 
 In the search of making MANGO's usage as seamless and easy for developers as possible, a great addition to the framework would be the automatic execution of task graphs. 
@@ -45,7 +68,7 @@ This will provide a significant performance improvement for memory-bound applica
 
 \subsection{Multithreaded CUDA Management}
 
-In order to improve the performance of MANGO when running CUDA applications, it is important to implement multithreading in the CUDA management library running on the HHAL server. As mentioned in chapter \ref{ch:ExperimentalResults}, it would be possible to avoid the overhead of switching device contexts between each kernel launch by creating a separate thread for each CUDA device. 
+In order to improve the performance of MANGO when running CUDA applications, it is important to implement multithreading in the NVIDIA Architecture Node library running on the HHAL server. As mentioned in chapter \ref{ch:ExperimentalResults}, it would be possible to avoid the overhead of switching device contexts between each kernel launch by creating a separate thread for each CUDA device. 
 
 In addition, if we also exploit the CUDA stream API, it would allow for the asynchronous transfer of data to and from device buffers, consequently enabling the overlap of data transfers and kernel executions. 
 
