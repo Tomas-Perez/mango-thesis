@@ -5,7 +5,7 @@ During this experimental campaign, our goals were to:
 \begin{itemize}
     \item Measure the performance of MANGO with respect to other available programming models.
     \item Compare the programmability of MANGO with respect to other available programming models.
-    \item Analyze where are the main overheads of the current MANGO implementation and how they can be reduced.
+    \item Analyze where the main overheads of the current MANGO implementation are and how they can be reduced.
 \end{itemize}
 
 \section{Setup and Methodology} \label{sect:setup-methodology}
@@ -121,7 +121,7 @@ In AXPY we are not interested in the scaling over different input sizes but in t
 
 It is important to note that for all benchmarks in both CUDA and OpenCL we execute the set of benchmarks twice. Once to measure the total execution time of the entire benchmark and another to measure each individual component. As all our measurements in these models are done externally (i.e. we cannot make intrusive profiling modifications like with MANGO) they could incur in extra overhead due to the need of forcing synchronization between the host and the device in order to make measurements. For example, OpenCL buffer writes are usually enqueued in a \texttt{CommandQueue} and executed asynchronously, to measure them we forced a synchronous transfer by calling \texttt{clFinish} on the \texttt{CommandQueue}.
 
-Finally, in the case of MANGO, we performed our measurements on two different sectors of the application. As mentioned previously, the HHAL library is implemented in a client-server arrangement, where the communication between client and server is performed via socket. This provides us with an easy way to run the HHAL in a separate cluster in the future. However, this adds extra communication overhead to the MANGO client which is not present in either CUDA nor OpenCL, as they both run directly on the same host machine. Due to this, we measure performance both on the client side (taking into account IPC overhead) but also directly on the HHAL server (in order to compare our implementation with CUDA and OpenCL).
+Finally, in the case of MANGO, we performed the measurements on two different sectors of the application. As mentioned previously, the HHAL library is implemented in a client-server arrangement, where the communication between client and server is performed via socket. This provides us with an easy way to run the HHAL in a separate cluster in the future. However, this adds extra communication overhead to the MANGO client which is not present in either CUDA nor OpenCL, as they both run directly on the same host machine. Due to this, we measure performance both on the client side (taking into account IPC overhead) but also directly on the HHAL server (in order to compare our implementation with CUDA and OpenCL).
 
 \subsection{Programmability}
 
@@ -361,7 +361,7 @@ Starting with figure \ref{fig:hotspot_total_and_kernel_executions_mean_ipc} we c
 
 For the same metrics, PathFinder sees a much steeper increase in execution time along with the execution time. As can be see in figure \ref{fig:pathfinder_total_and_kernel_executions_mean_ipc}b, this is more closely linked with the kernel execution time which here shows a clear separation between IPC and no IPC. In addition, the PathFinder kernel is run more times as the input size increases, so this overhead piles up with multiple executions.
 
-If we compare these results with the ones in HotSpot we can conclude that the overhead experienced with IPC is fixed and does not scale with input size. This is supported by the fact that HotSpot kernel executions are an order of magnitude larger than PathFinder executions (150ms for HotSpot versus 90/40μs for PathFinder).
+If we compare these results with the ones in HotSpot we can conclude that the overhead experienced with IPC is fixed and does not scale with input size. This is supported by the fact that HotSpot kernel executions are an order of magnitude larger than PathFinder executions (150ms for HotSpot versus 90/4$\mu$s for PathFinder).
 
 \begin{figure}%
     \centering
@@ -381,7 +381,7 @@ If we compare these results with the ones in HotSpot we can conclude that the ov
     \label{fig:pathfinder_total_and_kernel_executions_mean_ipc}%
 \end{figure}
 
-Buffer transfers, as expected, are affected significantly more by IPC as the amount of data that needs to be transferred is much higher than what is needed to launch a kernel. Both figure \ref{fig:hotspot_buffer_transfers_mean_ipc} and figure \ref{fig:pathfinder_buffer_transfers_mean_ipc} show similar scaling for buffer writes. There is a clear discrepancy between the buffer reads, however this can easily be blamed on the considerable difference in buffer sizes.
+Buffer transfers, as expected, are affected significantly more by IPC as the amount of data that needs to be transferred is much higher than what is needed to launch a kernel. Both figure \ref{fig:hotspot_buffer_transfers_mean_ipc} and figure \ref{fig:pathfinder_buffer_transfers_mean_ipc} show similar scaling for buffer writes. There is a clear discrepancy between the buffer reads, however this can be attributed to the considerable difference in buffer sizes.
 
 
 \begin{figure}%

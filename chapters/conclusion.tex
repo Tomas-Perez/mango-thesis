@@ -12,13 +12,13 @@ In this work we explored our contributions to the MANGO software stack, extendin
 
 This started with the implementation of a Python wrapper in order to provide users with a simpler API in a language which is more widely used for data science and machine learning applications. As these are one of the main drivers for HPC development, a Python API allows our programming model to be more easily accessible and usable for new up and coming users.
 
-After that, the addition of Just-In-Time (JIT) compilation allowed users to load kernels from source code without the need of precompiling them first. This not only improves the feedback loop by decreasing the time to deploy a new kernel modification, but also will in the future allow for optimizations over the kernel code which need runtime device capability and availability information.
+After that, the addition of Just-In-Time (JIT) compilation allowed users to load kernels from source code without the need of precompiling them. This not only improves the feedback loop by decreasing the time to deploy a new kernel modification, but also will in the future allow for optimizations over the kernel code which need runtime device capability and availability information.
 
 Our main contribution however involved the extension of the platforms supported by MANGO, granting the system with the capacity to exploit GPUs as accelerators for general purpose applications. This was achieved by the implementation of the NVIDIA Architecture Node (NAN) which leverages the CUDA Driver API in order to execute kernels in any one of the connected devices. 
 
 During the integration of the NAN with the existing MANGO stack, there was a significant hurdle in order to adapt the libmango code to support this new platform. A hurdle that was a clear symptom of the dependence of the host API to the underlying architectures running the kernels. Even though the initial abstraction layer of the HN library and daemon allowed for abstraction over the custom MANGO hardware, it was not easily extendable to other devices, such as a GPUs.
 
-This finally concluded in our implementation of the Heterogeneous Hardware Abstraction Library (HHAL), which also involved an internal restructuring of the libmango library. With the new HHAL library, we aimed to allow for simple extension of the software stack to support new devices, while also maximizing the performance that can be extracted from each individual architecture. By keeping the abstractions of the hardware at the appropriate level, platform specific improvements can be made without affecting the rest of the interconnected libraries, but still achieving greater performance benefits. What is more, the client-server approach used when designing the HHAL will allow for a straightforward adaptation of MANGO to a distributed system, spanning multiple clusters.
+This finally concluded in our implementation of the Heterogeneous Hardware Abstraction Library (HHAL), which also involved an internal restructuring of the Libmango library. With the new HHAL library, we aimed to allow for simple extension of the software stack to support new devices, while also maximizing the performance that can be extracted from each individual architecture. By keeping the abstractions of the hardware at the appropriate level, platform specific improvements can be made without affecting the rest of the interconnected libraries, but still achieving greater performance benefits. What is more, the client-server approach used when designing the HHAL will allow for a straightforward adaptation of MANGO to a distributed system, spanning multiple clusters.
 
 Closing out our thesis, we moved forward with a experimental campaign in order to evaluate the new capabilities added by the NAN and the HHAL library, as well as how the MANGO project itself compares with other more established programming models in terms of performance and application programmability. Even though maximizing performance was not our main priority for this initial implementation, the results of our experiments show a promising outline for the future of the project. 
 
@@ -26,7 +26,7 @@ The performance overheads found in MANGO when compared to other programming mode
 
 \section{Future Work} \label{sect:future-work}
 
-During our work on the system we thought of many different ideas that could be implemented but we were not able to cover ourselves in order to keep a reasonable scope for this thesis. Here we detail these ideas, in hope that they can be used by up and coming students, looking to delve into the software stack and make MANGO an even greater platform that we could ever achieve on our own.
+During our work on the system we thought of many different ideas that could be implemented but we were not able to cover ourselves in order to keep a reasonable scope for this thesis. Here we detail these ideas, in hope that they can be used by up and coming developers, looking to delve into the software stack and make MANGO an even greater platform that we could achieve on our own.
 
 \subsection{Task Graph Automatic Execution}
 
@@ -60,7 +60,7 @@ With accelerator communication now taking place through the HHAL module, an HN M
 
 \subsection{HHAL "hybrid" mode communication} \label{sub-sect:hhal-hybrid-mode}
 
-As seen in our experimental results in chapter \ref{ch:ExperimentalResults}, the performance of MANGO is hurt by the client-server approach of the HHAL. Although this aspect is key for a distributed system, it can be improved when dealing with a computer which runs both the MANGO host and the HHAL. 
+As seen in our experimental results in chapter \ref{ch:ExperimentalResults}, the performance of MANGO is hurt by the client-server approach of the HHAL. Although this aspect is key for a distributed system, it can be improved when dealing with a system which runs both the MANGO host and the HHAL. 
 
 Our proposed "hybrid" mode will introduce a new type of communication between, most importantly the MANGO host and the HHAL, but also Barbeque if it runs on the same machine. It will switch from pure socket connections to a mix of shared memory, for necessary bookkeeping between Barbeque and MANGO, and a library directly linked to the MANGO executable, bypassing all types of IPC when dealing with kernel executions and buffer transfers.
 
@@ -68,8 +68,8 @@ This will provide a significant performance improvement for memory-bound applica
 
 \subsection{Multithreaded CUDA Management}
 
-In order to improve the performance of MANGO when running CUDA applications, it is important to implement multithreading in the NVIDIA Architecture Node library running on the HHAL server. As mentioned in chapter \ref{ch:ExperimentalResults}, it would be possible to avoid the overhead of switching device contexts between each kernel launch by creating a separate thread for each CUDA device. 
+In order to improve the performance of MANGO when running CUDA applications, it is important to implement multithreading in the Nvidia Architecture Node library running on the HHAL server. As mentioned in chapter \ref{ch:ExperimentalResults}, it would be possible to avoid the overhead of switching device contexts between each kernel launch by creating a separate thread for each CUDA device. 
 
 In addition, if we also exploit the CUDA stream API, it would allow for the asynchronous transfer of data to and from device buffers, consequently enabling the overlap of data transfers and kernel executions. 
 
-By implementing all this on the HHAL side, the changes would be completely transparent to the user and the libmango API.
+By implementing all this on the HHAL side, the changes would be completely transparent to the user and the Libmango API.
