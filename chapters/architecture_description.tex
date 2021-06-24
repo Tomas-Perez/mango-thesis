@@ -5,15 +5,16 @@ First, we provide an overall description of the system, followed by an explanati
 
 \section{Overall description}
 
-The MANGO project aims at allowing developers to easily develop applications that target different types of accelerator architectures. In particular, three types of accelerators are considered: symmetric multiprocessors, which are characterized by good capabilities in terms of OS support and execution flexibility (i.e. they are able to run a POSIX-compliant runtime); GPGPU-like accelerators, which are programmable but are not able to run a fully compliant POSIX runtime; and hardware accelerators, which do not need or support any kind  of software runtime. Applications, on the other hand, may be developed either by domain experts with limited knowledge of parallel computing and programming models, or by more experienced programmers. 
+The MANGO project aims at allowing developers to easily develop applications that target different types of accelerator architectures. In particular, three types of accelerators are considered: symmetric multiprocessors, which are characterized by good capabilities in terms of OS support and execution flexibility (i.e. they are able to run a POSIX-compliant runtime); GPGPU-like accelerators, which are programmable but are not able to run a fully compliant POSIX runtime; and hardware accelerators, which do not need or support any kind  of software runtime. Applications may be developed either by domain experts with limited knowledge of parallel computing and programming models, or by more experienced programmers. 
 
 The user-facing module (Libmango), therefore, needs to operate in a way that is akin to an intermediate language in a compiler: it must allow the software stack developers to easily map high-level programming models on the range of supported accelerators, while providing functional compatibility \cite{mango_exploring_manycore_architectures}. 
 
-Depending on the individual capabilities of each accelerator, the accelerator-facing section of the system should also introduce optimizations and/or additional features. And allow developers to easily expand the MANGO system by adding support of other architectures. The HHAL module, along with platform libraries (NAN, HN and GN), take care of these requirements.
+Depending on the individual capabilities of each accelerator, the accelerator-facing section of the system should also introduce optimizations and/or additional features. 
 
-User applications, however complex, must be scheduled to run on the system-available resources. This task, also involving the resource allocation, can be performed with multiple optimization goals in mind, job that is carried out by the Resource Manager: BarbequeRTRM.
+In addition, developers must be capable of easily expanding the MANGO system by adding support of other architectures. The HHAL module, along with platform libraries (NAN, HN and GN), take care of these requirements.
 
-%TODO better diagram
+User applications, however complex, must be scheduled to run on the system available resources. This task, also involving the resource allocation, can be performed with multiple optimization goals in mind, job that is carried out by the Resource Manager: BarbequeRTRM.
+
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.7\textwidth]{img/architecture.png}
@@ -22,7 +23,7 @@ User applications, however complex, must be scheduled to run on the system-avail
     \label{fig:mango_system_overview}
 \end{figure}
 
-In figure \ref{fig:mango_system_overview}, a complete overview of the MANGO system is presented, featuring the Libmango, BarbequeRTRM and HHAL modules, and platform libraries.
+In figure \ref{fig:mango_system_overview}, a complete overview of the MANGO system is presented, featuring the Libmango, BarbequeRTRM and HHAL modules, as well as platform libraries.
 
 \section{Core elements}
 Throughout the multiple MANGO modules, there are a few core elements often present in each module. These are the components necessary to specify and control an user application and its execution. Although their names may vary from module to module, here they are defined as Kernel, Memory Buffer, Event and Task graph.
@@ -52,7 +53,7 @@ Three types of kernel arguments are supported:
     \label{fig:in_out_buffers}
 \end{figure}
 
-In computer science, a data buffer (or just buffer) is a region of a physical memory storage used to temporarily store data while it is being moved from one place to another \cite{buffer_wikipedia}.
+A Memory Buffer is a region of memory used to store data and through which communication to, from and among kernels is carried out. 
 
 As depicted in figure \ref{fig:in_out_buffers}, Kernels read from Input Buffers and write to Output Buffers for inter-kernel and host-kernel data transferring.
 
@@ -107,7 +108,7 @@ Once the application is specified, the task graph information is sent to the Bar
 \subsection{Kernel management} \label{Libmango:KernelManagement}
 Libmango exposes functionalities and data structures that can be used to represent and manipulate kernels.
 
-Kernels are identified by an user-provided integer. For a single kernel, multiple implementations can be specified, each one targeting a different supported accelerator and thus provided in their respective architecture's requirements. I.e. a kernel targeting an Nvidia GPU would require a CUDA implementation.
+Kernels are identified by an user-provided integer. For a single kernel, multiple implementations can be specified, each one targeting a different supported accelerator and thus provided in their respective architecture's requirements, i.e. a kernel targeting an Nvidia GPU would require a CUDA implementation.
 
 Kernel versions (implementations) are stored either in memory or in external files. According to the targeted architecture, multiple source types are supported. The kernel source can be a pre-compiled binary file or code in accelerator-supported language, provided via a memory-stored string or a source file, to be dynamically compiled as required.
 The resource manager relies on the available options for the assignment of kernels to accelerators.
@@ -118,7 +119,7 @@ Libmango supports three types of Kernel arguments: Scalar arguments, Buffer argu
 These act as wrappers of the HHAL kernel arguments.
 
 \subsubsection{Scalar argument}
-A Scalar argument consists of a scalar value. The types supported by Libmango are signed and unsigned integers of sizes 8, 16 and 32 bits, as well as long and float values. 
+A Scalar argument consists of a scalar value. The types supported by Libmango are signed and unsigned integers of sizes 8, 16, 32 and 64 bits, as well as float values. 
 When a Scalar argument is created, the provided value is copied and stored in memory, and later sent to the HHAL module when their respective kernel is ran. 
 
 \subsubsection{Buffer argument}
@@ -153,7 +154,7 @@ Besides the native C++ API, Libmango currently exposes C and Python API wrappers
 \subsubsection{C API Wrapper}
 % TODO: this doesn't say much. The most important part of the C API is hiding the object oriented C++ and smart pointers. Also I'm pretty sure using uint32_t addressing is wrong, but a problem of the GN library. - Tomas
 
-The C language API is a wrapper around the C++ API that is provided both for compatibility with C code and for compatibility with the early version of MANGO, which was developed in C.
+The C language API is a wrapper around the C++ API that is provided both for usage in C applications, and for compatibility with the early version of MANGO, which was developed in C.
 
 All the data types in the function prototypes have been made opaque using specific typedef types. This hides to the application some specific types of the machine, such as the size of the memory addresses. In the current MANGO implementation, the used types are mostly uint32\_t, due to the addressing size that is of 32-bit.
 
@@ -259,7 +260,7 @@ int main(int argc, char const *argv[])
     }
 \end{lstlisting}
 
-At the beginning of the \texttt{main} function, we initialize the logger, and the application's \texttt{Context} is created. For the initialization of the Context, an application name is required: "cuda\_simple", as well as a recipe file name for the BarbequeRTRM resource allocation: "test\_manga\_cuda".
+At the beginning of the \texttt{main} function, we initialize the logger, and the application's \texttt{Context} is created. For the initialization of the \texttt{Context}, an application name is required: "cuda\_simple", as well as a recipe file name for the BarbequeRTRM resource allocation: "test\_manga\_cuda".
 
 Then, the three buffers we need for the operation are declared. \texttt{x} and \texttt{y} are the input buffers, so they are initialized with known values. \texttt{o} is the output buffer where we will store the results, so there is no need to initialize its data.
 
@@ -285,11 +286,11 @@ To load the saxpy kernel binary file, we create a \texttt{KernelFunction} object
     mango_rt.resource_allocation(tg);
 \end{lstlisting}
 
-In order to realize the resource allocation, we first need to register the elements in the Context and create the \texttt{TaskGraph}.
-The kernel is registered in the Libmango Context by providing its id, kernel function and input and ouput buffers.
+In order to realize the resource allocation, we first need to register the elements in the \texttt{Context} and create the \texttt{TaskGraph}.
+The kernel is registered in the Libmango \texttt{Context} by providing its id, kernel function and input and output buffers.
 The buffers are registered by providing their ids, size, kernels where they act as input and kernels where they act as output.
 
-Finally, the \texttt{TaskGraph} is created with the previously registered elements and the resource allocation is performed over the specified TaskGraph.
+Finally, the \texttt{TaskGraph} is created with the previously registered elements and the resource allocation is performed over the specified \texttt{TaskGraph}.
 
 \begin{lstlisting}[style=CStyle, caption=Sample - Arguments set up]
     auto argX = mango::BufferArg(b1);
@@ -313,7 +314,7 @@ A \texttt{KernelArguments} object groups the arguments to be passed to a given k
     b2->write(y, buffer_size);
 \end{lstlisting}
 
-Before launching the kernel, we need to write the data from the host buffers onto the registered buffers that where allocated at the target accelerators in the resource allocation. To write to a buffer, we use the \texttt{write()} function of the \texttt{Buffer} objects that were returned from the Context registration.
+Before launching the kernel, we need to write the data from the host buffers onto the registered buffers that where allocated at the target accelerators in the resource allocation. To write to a buffer, we use the \texttt{write()} function of the \texttt{Buffer} objects that were returned from the \texttt{Context} registration.
     
 \begin{lstlisting}[style=CStyle, caption=Sample - Kernel launch]
     std::cout << "Sample host: Starting kernel..." << std::endl;
@@ -359,16 +360,16 @@ We use the \texttt{saxpy} function defined at the beginning of the sample to che
 }
 \end{lstlisting}
 
-Before returning, we perform the resource deallocation of the TaskGraph, and free the host buffers.
+Before returning, we perform the resource deallocation of the \texttt{TaskGraph}, and free the host buffers.
 
 \section{BarbequeRTRM}
 
 The MANGO architecture is based on the idea of building energy efficient HPC (High Performance Computing) systems. In heterogeneous architectures, the resource management problem is especially complex due to the difficulty of scheduling tasks over multiple architectures with different instruction sets and requirements.
 
-A resource manager performs the tasks scheduling and assignment of resources to the available accelerators, according to the application's objective, like the minimization of power consumption or the minimization of execution time \cite{mango_exploring_manycore_architectures}.
+A resource manager performs the tasks' scheduling and assignment of resources to the available accelerators, according to the application's objective, like the minimization of power consumption or the minimization of execution time \cite{mango_exploring_manycore_architectures}.
 
 The framework used for resource management in the MANGO system is the Barbeque Run-Time Resource Manager (BarbequeRTRM). 
-As described in its official documentation \cite{bosp}, BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (i.e. CPU, GPU, memory, HW accelerators, etc.) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms \cite{barbecue_1}\cite{barbecue_2}. As BarbequeRTRM is a large system with multiple applications, in this section we will focus on it's usage in the MANGO system and the relevant components involved in the process.
+As described in its official documentation \cite{bosp}, BarbequeRTRM is a modular and extensible run-time resource manager, to manage the allocation of computing resources (i.e. CPU, GPU, memory, HW accelerators, etc.) to multiple concurrent applications. Its modular design allows the developers to add custom resource allocation policies, according to specific use-cases and target platforms \cite{barbecue_1, barbecue_2}. As BarbequeRTRM is a large system with multiple applications, in this section we will focus on it's usage in the MANGO system and the relevant components involved in the process.
 
 \subsection{Resource Manager Architecture} \label{bbque}
 
@@ -376,7 +377,7 @@ As described in its official documentation \cite{bosp}, BarbequeRTRM is a modula
     \centering
     \includegraphics[width=\textwidth]{img/barbecue-arch.png}
     \captionsetup{justification=centering}
-    \caption{Overview of the BarbequeRTRM (Credit: \cite{mango_exploring_manycore_architectures})}
+    \caption{Overview of the BarbequeRTRM \cite{mango_exploring_manycore_architectures}}
     \label{fig:barbecue-arch}
 \end{figure}
 
@@ -392,7 +393,7 @@ There are, of course, resources out of the Linux operating system control, in th
 
 The \textbf{Platform Proxy} also performs the resource assignment for its platform. This is done through functions exposed by the \textbf{HHAL API}, for which a specific Platform Proxy must have an HHAL Client.
 
-In terms of task scheduling, the \textbf{Scheduler Manager} is responsible for loading a \textbf{Scheduling Policy} and executing the scheduling algorithm for a given task graph. Multiple resource allocation policies can be implemented to account for the specific requirements of the user's system and application, i.e. policies focusing on power and temperature control, execution time, isolation\cite{mango_exploring_manycore_architectures}, etc. The utilized resource allocation policy is selected at installation time. 
+In terms of task scheduling, the \textbf{Scheduler Manager} is responsible for loading a \textbf{Scheduling Policy} and executing the scheduling algorithm for a given task graph. Multiple resource allocation policies can be implemented to account for the specific requirements of the user's system and application, i.e. policies focusing on power and temperature control, execution time, isolation, etc. \cite{mango_exploring_manycore_architectures}. The utilized resource allocation policy is selected at installation time. 
 Here its worth mentioning the \textbf{recipe} file (further explained in section \ref{bbque:recipe}), through which the user can specify the QoS required for their application.
 
 \subsection{Integration} \label{bbque:integration}
@@ -445,11 +446,11 @@ As seen in the sample \ref{bbque:recipe_example}, under the \texttt{reqs} tag, \
 \begin{itemize}
     \item \texttt{id}: A number identifier.
     \item \texttt{name}: A name used for logging purposes.
-    \item \texttt{hw\_prefs}: ordered list of accelerator preferences.
-    \item \texttt{inbw\_kbps}: read bandwidth.
-    \item \texttt{outbw\_kbps}: write bandwidth.
-    \item \texttt{grid\_dim}: grid dimensions for an Nvidia kernel.
-    \item \texttt{block\_dim}: block dimensions for an Nvidia kernel.
+    \item \texttt{hw\_prefs}: Ordered list of accelerator preferences.
+    \item \texttt{inbw\_kbps}: Read bandwidth.
+    \item \texttt{outbw\_kbps}: Write bandwidth.
+    \item \texttt{grid\_dim}: Grid dimensions for an Nvidia kernel.
+    \item \texttt{block\_dim}: Block dimensions for an Nvidia kernel.
 \end{itemize}
 
 \begin{lstlisting}[style=CStyle, label=bbque:recipe_example, caption=BarbequeRTRM Recipe file - Saxpy Sample in GN and Nvidia]

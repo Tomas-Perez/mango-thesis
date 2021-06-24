@@ -6,7 +6,7 @@ Applications of this technology, from physics, graphical and meteorological comp
 
 As time passed, resources that were once hardly accessible by end users, due to the elevated cost of acquisition and maintenance, are now made widely available through Cloud Computing.
 These circumstances called for a rapid evolution of High Performance Computing (HPC), in the search for performance and power-efficiency optimization. 
-The power requirements of HPC centers are increasingly higher, to the point where power supply availability is a main concern in their scaling capabilities. Combined with the growing demand for HPC, it is clear that HPC hardware and software architectures need not only high performance technology solutions, but also power efficient ones.
+The power requirements of HPC centers are increasingly higher, to the point where power supply availability is a main concern in their scaling capabilities. Combined with the growing demand for this technology, it is clear that HPC hardware and software architectures need not only high performance technology solutions, but also power efficient ones.
 Deeply heterogeneous systems are capable of achieving the necessary performance per watt levels, due to the exploitation of different hardware components specifically designed with certain applications in mind, i.e. parallel computing.
 Aside from power and performance, another relevant quality is predictability, a requirement of video transcoding and medical imaging applications. Predictability acts as a trade-off with respect to power consumption, due to the reservation of higher amounts of computing resources to ensure the satisfaction of requirements. 
 
@@ -84,7 +84,7 @@ For Libmango to fit into the new MANGO structure, a rework of most of its compon
 \begin{itemize}
     \item Keep the public Libmango API the same, for backwards compatibility.
     \item Remove architecture specific calculations, now carried out by the HHAL module.
-    \item Simplify bloated data structures, containing information not used in any module.
+    \item Simplify bloated data structures, containing information no longer required.
 \end{itemize}
 
 As previously mentioned, the Dynamic Compiler was also moved from Libmango to the HHAL module.
@@ -100,7 +100,7 @@ As previously mentioned, the Dynamic Compiler was also moved from Libmango to th
     \label{fig:mango_final_stack}
 \end{figure}
 
-HHAL and NAN development, Libmango's rework and BarbequeRTRM integration, all took 10 months to complete. The implementation work was performed across all modules in an iterative manner, so time dedicated to each module was not measured.
+HHAL and NAN development, Libmango's rework and BarbequeRTRM integration, all took ten months to complete. The implementation work was performed across all modules in an iterative manner, so time dedicated to each module was not measured.
 The resulting MANGO software stack can be seen in figure \ref{fig:mango_final_stack}.
 
 \section{Document Structure}
