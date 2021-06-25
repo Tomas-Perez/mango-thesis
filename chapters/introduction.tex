@@ -59,12 +59,12 @@ The first implementation of the \textbf{Dynamic Compiler} was as an extension of
 
 \subsection{GPU Support}
 
-The next challenge to tackle was the addition of GPU support to the MANGO system, specifically CUDA compatible NVIDIA GPUs. 
+The next challenge to tackle was the addition of GPU support to the MANGO system, specifically CUDA compatible Nvidia GPUs. 
 With the objective of further fulfilling MANGO's aim at enabling end users to work with highly heterogeneous HPC systems, GPU support is of utmost importance. Apart from their efficient graphics processing capabilities, GPUs are the main accelerator type used in machine learning and deep learning applications due to their highly parallel architecture.
 
 At the time, the HN library played the role of a hardware abstraction layer between hardware-specific libraries and the rest of the MANGO system. Despite being developed with abstraction in mind, the subset of HN-supported hardware accelerators did not merit great levels of generalization, resulting in an abstraction granularity that is too specific for the smooth integration of accelerators such as GPUs.
 
-As a consequence, instead of expanding the HN library, development of the Nvidia Architecture Node (NAN) \ref{NvidiaArchitectureNode}, the platform library in charge of launching kernels on system-available NVIDIA devices, begun as an independent MANGO module.
+As a consequence, instead of expanding the HN library, development of the Nvidia Architecture Node (NAN) \ref{NvidiaArchitectureNode}, the platform library in charge of launching kernels on system-available Nvidia devices, begun as an independent MANGO module.
 
 An initial integration effort of the NAN with the Libmango module was successful, enabling kernel execution on target GPUs. 
 But a problem with MANGO's structure became increasingly clear. The limited abstraction provided by HN caused the Libmango module to be closely attached to its API and working requirements. This inter-dependency was made evident by the presence of elements like a memory manager in the Libmango module, which was supposed to be architecture agnostic.

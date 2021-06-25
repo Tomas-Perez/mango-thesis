@@ -14,7 +14,7 @@ This started with the implementation of a Python wrapper in order to provide use
 
 After that, the addition of Just-In-Time (JIT) compilation allowed users to load kernels from source code without the need of precompiling them. This not only improves the feedback loop by decreasing the time to deploy a new kernel modification, but also will in the future allow for optimizations over the kernel code which need runtime device capability and availability information.
 
-Our main contribution however involved the extension of the platforms supported by MANGO, granting the system with the capacity to exploit GPUs as accelerators for general purpose applications. This was achieved by the implementation of the NVIDIA Architecture Node (NAN) which leverages the CUDA Driver API in order to execute kernels in any one of the connected devices. 
+Our main contribution however involved the extension of the platforms supported by MANGO, granting the system with the capacity to exploit GPUs as accelerators for general purpose applications. This was achieved by the implementation of the Nvidia Architecture Node (NAN) which leverages the CUDA Driver API in order to execute kernels in any one of the connected devices. 
 
 During the integration of the NAN with the existing MANGO stack, there was a significant hurdle in order to adapt the libmango code to support this new platform. A hurdle that was a clear symptom of the dependence of the host API to the underlying architectures running the kernels. Even though the initial abstraction layer of the HN library and daemon allowed for abstraction over the custom MANGO hardware, it was not easily extendable to other devices, such as a GPUs.
 

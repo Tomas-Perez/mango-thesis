@@ -4,11 +4,11 @@ This chapter covers the state of the art in heterogenous computing programming m
 
 Today, over six hundred applications utilize GPU acceleration across a broad range of industries including: finance, design for manufacturing/construction, artificial intelligence, medical imaging and more. As such, it was a very important platform to add to the MANGO software stack, and one of the main contributions of our thesis.
 
-Section \ref{sect:history-gpgpu} covers the history of advancements in GPGPU technology and is largely based on \cite{brief_history_gpgpu}, a talk by NVIDIA Software Engineer Mark Harris. This is a very interesting topic and shows the evolution in development using GPUs, culminating in the release of NVIDIA's CUDA. 
+Section \ref{sect:history-gpgpu} covers the history of advancements in GPGPU technology and is largely based on \cite{brief_history_gpgpu}, a talk by Nvidia Software Engineer Mark Harris. This is a very interesting topic and shows the evolution in development using GPUs, culminating in the release of Nvidia's CUDA. 
 
 The following sections cover other programming models starting from OpenCL in section \ref{sect:opencl}. It being the most well established programming model in GPUs after CUDA, which also provides support for programming in CPUs and FPGAs.
 
-ROCm, AMD's response to the significant adoption of CUDA, is covered in section \ref{sect:rocm}. By adopting a very similar API to CUDA, AMD is able to easily port existing CUDA applications in order to run them on their own GPUs while still being able to compile for NVIDIA's.
+ROCm, AMD's response to the significant adoption of CUDA, is covered in section \ref{sect:rocm}. By adopting a very similar API to CUDA, AMD is able to easily port existing CUDA applications in order to run them on their own GPUs while still being able to compile for Nvidia's.
 
 After that, section \ref{sect:openmp-openacc} covers both OpenMP and OpenACC, which adopt a very similar compiler-directive-based approach to programming GPUs.
 
@@ -28,10 +28,10 @@ In August 1999, Kedem et al. \cite{unix_passwords_gpgpu} published a paper where
     \caption{Generalized Voronoi diagram computed interactively on PC (Credit: Hoff et al.)}
 \end{figure}
 
-Also in 1999, Hoff et al. \cite{voronoi_diagrams_gpgpu} managed to perform computations of generalized Voronoi diagrams using graphics accelerators, such as the NVIDIA TNT2, connected to a PC \cite{brief_history_gpgpu}, as opposed to the specialized hardware in the PixelFlow. This was achieved by using the OpenGL API \cite{opengl}. However, at that time GPUs were not programmable. The hardware exposed what is known as a Fixed Function Pipeline which the user could configure according to their needs. With that configuration, the GPU would execute a series of built in math functions which were focused on rendering, not on computation \cite{opengl_fixed_function_pipeline}.
+Also in 1999, Hoff et al. \cite{voronoi_diagrams_gpgpu} managed to perform computations of generalized Voronoi diagrams using graphics accelerators, such as the Nvidia TNT2, connected to a PC \cite{brief_history_gpgpu}, as opposed to the specialized hardware in the PixelFlow. This was achieved by using the OpenGL API \cite{opengl}. However, at that time GPUs were not programmable. The hardware exposed what is known as a Fixed Function Pipeline which the user could configure according to their needs. With that configuration, the GPU would execute a series of built in math functions which were focused on rendering, not on computation \cite{opengl_fixed_function_pipeline}.
 
 \subsection{Programmable GPUs}
-Programmable GPUs did not come until 2001, as NVIDIA introduced GeForce series 3. This replaced the fixed functions in the previous model with programmable shaders which could be controlled by the developers \cite{nvidia_nfinitefx_pixel, nvidia_nfinitefx_vertex}. These features were, of course, aimed at game developers and 3D designers, but they also allowed for new applications of GPU technology.
+Programmable GPUs did not come until 2001, as Nvidia introduced GeForce series 3. This replaced the fixed functions in the previous model with programmable shaders which could be controlled by the developers \cite{nvidia_nfinitefx_pixel, nvidia_nfinitefx_vertex}. These features were, of course, aimed at game developers and 3D designers, but they also allowed for new applications of GPU technology.
 
 Using a GeForce 3, Larsen and McAllister achieved the first matrix multiplication done on a GPU \cite{early_matrix_multiplication_gpgpu}. Their work was done by mapping the matrices into textures that could be manipulated with the OpenGL API. This textures would be transferred to the GPU, rendered and then copied back to CPU memory to be mapped again to a matrix format so results could be read. Incidentally, the resulting "matrix texture" would be shown on screen. There is no explicit mention of the use of programmable shaders in this work, however this would not have changed the study drastically as the fixed functions of the previous model could handle the operations required. The main problem Larsen and McAllister found was the 8 bit fixed point precision and saturation arithmetic used by the hardware. Saturation arithmetic, although very useful in graphics, makes it harder to design a higher precision fixed-point implementation.
 
@@ -39,7 +39,7 @@ Approximate simulations of natural phenomena were achieved on the GPU by Harris 
 
 In late 2002, after seeing the growing trend in general purpose computation on GPUs, Harris coined the term GPGPU, an acronym for "General Purpose computing on Graphics Processing Units" \cite{brief_history_gpgpu}. GPGPU.org, a website dedicated to news and resources on GPGPU research, would go live August 2003.
 
-DirectX 9 (DX9) introduced the Shader Model 2.0 and with it support for floating-point operations. In July 2002, ATI released the first DirectX 9 capable graphics card in the form of the Radeon 9700 PRO \cite{ati_9700_pro}. NVIDIA followed up with their own DX9 GPU, the GeForceFX, in January 2003 \cite{geforcefx}.
+DirectX 9 (DX9) introduced the Shader Model 2.0 and with it support for floating-point operations. In July 2002, ATI released the first DirectX 9 capable graphics card in the form of the Radeon 9700 PRO \cite{ati_9700_pro}. Nvidia followed up with their own DX9 GPU, the GeForceFX, in January 2003 \cite{geforcefx}.
 
 DX9 Hardware allowed researchers to implement algorithms which previously could not be ran on the GPU due to lack of floating-point support. One example of this is global illumination. In \cite{photon_mapping_gpgpu}, Purcell et al. achieve interactive frame rates on a GeForce FX 5900 computing global illumination via photon mapping. This is done by utilizing an incremental approach, where increasingly better approximations are rendered until the image converges, the initial approximations can be shown to the user for interactive feedback. On a 160 x 160 window, it is possible to interactively manipulate the camera, scene geometry and light source. Once interaction stops, the illumination converges in one or two seconds, an example can be seen in figure \ref{fig:lighting-approximations}.
 
@@ -56,7 +56,7 @@ DX9 Hardware allowed researchers to implement algorithms which previously could 
 
 The main bottleneck that Purcell et al. faced in their paper stemmed from the lack of random access writes. While the original photon mapping algorithm uses a balanced k-d tree, it is not possible to construct one on the GPU due to this limitation. Instead, the researchers had to modify the algorithm in order to account for this, replacing the k-d tree with a uniform grid. To build this grid, they implemented two algorithms, bitonic merge sort and stencil routing. The bitonic sort is computationally less efficient, needing \(O(\log^2 n)\) rendering passes. On the other hand, stencil routing can be computed in a single pass but suffers from memory readback performance bottlenecks.
 
-All the kernels were written in Cg, a general purpose language for GPUs released by NVIDIA at the start of 2003 \cite{nvidia_cg}. The design of Cg was inspired by the C language to provide a high level language that is still close to the underlying hardware. The C syntax served as a starting point which was then extended and modified as necessary to support GPU architectures effectively. The general purpose nature of the language allows the programmer to use very similar code to program the vertex and fragment stages of the rendering pipeline. This also simplifies programming for GPGPU applications, an aspect that was taken into account when designing the language due to the rising popularity of the field.
+All the kernels were written in Cg, a general purpose language for GPUs released by Nvidia at the start of 2003 \cite{nvidia_cg}. The design of Cg was inspired by the C language to provide a high level language that is still close to the underlying hardware. The C syntax served as a starting point which was then extended and modified as necessary to support GPU architectures effectively. The general purpose nature of the language allows the programmer to use very similar code to program the vertex and fragment stages of the rendering pipeline. This also simplifies programming for GPGPU applications, an aspect that was taken into account when designing the language due to the rising popularity of the field.
 
 \subsection{Brook}
 Languages like Cg, Microsoft's HLSL and OpenGL's GLslang allowed for shaders to be written in C-like syntax. However, they still required the programmer to express GPU applications in terms of graphics primitives and to use the existing graphics APIs to control the rest of the graphics pipeline, such as memory allocation and loading programs. In August 2004 researchers at Stanford University presented Brook \cite{brook}, a programming environment that provides developers with a view of the GPU as a streaming coprocessor.
@@ -101,7 +101,7 @@ In November 2005, Microsoft launched the XBOX 360 console. A noteworthy aspect o
     \centering
     \includegraphics[width=0.6\textwidth]{img/classic-model-gpu-idle-units.png}
     \captionsetup{justification=centering}
-    \caption{Fixed shader model performance characteristics (Credit: NVIDIA)}
+    \caption{Fixed shader model performance characteristics (Credit: Nvidia)}
     \label{fig:gpu-fixed-shader-perf}
 \end{figure}
 
@@ -109,17 +109,17 @@ In November 2005, Microsoft launched the XBOX 360 console. A noteworthy aspect o
     \centering
     \includegraphics[width=0.6\textwidth]{img/unified-shader-gpu-utilization.png}
     \captionsetup{justification=centering}
-    \caption{Unified shader performance characteristics (Credit: NVIDIA)}
+    \caption{Unified shader performance characteristics (Credit: Nvidia)}
     \label{fig:gpu-unified-shader-perf}
 \end{figure}
 
-While ATI produced the first unified shader GPU for the XBOX 360, NVIDIA was the one  to release the model in PCs with the GeForce 8800 in November 2006. DirectX 10 had introduced Shader Model 4.0 which included a unified shader instruction set. Even though a unified architecture was not a requirement to use DirectX 10, it provided better efficiency, load-balancing and power utilization \cite{geforce_8800_architecture}. A block diagram of the GeForce 8800 can be seen in figure \ref{fig:8800-arch}. The streaming processors (SP) marked in green are the units in charge of all the shader processing (the shader cores).
+While ATI produced the first unified shader GPU for the XBOX 360, Nvidia was the one  to release the model in PCs with the GeForce 8800 in November 2006. DirectX 10 had introduced Shader Model 4.0 which included a unified shader instruction set. Even though a unified architecture was not a requirement to use DirectX 10, it provided better efficiency, load-balancing and power utilization \cite{geforce_8800_architecture}. A block diagram of the GeForce 8800 can be seen in figure \ref{fig:8800-arch}. The streaming processors (SP) marked in green are the units in charge of all the shader processing (the shader cores).
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{img/geforce-8800-block-diagram.png}
     \captionsetup{justification=centering}
-    \caption{GeForce 8800 GTX Block Diagram (Credit: NVIDIA)}
+    \caption{GeForce 8800 GTX Block Diagram (Credit: Nvidia)}
     \label{fig:8800-arch}
 \end{figure}
 
@@ -129,9 +129,9 @@ ATI (from here on out referred to as AMD due to their acquisition in 2006) was a
 
 By providing a first party computing model, CTM eliminates the need for developers to work with graphics APIs and deal with a rendering pipeline. Instead of having to adapt algorithms work with textures, vertices, pixels and shaders, the developer can perform computation by binding memory as inputs and outputs to the stream processors directly. This includes Brook, which no longer has the requirement to work on top of a graphics API backend.
 
-\subsection{NVIDIA CUDA} \label{STATE:cuda}
+\subsection{Nvidia CUDA} \label{STATE:cuda}
 
-In June of 2007, NVIDIA introduced CUDA \cite{cuda_toolkit_archive}. The significant redesign that came with the adoption of unified shaders for the GeForce 8800 GTX, as well as the flexibility achieved by the final model, allowed NVIDIA to develop a hardware and software solution for data-intensive computing.
+In June of 2007, Nvidia introduced CUDA \cite{cuda_toolkit_archive}. The significant redesign that came with the adoption of unified shaders for the GeForce 8800 GTX, as well as the flexibility achieved by the final model, allowed Nvidia to develop a hardware and software solution for data-intensive computing.
 
 The CUDA C++ language is a minimal extension over C++ adding parallelism features. As opposed to AMD CTM, which combined the CAL C API with a low level kernel language, this programming model is single source. CPU (host) code and GPU (kernel) code are written in the same language and can be contained in the same file. When launching a kernel in CUDA, the user must provide an \textit{execution configuration} with a custom $<<< ... >>>$ syntax. The most important aspect of this configuration is the dimensions of the \textit{grid} and \textit{thread blocks}.
 
@@ -177,7 +177,7 @@ int main(void) {
 }
 \end{lstlisting}
 
-Overall, CUDA's advantages over AMD's CTM gave NVIDIA the upper hand in the GPGPU field and it is still in use to this day. By contrast, in 2008, AMD's CTO of graphics announced that the company was shifting its focus away from CTM and into the upcoming OpenCL standard \cite{amd_ctm_ditch}, detailed in the following section.
+Overall, CUDA's advantages over AMD's CTM gave Nvidia the upper hand in the GPGPU field and it is still in use to this day. By contrast, in 2008, AMD's CTO of graphics announced that the company was shifting its focus away from CTM and into the upcoming OpenCL standard \cite{amd_ctm_ditch}, detailed in the following section.
 
 \section{OpenCL} \label{sect:opencl}
 
@@ -271,7 +271,7 @@ int main(void) {
 }
 \end{lstlisting}
 
-Seventeen different companies (including Apple, Intel, AMD and NVIDIA) distribute products conforming to the OpenCL standard \cite{opencl_conformant_companies}. This allows an OpenCL kernel to run on the majority of hardware available on the market, including CPUs, GPUs, FPGAs and more. As is illustrated in figure \ref{fig:opencl_accelerated_apps}, a great number of applications use OpenCL as a backend to enable parallelism on this hardware.
+Seventeen different companies (including Apple, Intel, AMD and Nvidia) distribute products conforming to the OpenCL standard \cite{opencl_conformant_companies}. This allows an OpenCL kernel to run on the majority of hardware available on the market, including CPUs, GPUs, FPGAs and more. As is illustrated in figure \ref{fig:opencl_accelerated_apps}, a great number of applications use OpenCL as a backend to enable parallelism on this hardware.
 
 \begin{figure}[ht]
     \centering
@@ -288,13 +288,13 @@ EngineCL \cite{enginecl}, introduces a new object-oriented API on top of OpenCL.
 FluidiCL \cite{fluidicl} maintains the OpenCL API but implements it in such a way that the user can treat multiple devices as a single entity. Thus, it is very easy to adapt an existing OpenCL application to run using FluidiCL, as all function calls can remain unchanged. The paper considers the implementation running on an experimental system with a single GPU and CPU. At the time of setup, both kernel compilation and buffer writes are broadcasted to both devices. That is, the kernel is compiled for both and, likewise, the input data is transferred to both of their buffers. When the execution starts, the GPU starts running the kernel with a decreasing order of work-group IDs, meanwhile the CPU executes smaller sub-kernels in increasing order of work-group IDs. At some point, when the work-groups IDs handled by both cross over, the work is finished and the results are merged on the GPU.
 
 \section{AMD ROCm} \label{sect:rocm}
-Initially announced in November 2015 as the "Boltzmann Initiative", AMD ROCm is an open-source software development platform for HPC GPU computing \cite{boltzmann_initiative}. It is AMD's latest competitor to NVIDIA's CUDA.
+Initially announced in November 2015 as the "Boltzmann Initiative", AMD ROCm is an open-source software development platform for HPC GPU computing \cite{boltzmann_initiative}. It is AMD's latest competitor to Nvidia's CUDA.
 
-Since shifting their focus away from CTM in 2008 and mainly supporting the OpenCL standard, AMD still lost a significant market share to NVIDIA in the GPGPU market \cite{amd_as_alternative}. Developers preferred the CUDA approach which, although constrained them to NVIDIA products, provided a more convenient programming experience by following a single source model.
+Since shifting their focus away from CTM in 2008 and mainly supporting the OpenCL standard, AMD still lost a significant market share to Nvidia in the GPGPU market \cite{amd_as_alternative}. Developers preferred the CUDA approach which, although constrained them to Nvidia products, provided a more convenient programming experience by following a single source model.
 
-In order to further tap into the GPGPU market, mostly filled by CUDA developers, AMD implemented ROCm and, being more specific, HIP. HIP is a C++ Runtime API and kernel language very similar to CUDA that is portable across NVIDIA and AMD GPUs. Porting a CUDA application to HIP does not involve much more than replacing all instances of \textbf{cuda} in the file with \textbf{hip}. AMD also provides the \textit{Hipify} tool, which performs these operations automatically.
+In order to further tap into the GPGPU market, mostly filled by CUDA developers, AMD implemented ROCm and, being more specific, HIP. HIP is a C++ Runtime API and kernel language very similar to CUDA that is portable across Nvidia and AMD GPUs. Porting a CUDA application to HIP does not involve much more than replacing all instances of \textbf{cuda} in the file with \textbf{hip}. AMD also provides the \textit{Hipify} tool, which performs these operations automatically.
 
-HIP code can be compiled for either AMD or NVIDIA GPUs. Compilation was previously handled by \texttt{hcc} and \texttt{nvcc} respectively, but these tools have been replaced in ROCm v3.5 by the HIP-Clang compiler, which can compile code for both vendors.
+HIP code can be compiled for either AMD or Nvidia GPUs. Compilation was previously handled by \texttt{hcc} and \texttt{nvcc} respectively, but these tools have been replaced in ROCm v3.5 by the HIP-Clang compiler, which can compile code for both vendors.
 
 When compared to OpenCL, HIP, like CUDA, has the advantage of a single source C++ programming model. Host and device code can live in the same file and use most of C++'s feature set including lambdas, templates and classes. Thus, porting CUDA code is significantly easier for HIP as mentioned previously. Porting from CUDA to OpenCL not only involves separating device code from host code, it also requires translating this device code from C++ to OpenCL C and modifying all CUDA function calls and keywords to their OpenCL counterparts.
 
@@ -308,7 +308,7 @@ As a case study, in SC16 Ben Sander from AMD made a presentation showing the wor
     \label{fig:caffe-rocm-port}
 \end{figure}
 
-\cite{ginkgo_rocm_port} also presents a case of porting an application from CUDA to HIP. Tsai et al. found the process very smooth and were able to automatize most of the work by extending the initial Hipify script to their needs. Although HIP allowed them to run their application on both AMD and NVIDIA, they still preferred to keep native support for CUDA and maintain two versions at the same time. This setup allowed them to take advantage of HIP's similarity to CUDA by sharing a third of the code base between both implementations. In the cases where they used CUDA specific functionality, they were able to replicate it in HIP and use a common API to call the appropriate implementation depending on the programming model used. Finally, they also included experiments to show the performance of HIP code compared to native CUDA on NVIDIA GPUs. These tests showed that the overhead of HIP over CUDA is negligible, with 50\% of the test cases showing less than 3\% performance difference and 90\% of the test cases showing less than 10\% performance difference.
+\cite{ginkgo_rocm_port} also presents a case of porting an application from CUDA to HIP. Tsai et al. found the process very smooth and were able to automatize most of the work by extending the initial Hipify script to their needs. Although HIP allowed them to run their application on both AMD and Nvidia, they still preferred to keep native support for CUDA and maintain two versions at the same time. This setup allowed them to take advantage of HIP's similarity to CUDA by sharing a third of the code base between both implementations. In the cases where they used CUDA specific functionality, they were able to replicate it in HIP and use a common API to call the appropriate implementation depending on the programming model used. Finally, they also included experiments to show the performance of HIP code compared to native CUDA on Nvidia GPUs. These tests showed that the overhead of HIP over CUDA is negligible, with 50\% of the test cases showing less than 3\% performance difference and 90\% of the test cases showing less than 10\% performance difference.
 
 \section{OpenMP \& OpenACC} \label{sect:openmp-openacc}
 In this section we will tackle OpenMP and OpenACC in conjunction as they take very similar approaches.
@@ -378,7 +378,7 @@ q.wait();
 
 The code within the the lambda argument to the \texttt{parallel\_for} is the device kernel. This code will be compiled using the device compiler and executed on the device.
 
-SYCL can be laid out on top of multiple backends. A backend exposes one or multiple SYCL platforms (collections of devices). For example, implementations can expose an OpenCL backend to give access to OpenCL devices, or a CUDA backend to give access to NVIDIA GPUs. Apart from the generic API that all backends must implement in order to provide the basic device functionality, each backend can expose their specific features through interoperability headers to provide the developer with more control at the expense of portability.
+SYCL can be laid out on top of multiple backends. A backend exposes one or multiple SYCL platforms (collections of devices). For example, implementations can expose an OpenCL backend to give access to OpenCL devices, or a CUDA backend to give access to Nvidia GPUs. Apart from the generic API that all backends must implement in order to provide the basic device functionality, each backend can expose their specific features through interoperability headers to provide the developer with more control at the expense of portability.
 
 When building a SYCL application, the user can choose which backends to use. This is the set of \textit{active backends} for the application. The application can then be run on any host platform that supports at least one of the active backends. The subset of active backends which are supported by the host platform at runtime are called the \textit{available backends}.
 
@@ -482,7 +482,7 @@ By looking at the table, we can see that there are two capabilities still not co
 
 We argue that, although at first glance introducing these capabilities would improve programmability, the performance gained by their absence is much more important to HPC.
 
-First of all, using a single kernel programming model for multiple devices, even one that is open source, does not guarantee portability. We will take OpenCL as an example. As seen in section \ref{sect:opencl}, it is the responsibility of the hardware vendors to provide support for any new feature of the standard. This introduces version differences between different platforms, for example NVIDIA GPUs still only support OpenCL 1.2. While OpenCL 2.x introduced multiple useful features, the lack of support from NVIDIA, which is one of its main targets, slowed down 2.0 adoption. The effect was so considerable that the 3.0 standard removed the requirement for most of the features introduced in 2.x. 
+First of all, using a single kernel programming model for multiple devices, even one that is open source, does not guarantee portability. We will take OpenCL as an example. As seen in section \ref{sect:opencl}, it is the responsibility of the hardware vendors to provide support for any new feature of the standard. This introduces version differences between different platforms, for example Nvidia GPUs still only support OpenCL 1.2. While OpenCL 2.x introduced multiple useful features, the lack of support from Nvidia, which is one of its main targets, slowed down 2.0 adoption. The effect was so considerable that the 3.0 standard removed the requirement for most of the features introduced in 2.x. 
 
 If a developer has two target OpenCL devices for the same kernel, one with 1.2 capabilities and one with 2.0 capabilities one of two things can happen: 
 \begin{enumerate}
@@ -490,7 +490,7 @@ If a developer has two target OpenCL devices for the same kernel, one with 1.2 c
     \item they write two separate kernels and possibly two separate host side implementations to exploit all the newest features on the device that supports the latest standard, while also maintaining compatibility with the 1.2 device.
 \end{enumerate}
  
-As such, a great hurdle for kernel portability is the hardware vendors' unwillingness to work together \cite{but_mummy_cuda}. This is perfectly reasonable, like in any other market, a company will gain an advantage over their competitors in whichever way they can and maintain it as long as possible. If NVIDIA simply releases CUDA as an open source standard for all GPUs to utilize, they will lose their upper hand over AMD in the GPGPU market.
+As such, a great hurdle for kernel portability is the hardware vendors' unwillingness to work together \cite{but_mummy_cuda}. This is perfectly reasonable, like in any other market, a company will gain an advantage over their competitors in whichever way they can and maintain it as long as possible. If Nvidia simply releases CUDA as an open source standard for all GPUs to utilize, they will lose their upper hand over AMD in the GPGPU market.
 
 Even if, despite all their differences, all hardware vendors would work together on a single project, the differences in the hardware architecture will still be present. Indeed, the purpose of Heterogeneous Computing is to handle multiple devices with different memory access requirements, levels of parallelism, instruction sets and more. Although it may be possible to abstract all this away from the kernel programmer, it will not come without a cost in performance.
 
