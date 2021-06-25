@@ -424,22 +424,85 @@ Kokkos is built on top of multiple backends. This means that it is not tied to a
 In terms of performance, the initial implementation presented in \cite{kokkos} showed it was capable of achieving at least 90\% of the performance of the architecture specific, optimized variants of the same benchmarks (i.e. comparing Kokkos against OpenMP for CPUs and CUDA for GPUs). \cite{performance_portability_multimaterial_kernels} also evaluates the performance of Kokkos. As mentioned in the SYCL section, this paper uses two different multi-material problems as benchmarks. The overall performance of Kokkos is 6\% lower for the first problem and 22\% lower for the second problem. While CUDA and OpenMP implementations have the advantage, they also require different codebases, while Kokkos is completely portable across devices.
 
 
-\section{Mango V1} \label{sect:mangov1}
-- resource management
-- programming model
-- multisource
-- custom hardware
+\section{MANGO V1} \label{sect:mangov1}
+The first version of the MANGO project, here referenced to as MANGO V1, presents a programming model that simplifies the development of parallel applications exploiting deeply heterogeneous architectures. 
+
+Providing a C and a C++ API, what separates MANGO from the previously mentioned alternatives is the inclusion of a resource manager (BarbequeRTRM \ref{bbque}). The resource manager is capable of scheduling user's tasks over the system available accelerators according to user requirements and the current state of the system. 
+A custom hardware architecture, consisting on multiple clusters of FPGA accelerators, and capable of fast reconfiguration, was developed along the MANGO software stack and utilized for the exploration of manycore architectures for HPC systems.
+As a result, MANGO V1 offers support for PEAK, nu+ and DCT accelerators, while also providing CPU emulation for development and testing purposes.
+
+\begin{lstlisting}[style=CStyle, caption=MANGO saxpy example (host), floatplacement=H, label={lst:mangov1_sample}]
+#define KERNEL 1
+#define B1 1
+#define B2 2
+#define B3 3
+
+int main(int argc, char const *argv[])
+{
+    // Initialization
+    mango::mango_init_logger();
+    auto mango_rt = mango::Context("gn_saxpy", "test_manga");
+
+    // Omitted: Initialize a, n, x, y, o
+
+    char kernel_path[] = "/opt/mango/usr/local/share/gn_saxpy/saxpy";
+    auto kf = std::make_shared<mango::KernelFunction>();
+    kf->load(kernel_path, mango::UnitType::GN, mango::FileType::BINARY);
+
+    // Register task graph
+    auto k  = mango_rt.register_kernel(KERNEL, kf, {B1, B2}, {B3});
+    auto b1 = mango_rt.register_buffer(B1, buffer_size, {}, {KERNEL});
+    auto b2 = mango_rt.register_buffer(B2, buffer_size, {}, {KERNEL});
+    auto b3 = mango_rt.register_buffer(B3, buffer_size, {KERNEL}, {});
+
+    auto tg = mango::TaskGraph({k}, {b1, b2, b3});
+
+    // Resource Allocation
+    mango_rt.resource_allocation(tg);
+
+    // Set up arguments
+    auto argX = mango::BufferArg(b1);
+    auto argY = mango::BufferArg(b2);
+    auto argO = mango::BufferArg(b3);
+    auto argA = mango::ScalarArg<float>(a);
+    auto argN = mango::ScalarArg<int>(n);
+
+    auto argsKERNEL = mango::KernelArguments({argA, argX, argY, argO, argN}, k);
+
+    // Omitted: Write to buffers
+
+    // Start kernel
+    auto e = mango_rt.start_kernel(k, argsKERNEL);
+
+    // Wait for kernel termination
+    e->wait();
+
+    // Omitted: Check results and free resources
+}
+\end{lstlisting}
+
+
+
+Mainly due to its resource management capabilities, MANGO's programming model provides a level of abstraction over the hardware far greater than its competition, removing the querying of platform information from the list of user responsibilities. 
+As seen in listing \ref{lst:mangov1_sample}, the only architecture specific information required is a kernel compatible with its target accelerator. Multiple kernel versions can be provided for a single task, leaving to the resource manager the decision of which accelerator performs its execution. 
+
+MANGO's API exposes a set of data structures for the specification of an user's application. A \texttt{TaskGraph} holds \texttt{Kernel}, \texttt{Buffer} and \texttt{Event} data structures, defining their dependencies. 
+Once the task graph is defined, the resource allocation is performed.
+Kernel termination events are automatically generated for synchronization purposes, while users can specify custom events to use as desired.
+A variety of kernel arguments are supported, including scalar values, memory buffers and user events. Arguments are grouped in a \texttt{KernelArguments} structure, which is passed when a kernel is started.
+
+MANGO V1 was the foundation for our work, in which we seek to further improve the platform through a number of additions that help close gaps left by other solutions in this field.
 
 \section{Gap Analysis}
 
 In this section, we will compare the programming models seen so far in order to analyze the present gaps in the heterogeneous computing space that MANGO can fill.
-As explained in the introduction \ref{ch:introduction}, MANGO is an ongoing project with the goal of enabling the development of user applications on heterogeneous HPC systems, while including a system resource manager. 
+As explained previously, MANGO is an ongoing project with the goal of enabling the development of user applications on heterogeneous HPC systems, while including a system resource manager. 
 Our contributions to the project focused on the addition of a Python language API, Just In Time compilation of kernels, and GPU support.
 This work resulted in a new version of the system: MANGO V2.
 
-For the following analysis, we consider MANGO V1 and MANGO V2 separately, to further differentiate the capabilities that were already present in the first version of the system, from those introduced by our contributions.
+For the following analysis, we consider MANGO V1 and MANGO V2 separately to further differentiate the capabilities that were already present in the first version of the system, from those introduced by our contributions.
 
-The capabilities we are interested in, for the presented programming models are:
+The capabilities we are interested in for the presented programming models are:
 
 \begin{itemize}
     \item Device support, including CPU, GPU and FPGAs.
