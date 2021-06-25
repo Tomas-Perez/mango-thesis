@@ -10,9 +10,9 @@ The following sections cover other programming models starting from OpenCL in se
 
 ROCm, AMD's response to the significant adoption of CUDA, is covered in section \ref{sect:rocm}. By adopting a very similar API to CUDA, AMD is able to easily port existing CUDA applications in order to run them on their own GPUs while still being able to compile for NVIDIA's.
 
-After that, section \ref{sect:openmp-openacc} covers both OpenMP and OpenACC, which adopt very similar compiler-directive-based to programming GPUs.
+After that, section \ref{sect:openmp-openacc} covers both OpenMP and OpenACC, which adopt a very similar compiler-directive-based approach to programming GPUs.
 
-Finally, sections \ref{sect:sycl} and \ref{sect:kokkos} cover SYCL and Kokkos respectively. SYCL being the latest open standard for heterogeneous computing, which aims at providing a higher level approach than OpenCL. On the other hand, Kokkos looks towards abstracting away the memory access patterns needed by different architectures in such a way that the same code can exhibit the best performing one depending on the target device.
+Finally, sections \ref{sect:sycl} and \ref{sect:kokkos} cover SYCL and Kokkos respectively. SYCL being the latest open standard for heterogeneous computing, which aims at providing a higher level approach than OpenCL. On the other hand, Kokkos works towards abstracting away the memory access patterns needed by different architectures in such a way that the same code can exhibit the best performing one depending on the target device.
 
 \section{The History of GPGPU} \label{sect:history-gpgpu}
 
@@ -72,7 +72,7 @@ void main(void) {
     float a;
     float4 X[100], Y[100], Z[100];
     float4 x<100>, y<100>, z<100>;
-    // Initialize a, X, Y ...
+    // Omitted: Initialize a, X, Y
     streamRead(x, X);     // copy data from mem to stream
     streamRead(y, Y);
     saxpy(a, x, y, z);    // execute kernel on all elements
@@ -135,7 +135,7 @@ In June of 2007, NVIDIA introduced CUDA \cite{cuda_toolkit_archive}. The signifi
 
 The CUDA C++ language is a minimal extension over C++ adding parallelism features. As opposed to AMD CTM, which combined the CAL C API with a low level kernel language, this programming model is single source. CPU (host) code and GPU (kernel) code are written in the same language and can be contained in the same file. When launching a kernel in CUDA, the user must provide an \textit{execution configuration} with a custom $<<< ... >>>$ syntax. The most important aspect of this configuration is the dimensions of the \textit{grid} and \textit{thread blocks}.
 
-A thread block is a group of threads that is executed in a single streaming multiprocessor (SM), which is a group of stream processors (SP). As its definition indicates, a thread block must fit in a single SM and thus is limited by the hardware. This limits a thread block to contain a maximum of 1,024 threads. The dimensions of a thread block is given by a \texttt{dim3} which is a 3-dimensional vector, allowing the programmer to distribute the threads in a 3D configuration. Using 1D, 2D or 3D configurations is purely for convenience of the developer. They can use the one that best suits the kernel to run.
+A thread block is a group of threads that is executed in a single streaming multiprocessor (SM), which is a group of stream processors (SP). As its definition indicates, a thread block must fit in a single SM and thus is limited by the hardware. Currently, this limits a thread block to contain a maximum of 1,024 threads. The dimensions of a thread block is given by a \texttt{dim3} which is a 3-dimensional vector, allowing the programmer to distribute the threads in a 3D configuration. Using 1D, 2D or 3D configurations is purely for convenience of the developer. They can use the one that best suits the kernel to run.
 
 A grid is then a group of thread blocks. The maximum amount of blocks that can run in parallel is limited by the amount of SMs in a particular GPU, however this does not limit the dimensions of the grid. Due to memory latency, it is better to launch a large grid of blocks at the same time. Having a lot of blocks at its disposal allows the GPU to switch the blocks being executed depending on the contents of the memory. If a given block needs to load a piece of data from memory as it is not currently in the GPU registers, it can be swapped out until the data is loaded, hiding the overhead. Grid dimensions are also indicated with a \texttt{dim3}, for the same reasons as the blocks.
 
@@ -145,7 +145,7 @@ An example of CUDA code can be seen in listing \ref{lst:cuda_saxpy}.
 
 When compared to AMD's offering, CUDA is a higher level interface than CAL, but it also provides more hardware access than Brook. In exchange for requiring more hardware knowledge, CUDA exposes multiple levels of memory hierarchy, per-thread registers, fast shared memory between threads in a block, board memory and host memory. In addition, while Brook only exposes a single dimension of parallelism, data parallelism via streaming, CUDA provides data parallelism and multithreading. CUDA kernels are also more flexible, as they allow the use of pointers, arbitrary writes and thread synchronization between threads in a single block \cite{gpu_computing}.
 
-\begin{lstlisting}[style=CStyle, caption=CUDA saxpy example, float, floatplacement=HT, label={lst:cuda_saxpy}]
+\begin{lstlisting}[style=CStyle, caption=CUDA saxpy example, float, label={lst:cuda_saxpy}]
 __global__ void saxpy(int n, float a, float *x, float *y, float *z) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i < n) z[i] = a * x[i] + y[i];
@@ -156,7 +156,7 @@ int main(void) {
   float X[100], Y[100], Z[100];
   float *d_x, *d_y, *d_z;
 
-  // initialize a, X, Y
+  // Omitted: Initialize a, X, Y
 
   cudaMalloc(&d_x, 100 * sizeof(float)); 
   cudaMalloc(&d_y, 100 * sizeof(float));
@@ -185,16 +185,16 @@ Released in December 2008, Open Compute Language or OpenCL \cite{opencl_spec} is
 
 The framework is comprised by the following components:
 \begin{itemize}
-    \item \textbf{Platform layer}: allows the host program to create contexts and discover OpenCL devices and their capabilities.
-    \item \textbf{Runtime}: allows the host program to manipulate contexts one they have been created.
-    \item \textbf{Compiler}: creates program executables that contain OpenCL kernels. Depending on the capabilities of a device, the compiler may build executables from either OpenCL C source strings, the SPIR-V intermediate language, or device-specific program binary objects. Some implementations may support other kernel languages or intermediate languages.
+    \item \textbf{Platform layer}: Allows the host program to create contexts and discover OpenCL devices and their capabilities.
+    \item \textbf{Runtime}: Allows the host program to manipulate contexts one they have been created.
+    \item \textbf{Compiler}: Creates program executables that contain OpenCL kernels. Depending on the capabilities of a device, the compiler may build executables from either OpenCL C source strings, the SPIR-V intermediate language, or device-specific program binary objects. Some implementations may support other kernel languages or intermediate languages.
 \end{itemize}
 
 Unlike CUDA, where host and device code live in the same file and are written in the same language, OpenCL introduces a kernel specific language called OpenCL C \cite{opencl_c_spec} which runs on the device. Meanwhile, on the host side, OpenCL exposes functionality through a C library.
 
 OpenCL C is based on the \textit{ISO/IEC 9899:1999 - Programming languages - C} specification (also referred to as C99) \cite{c99}, with the addition of some \textit{ISO/IEC 9899:2011 - Information technology - Programming languages - C} specification (also referred to as C11) \cite{c11} features, plus some extensions and restrictions to support parallel kernels.
 
-This dedicated kernel language allows the developer to write a single kernel code base and execute it in different devices. This ensures the \textit{functional} portability of code across devices, eliminating the need for applications to be re-coded on a per-device or per-programming toolkit basis \cite{performance_portability_2013}. The same code can be distributed to any OpenCL device and is compiled by a device specific compiler at runtime (device specific binaries can also be distributed) However, portability issues may still arise if the hardware supports different versions of the standard. In addition, there can also be issues in terms of performance portability due to architecture differences and compiler optimizations available on each platform \cite{performance_portability_2013, performance_portability_2019, performance_portability_2020}. For maximum performance, some tweaking of the source code may still be necessary depending on which device is being targeted \cite{optimizing_opencl_fpga_integer, optimizing_opencl_fpga_automata}.
+This dedicated kernel language allows the developer to write a single kernel code base and execute it in different devices. This ensures the \textit{functional} portability of code across devices, eliminating the need for applications to be re-coded on a per-device or per-programming toolkit basis \cite{performance_portability_2013}. The same code can be distributed to any OpenCL device and is compiled by a device specific compiler at runtime (device specific binaries can also be distributed). However, portability issues may still arise if the hardware supports different versions of the standard. In addition, there can also be issues in terms of performance portability due to architecture differences and compiler optimizations available on each platform \cite{performance_portability_2013, performance_portability_2019, performance_portability_2020}. For maximum performance, some tweaking of the source code may still be necessary depending on which device is being targeted \cite{optimizing_opencl_fpga_integer, optimizing_opencl_fpga_automata}.
 
 SPIR-V is an intermediate language which is also supported as an input language for OpenCL. Instead of distributing and ingesting OpenCL C in the host, developers can precompile their kernels into SPIR-V, allowing for faster kernel load times and avoiding directly exposed source code \cite{spir_overview}. While SPIR-V is also supported by the Vulkan \cite{vulkan} graphics API, it uses a different execution mode of the language (\textbf{GLCompute} versus \textbf{Kernel} for OpenCL), so compute codes are not interchangeable \cite{spir_spec}. Another caveat is that SPIR-V support is only mandatory for OpenCL 2.1 and 2.2 devices, support was made optional for OpenCL 3.0 devices \cite{opencl_spec}. This reduces the amount of devices which will guarantee SPIR-V compatibility, reducing the appeal of SPIR-V only distributions.
 
@@ -221,12 +221,12 @@ int main(void) {
   float a;
   float X[100], Y[100], Z[100];
 
-  // Initialize a, X, Y ...
+  // Omitted: Initialize a, X, Y
 
   cl_uint num_devices;
   cl_device_id *device_list;
-  // Get platform and device information ...
-  // Get list of devices and choose device to run on ...
+  // Omitted: Get platform and device information
+  // Omitted: Get list of devices and choose device to run on
 
   cl_context context = 
     clCreateContext(num_devices, device_list, ...);
@@ -248,7 +248,7 @@ int main(void) {
   clEnqueueWriteBuffer(q, Y_clmem, 100 * sizeof(float), B, ...);
 
   cl_kernel kernel;
-  // Build program from source and create kernel ...
+  // Omitted: Build program from source and create kernel
 
   // Set the arguments of the kernel
   clSetKernelArg(kernel, 0, sizeof(float), (void *) &a);
@@ -267,7 +267,7 @@ int main(void) {
   clFlush(q);
   clFinish(q);
 
-  // Release all OpenCL allocated objects and host buffers...
+  // Omitted: Release all OpenCL allocated objects and host buffers
 }
 \end{lstlisting}
 
@@ -296,9 +296,9 @@ In order to further tap into the GPGPU market, mostly filled by CUDA developers,
 
 HIP code can be compiled for either AMD or NVIDIA GPUs. Compilation was previously handled by \texttt{hcc} and \texttt{nvcc} respectively, but these tools have been replaced in ROCm v3.5 by the HIP-Clang compiler, which can compile code for both vendors.
 
-When compared to OpenCL, HIP, like CUDA, has the advantage of a single source C++ programming. Host and device code can live in the same file and use most of C++'s feature set including lambdas, templates and classes. Thus, porting CUDA code is significantly easier for HIP as mentioned previously. Porting from CUDA to OpenCL not only involves separating device code from host code, it also requires translating this device code from C++ to OpenCL C and modify all CUDA function calls and keywords to their OpenCL counter parts.
+When compared to OpenCL, HIP, like CUDA, has the advantage of a single source C++ programming model. Host and device code can live in the same file and use most of C++'s feature set including lambdas, templates and classes. Thus, porting CUDA code is significantly easier for HIP as mentioned previously. Porting from CUDA to OpenCL not only involves separating device code from host code, it also requires translating this device code from C++ to OpenCL C and modifying all CUDA function calls and keywords to their OpenCL counterparts.
 
-As a case study, in SC16 Ben Sander from AMD made a presentation showing the work required to port CAFFE, a popular machine learning framework with 50,000 lines of CUDA code from CUDA to HIP \cite{caffe_rocm_port}. As shown in figure \ref{fig:caffe-rocm-port}, the HIP port of CAFFE only required changing 907 lines of code (LOC), of which 688 or almost 76\% was done automatically. Manual changes to the code took a single developer less than a week to complete. By contrast the OpenCL implementation of CAFFE required changing a more than 30,000 LOC.
+As a case study, in SC16 Ben Sander from AMD made a presentation showing the work required to port CAFFE, a popular machine learning framework with 50,000 lines of CUDA code from CUDA to HIP \cite{caffe_rocm_port}. As shown in figure \ref{fig:caffe-rocm-port}, the HIP port of CAFFE only required changing 907 lines of code (LOC), out of which 688 (almost 76\%) was done automatically. Manual changes to the code took a single developer less than a week to complete. By contrast the OpenCL implementation of CAFFE required changing more than 30,000 LOC.
 
 \begin{figure}[ht]
     \centering
@@ -308,7 +308,7 @@ As a case study, in SC16 Ben Sander from AMD made a presentation showing the wor
     \label{fig:caffe-rocm-port}
 \end{figure}
 
-\cite{ginkgo_rocm_port} also presents a case of porting an application from CUDA to HIP. Tsai et al. found the process very smooth and were able to automatize most of the work by extending the initial Hipify script to their needs. Although HIP allowed them to run their application on both AMD and NVIDIA, they still preferred to keep native support for CUDA and maintain two versions at the same time. Still, this setup allowed them to take advantage of HIP's similarity to CUDA by sharing a third of the code base between both implementations. In the cases where they used CUDA specific functionality, they were able to replicate it in HIP and use a common API to call the appropriate implementation depending on the programming model used. Finally, they also included experiments to show the performance of HIP code compared to native CUDA on NVIDIA GPUs. These tests showed that the overhead of HIP over CUDA is negligible, with 50\% of the test cases showing less than 3\% performance difference and 90\% of the test cases showing less than 10\% of performance difference.
+\cite{ginkgo_rocm_port} also presents a case of porting an application from CUDA to HIP. Tsai et al. found the process very smooth and were able to automatize most of the work by extending the initial Hipify script to their needs. Although HIP allowed them to run their application on both AMD and NVIDIA, they still preferred to keep native support for CUDA and maintain two versions at the same time. This setup allowed them to take advantage of HIP's similarity to CUDA by sharing a third of the code base between both implementations. In the cases where they used CUDA specific functionality, they were able to replicate it in HIP and use a common API to call the appropriate implementation depending on the programming model used. Finally, they also included experiments to show the performance of HIP code compared to native CUDA on NVIDIA GPUs. These tests showed that the overhead of HIP over CUDA is negligible, with 50\% of the test cases showing less than 3\% performance difference and 90\% of the test cases showing less than 10\% performance difference.
 
 \section{OpenMP \& OpenACC} \label{sect:openmp-openacc}
 In this section we will tackle OpenMP and OpenACC in conjunction as they take very similar approaches.
@@ -324,7 +324,7 @@ int main(void) {
     float a;
     float x[100], y[100], z[100];
 
-    // Initialize a, x, y ...
+    // Omitted: Initialize a, x, y
 
     #pragma omp target map(to:a, x[0:100], y[0:100]) map(from:z[0:100])
     #pragma omp parallel for
@@ -354,7 +354,7 @@ using namespace sycl;
 float A;
 float h_X[100], h_Y[100], h_Z[100];
 
-// Initialize A, h_X, h_Y ...
+// Omitted: Initialize A, h_X, h_Y
 
 queue q; // Queue to enqueue work to the default device
 
@@ -396,33 +396,39 @@ In \cite{performance_portability_multimaterial_kernels} Reguly studies the perfo
 
 \cite{sycl_hpc_applications} presents a more recent survey of SYCL performance. It evaluates the memory bandwidth achieved by three different applications:
 \begin{itemize}
-    \item BabelStream: a popular measure of memory transfer speeds to and from global device memory.
-    \item Heat: 5-point stencil which computes the weighted average between a cell and their four neighbors.
-    \item CloverLeaf: largest application in the group, measuring at about 8,000 lines of code. It is composed of around 11 routines, each one performing either point-wise or stencil updates over a 2D grid.
+    \item BabelStream: A popular measure of memory transfer speeds to and from global device memory.
+    \item Heat: 5-point stencil which computes the weighted average between a cell and its four neighbors.
+    \item CloverLeaf: Largest application in the group, with close to 8,000 lines of code. It is composed of around 11 routines, each one performing either point-wise or stencil updates over a 2D grid.
 \end{itemize}
 All these applications are memory bandwidth bound, as it is common in HPC applications today.
-In this study SYCL proved to incur in very little overhead over the underlying implementations. Any performance problems shown in the applications were also reproduced in the direct implementations for the underlying programming models, so they are not SYCL level issues. What this study shows is that there is a clear need for better vendor support. All GPU implementations rely on open source projects which do not offer commercial support from the hardware vendors. Also, as SYCL is currently mostly built on top of other programming models, it requires the maturity and support of their implementations as well.
+In this study, SYCL proved to incur in very little overhead over the underlying implementations. Any performance problems shown in the applications were also reproduced in the direct implementations for the underlying programming models, so they are not SYCL level issues. What this study shows is that there is a clear need for better vendor support. All GPU implementations rely on open source projects which do not offer commercial support from the hardware vendors. Also, as SYCL is currently mostly built on top of other programming models, it relies on the maturity and support of their implementations as well.
 
 \subsection{Celerity}
 Celerity \cite{celerity} is an API for programming distributed memory accelerator clusters. It is built on top of SYCL and extends its programming model, allowing the user to distribute the work and data across multiple nodes in an automatic way. Celerity also leverages MPI (Message Passing Interface) \cite{mpi} to enable inter-node communication.
 
 The Celerity extensions act as a wrapper over the SYCL runtime, handling inter-node communication and scheduling, while each individual node executes the SYCL kernel in parallel. In order to enable this, Celerity introduces a global distributed queue, replacing the device local queues of SYCL. It also adds the requirement to specify the data access of each kernel, for reading and writing to the buffers. This allows Celerity to know beforehand which pieces of data need to be present at each node when distributing the work, and also to reconstruct the output buffer when the execution finishes.
 
-The execution model of Celerity is arranged in a master/worker fashion. Each worker node encapsulates the available accelerator hardware and receives commands coming from a master node, which is responsible for scheduling the work. In order to construct a dependency graph of the kernels to execute, the Celerity runtime executes the programs twice. First, in the \textit{pre-pass}, information about the kernel is collected, this includes buffer accesses, how these accesses are mapped into outputs, and the global size of the kernel. With this data, the master can construct the graph and generate commands to distribute to the workers. These commands not only contain buffer data and the kernel function but also dependency information, allowing the workers, during the \textit{live-pass}, to perform peer-to-peer communication as necessary and start execution as soon as their dependencies are fulfilled, instead of requiring communication with the master at each instance. This means that Celerity does not induce any extra bandwidth overhead compared to a fully decentralized approach.
+Celerity's execution model is arranged in a master/worker fashion. Each worker node encapsulates the available accelerator hardware and receives commands coming from a master node, which is responsible for scheduling the work. In order to construct a dependency graph of the kernels to execute, the Celerity runtime executes the programs twice. First, in the \textit{pre-pass}, information about the kernel is collected, this includes buffer accesses, how these accesses are mapped into outputs, and the global size of the kernel. With this data, the master can construct the graph and generate commands to distribute to the workers. These commands not only contain buffer data and the kernel function, but also dependency information. This allows the workers to perform peer-to-peer communication during the \textit{live-pass} as necessary and start execution as soon as their dependencies are fulfilled, instead of requiring communication with the master at each instance. This means that Celerity does not induce any extra bandwidth overhead compared to a fully decentralized approach.
 
 \section{Kokkos} \label{sect:kokkos}
 Kokkos \cite{kokkos} is a C++ library that enables applications and domain libraries to achieve performance portability on manycore architectures by unifying abstractions for both fine-grain data parallelism and memory access patterns.
 
 As a library-only solution, Kokkos does not require external tools such as a specialized compiler or even compiler extensions. Kokkos can be linked as a regular C++ library with CMake.
 
-One of the main features provided by this programming model, and the one that distinguishes it from the rest are \texttt{View} objects. \texttt{View}s are used as storage for kernel computations. Instead of using raw pointers and arrays, where the indexing is done as a simple memory reference at a given offset, \texttt{View}s change their memory layout depending on the device the kernel is running on. Operations on a \texttt{View} are not affected at all by this change, allowing kernels to be portable across devices while also providing the optimal memory access pattern on each architecture.
+One of the main features provided by this programming model, and the one that distinguishes it from the rest, are \texttt{View} objects. \texttt{View}s are used as storage for kernel computations. Instead of using raw pointers and arrays, where the indexing is done as a simple memory reference at a given offset, \texttt{View}s change their memory layout depending on the device the kernel is running on. Operations on a \texttt{View} are not affected at all by this change, allowing kernels to be portable across devices while also providing the optimal memory access pattern on each architecture.
 
 To implement parallelism, Kokkos provides a set of functions that cover different \textit{Execution Patterns}. These include parallel loops with \texttt{parallel\_for}, reductions with \texttt{parallel\_reduce}, scans with \texttt{parallel\_scan} and spawning of individual tasks. These patterns can also be nested, for example one can execute a \texttt{parallel\_reduce} inside a \texttt{parallel\_for} or vice versa.
 
 Kokkos is built on top of multiple backends. This means that it is not tied to any particular underlying implementation and can use the best performing programming model available on a particular platform. These backends include OpenMP, CUDA, ROCm, HPX \cite{hpx}, SYCL and pthreads.
 
-In terms of performance, the initial implementation presented in \cite{kokkos} showed it was capable to achieve at least 90\% of the performance of the architecture specific, optimized variants of the same benchmarks (i.e. comparing Kokkos against OpenMP for CPUs and CUDA for GPUs). \cite{performance_portability_multimaterial_kernels} also evaluates the performance of Kokkos. As mentioned in the SYCL section, this paper uses two different multi-material problems as benchmarks. The performance of Kokkos is overall 6\% lower for the first problem and 22\% lower for the second problem. While CUDA and OpenMP implementations have the advantage, they also require different codebases while Kokkos is completely portable across devices.
+In terms of performance, the initial implementation presented in \cite{kokkos} showed it was capable of achieving at least 90\% of the performance of the architecture specific, optimized variants of the same benchmarks (i.e. comparing Kokkos against OpenMP for CPUs and CUDA for GPUs). \cite{performance_portability_multimaterial_kernels} also evaluates the performance of Kokkos. As mentioned in the SYCL section, this paper uses two different multi-material problems as benchmarks. The overall performance of Kokkos is 6\% lower for the first problem and 22\% lower for the second problem. While CUDA and OpenMP implementations have the advantage, they also require different codebases, while Kokkos is completely portable across devices.
 
+
+\section{Mango V1} \label{sect:mangov1}
+- resource management
+- programming model
+- multisource
+- custom hardware
 
 \section{Gap Analysis}
 
@@ -433,12 +439,12 @@ This work resulted in a new version of the system: MANGO V2.
 
 For the following analysis, we consider MANGO V1 and MANGO V2 separately, to further differentiate the capabilities that were already present in the first version of the system, from those introduced by our contributions.
 
-These are the capabilities we are interested in, for the presented programming models:
+The capabilities we are interested in, for the presented programming models are:
 
 \begin{itemize}
     \item Device support, including CPU, GPU and FPGAs.
     \item Whether the model uses a single-source approach, where host and device code can coexist in the same source file, are written in the same programming language and can share common pieces of code.
-    \item The portability of the device kernels, as in whether it is possible for a kernel written to target a given device can be compiled for and executed in a different supported device.
+    \item The portability of the device kernels, as in whether it is possible for a kernel written to target a given device to be compiled for and executed in a different supported device.
     \item The ability to compile kernels at runtime (Just In Time compilation), according to their target accelerators.
     \item Resource management capabilities, allowing efficient use of the available devices depending on their current load, power consumption and relative performance.
     \item Support for control and distribution of the application along multiple clusters, each one with a set of diverse target devices.
@@ -446,6 +452,7 @@ These are the capabilities we are interested in, for the presented programming m
 
 A comparison of the capabilities of each programming model can be seen in table \ref{tab:progamming-model-comparison}.
 
+%TODO explain stars
 \begin{table}[ht]
     \centering
     \begin{tabular}{l|c|c|c|c|c|c|c|c}
@@ -468,22 +475,22 @@ A comparison of the capabilities of each programming model can be seen in table 
     \label{tab:progamming-model-comparison}
 \end{table}
 
-In terms of accelerator support, in MANGO V2, GPUs were added to the pool of supported accelerators, and CPU devices are now handled independently (in the previous version, CPU and FPGA usage was mutually exclusive).
+In MANGO V2, GPUs were added to the pool of supported accelerators, and CPU devices are now handled independently (in the previous version, CPU and FPGA usage was mutually exclusive).
 As part of our work, we introduced a new module named Heterogeneous Hardware Abstraction Layer (HHAL) \ref{HHAL}, capable of handling communication with multiple target accelerators and providing an easy path for integrating new devices.
 
 By looking at the table, we can see that there are two capabilities still not covered by MANGO V2: it is not a single source approach and also requires writing a separate kernel for each device.
 
 We argue that, although at first glance introducing these capabilities would improve programmability, the performance gained by their absence is much more important to HPC.
 
-First of all, using a single kernel programming model for multiple devices, even open source, ones does not guarantee portability. We will take OpenCL as an example. As seen in section \ref{sect:opencl} with OpenCL, it is the responsibility of the hardware vendors to provide support for any new feature of the standard. This introduces version differences between different platforms, for example NVIDIA GPUs still only support OpenCL 1.2. While OpenCL 2.x introduced multiple useful features, the lack of support from NVIDIA, which is one of its main targets, slowed down 2.0 adoption. The effect was so considerable that the 3.0 standard removed the requirement for most of the features introduced in 2.x. 
+First of all, using a single kernel programming model for multiple devices, even one that is open source, does not guarantee portability. We will take OpenCL as an example. As seen in section \ref{sect:opencl}, it is the responsibility of the hardware vendors to provide support for any new feature of the standard. This introduces version differences between different platforms, for example NVIDIA GPUs still only support OpenCL 1.2. While OpenCL 2.x introduced multiple useful features, the lack of support from NVIDIA, which is one of its main targets, slowed down 2.0 adoption. The effect was so considerable that the 3.0 standard removed the requirement for most of the features introduced in 2.x. 
 
 If a developer has two target OpenCL devices for the same kernel, one with 1.2 capabilities and one with 2.0 capabilities one of two things can happen: 
 \begin{enumerate}
     \item they limit themselves to 1.2 features, or
-    \item they write two separate kernels and possibly two separate host side implementations to exploit all the newest features on the device that supports the latest standard while also maintaining compatibility with the 1.2 device.
+    \item they write two separate kernels and possibly two separate host side implementations to exploit all the newest features on the device that supports the latest standard, while also maintaining compatibility with the 1.2 device.
 \end{enumerate}
  
-As such, a great hurdle for kernel portability is the hardware vendor's unwillingness to work together \cite{but_mummy_cuda}. This is perfectly reasonable, like in any other market, a company will gain an advantage over their competitors in whichever way they can and maintain it as long as possible. If NVIDIA simply releases CUDA as an open source standard for all GPUs to utilize, they will lose their upper hand over AMD in the GPGPU market.
+As such, a great hurdle for kernel portability is the hardware vendors' unwillingness to work together \cite{but_mummy_cuda}. This is perfectly reasonable, like in any other market, a company will gain an advantage over their competitors in whichever way they can and maintain it as long as possible. If NVIDIA simply releases CUDA as an open source standard for all GPUs to utilize, they will lose their upper hand over AMD in the GPGPU market.
 
 Even if, despite all their differences, all hardware vendors would work together on a single project, the differences in the hardware architecture will still be present. Indeed, the purpose of Heterogeneous Computing is to handle multiple devices with different memory access requirements, levels of parallelism, instruction sets and more. Although it may be possible to abstract all this away from the kernel programmer, it will not come without a cost in performance.
 
@@ -494,6 +501,6 @@ MANGO's plan is to embrace these differences in kernel implementations, allowing
 A rarely supported functionality is Just In Time compilation of kernels. With OpenCL and its users being the only ones to provide run-time compilation of kernels, in MANGO V2 we introduced, as part of the HHAL module, a Dynamic Compiler \ref{HHAL:DynamicCompiler}. The Dynamic Compiler is capable of compiling kernels at run-time for each of the supported devices, this way kernels are compiled from source as needed, according to their assigned accelerator.
 The main advantage this functionality gives is smoothing the development process, by allowing developers to work directly with kernel source code without requiring manual compilation for each target architecture.
 
-The key advantage of MANGO over the other mentioned programming models is its integration with a resource manager, namely BarbequeRTRM \ref{bbque}. While the previous models focus on executing a single kernel or set of kernels as fast as possible on a given platform, they do not take into account the current state of the machine that they are running on. If multiple applications could be running at the same time, there is a chance that the device most suitable for a given application is currently busy serving something else. Depending on what other devices are available, their relative performance for the kernel, power consumption and other aspects it may be more efficient to execute the work on a different device or just wait for the preferred one to be available. In addition, it could also be advantageous to suspend the execution of a given application in order to give priority to another which is more time sensitive.
+The key advantage of MANGO over the other mentioned programming models is its integration with a resource manager, namely BarbequeRTRM \ref{bbque}. While the previous models focus on executing a single kernel or set of kernels as fast as possible on a given platform, they do not take into account the current state of the machine that they are running on. If multiple applications could be running at the same time, there is a chance that the device most suitable for a given application is currently busy serving something else. Depending on what other devices are available, their relative performance for the kernel, power consumption and other aspects, it may be more efficient to execute the work on a different device or just wait for the preferred one to be available. In addition, it could also be advantageous to suspend the execution of a given application in order to give priority to another which is more time sensitive.
 
-Last but not least, no other model except Celerity offers distributed execution of an application over multiple clusters. Since its inception, one of the goals of MANGO was to provide this capability, allowing it to exploit the heterogeneity of a large number of different machines. In conjunction with Barbeque, which also provides the capability to manage resources in a distributed system, it would be possible to launch a number of different applications on a multitude of computers and achieve an efficient and performant execution of all tasks. There is still advancements to be done in this front, as it was not the topic of our work, but many implementation decisions were driven by it.
+Lastly, no other model except Celerity offers distributed execution of an application over multiple clusters. Since its inception, one of the goals of MANGO was to provide this capability, allowing it to exploit the heterogeneity of a large number of different machines. In conjunction with Barbeque, which also provides the capability to manage resources in a distributed system, it would be possible to launch a number of different applications on a multitude of computers and achieve an efficient and performant execution of all tasks. There are still advancements to be done in this front, as it was not the topic of our work, but many implementation decisions were driven by it.
