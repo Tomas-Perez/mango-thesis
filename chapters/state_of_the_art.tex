@@ -429,7 +429,7 @@ The first version of the MANGO project, here referenced to as MANGO V1, presents
 
 Providing a C and a C++ API, what separates MANGO from the previously mentioned alternatives is the inclusion of a resource manager (BarbequeRTRM \ref{bbque}). The resource manager is capable of scheduling user's tasks over the system available accelerators according to user requirements and the current state of the system. 
 A custom hardware architecture, consisting on multiple clusters of FPGA accelerators, and capable of fast reconfiguration, was developed along the MANGO software stack and utilized for the exploration of manycore architectures for HPC systems.
-As a result, MANGO V1 offers support for PEAK, nu+ and DCT accelerators, while also providing CPU emulation for development and testing purposes.
+As a result, MANGO V1 offers support for PEAK, nu+ and DCT accelerators, while also providing CPU emulation of these, for development and testing purposes.
 
 \begin{lstlisting}[style=CStyle, caption=MANGO saxpy example (host), floatplacement=H, label={lst:mangov1_sample}]
 #define KERNEL 1
@@ -467,7 +467,8 @@ int main(int argc, char const *argv[])
     auto argA = mango::ScalarArg<float>(a);
     auto argN = mango::ScalarArg<int>(n);
 
-    auto argsKERNEL = mango::KernelArguments({argA, argX, argY, argO, argN}, k);
+    auto argsKERNEL = 
+        mango::KernelArguments({argA, argX, argY, argO, argN}, k);
 
     // Omitted: Write to buffers
 
@@ -480,8 +481,6 @@ int main(int argc, char const *argv[])
     // Omitted: Check results and free resources
 }
 \end{lstlisting}
-
-
 
 Mainly due to its resource management capabilities, MANGO's programming model provides a level of abstraction over the hardware far greater than its competition, removing the querying of platform information from the list of user responsibilities. 
 As seen in listing \ref{lst:mangov1_sample}, the only architecture specific information required is a kernel compatible with its target accelerator. Multiple kernel versions can be provided for a single task, leaving to the resource manager the decision of which accelerator performs its execution. 
