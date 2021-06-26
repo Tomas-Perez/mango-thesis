@@ -1,6 +1,6 @@
 \chapter{Architecture Description} \label{ch:ArchitectureDescription}
 
-In this chapter, we provide a detailed description of the resulting MANGO software architecture, after the completion of our work.
+In this Chapter, we provide a detailed description of the resulting MANGO software architecture, after the completion of our work.
 First, we provide an overall description of the system, followed by an explanation of the core elements. Then, we dive deeper into the inner workings of each MANGO module and their interaction with the rest of the system.
 
 \section{Overall description}
@@ -37,7 +37,6 @@ The MANGO system manages user defined Kernels and their execution. For a particu
 
 As any computer program, a kernel must have the capability of interacting with the outside world in order to perform significant work. This is achieved through the support of kernel arguments.
 
-%TODO styling
 Three types of kernel arguments are supported: 
 \begin{itemize}
     \item Scalar Argument: A scalar value. For example, an integer.
@@ -154,7 +153,6 @@ As the core implementation of Libmango is in the C++ programming language, a set
 Besides the native C++ API, Libmango currently exposes C and Python API wrappers.
 
 \subsubsection{C API Wrapper}
-% TODO: this doesn't say much. The most important part of the C API is hiding the object oriented C++ and smart pointers. Also I'm pretty sure using uint32_t addressing is wrong, but a problem of the GN library. - Tomas
 
 The C language API is a wrapper around the C++ API that is provided both for usage in C applications, and for compatibility with the early version of MANGO, which was developed in C.
 
@@ -168,7 +166,6 @@ The Python wrapper aims at expanding MANGO accessibility onto scripting programm
 
 Python's popularity as a programming/scripting language made it an ideal candidate to enable a great number of developers access to the MANGO platform. As observed in figure \ref{fig:redmonk-ranks}, Python was the second most popular programming language in the RedMonk's Programming Language Rankings \cite{redmonks_rankings}, only falling behind JavaScript.
 
-%TODO fixed location for now, check later to see what to do
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{img/redmonk-ranks.png}
@@ -431,7 +428,6 @@ Under the \texttt{platform} section, the \texttt{id} value identifies the archit
 
 Referring back to AWMs, in the \texttt{awm} section, the following attributes are available:
 
-%TODO styling
 \begin{itemize}
     \item \texttt{id}: A number identifier.
     \item \texttt{name}: A name used for logging purposes.
@@ -444,7 +440,6 @@ The \texttt{resources} subsections contain the resource assignment configuration
 Since due to the MANGO programming model, per-task and per-buffer resource mapping is required, the AWM specification is not enough to cover the MANGO needs. The \texttt{tg} section was introduced to allow specification of task graph related mapping information.
 As seen in the sample \ref{bbque:recipe_example}, under the \texttt{reqs} tag, \texttt{task} information is provided for each task (kernel) in the application. The attributes are:
 
-%TODO styling
 \begin{itemize}
     \item \texttt{id}: A number identifier.
     \item \texttt{name}: A name used for logging purposes.

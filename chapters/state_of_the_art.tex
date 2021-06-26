@@ -523,13 +523,12 @@ The capabilities we are interested in for the presented programming models are:
 
 A comparison of the capabilities of each programming model can be seen in table \ref{tab:progamming-model-comparison}.
 
-%TODO explain stars
 \begin{table}[ht]
     \centering
     \begin{tabular}{l|c|c|c|c|c|c|c|c}
     \textit{Model} & \textit{CPU} & \textit{GPU} & \textit{FPGA} & \makecell{\textit{Single} \\ \textit{source}} & \makecell{\textit{Kernel} \\ \textit{portability}} & \makecell{\textit{Kernel JIT} \\ \textit{compilation}} & \makecell{\textit{Resource} \\ \textit{management}} & \makecell{\textit{Multiple} \\ \textit{clusters}} \\ \hline
-    MANGO V1 & Yes* & No & Yes & No & No & No & Yes & Yes* \\
-    MANGO V2 & Yes & Yes & Yes* & No & No & Yes & Yes & Yes* \\
+    MANGO V1 & Yes$^1$ & No & Yes & No & No & No & Yes & Yes$^4$ \\
+    MANGO V2 & Yes$^2$ & Yes & Yes$^3$ & No & No & Yes & Yes & Yes$^4$ \\
     CUDA & No & Yes & No & Yes & No & No & No & No \\
     OpenCL & Yes & Yes & Yes & No & Yes & Yes & No & No \\
     EngineCL & Yes & Yes & Yes & No & Yes & Yes & No & No \\
@@ -541,14 +540,18 @@ A comparison of the capabilities of each programming model can be seen in table 
     Celerity & Yes & Yes & Yes & Yes & Yes & No & No & Yes \\
     Kokkos & Yes & Yes & No & Yes & Yes & No & No & No 
     \end{tabular}
+    \begin{flushleft}
+    \footnotesize{
+        $^1$ GN Emulation, mutually exlusive with FPGAs, only used for testing \\ 
+        $^2$ Currently GN emulation only, direct CPU in the future \\ 
+        $^3$ Minimal integration effort required \\ 
+        $^4$ Work in progress
+    }
+    \end{flushleft}
     \captionsetup{justification=centering}
     \caption{Comparison of programming model capabilities}
     \label{tab:progamming-model-comparison}
 \end{table}
-
-* MANGO V1 CPU: GN Emulation, mutually exclusive with FPGA, only used for testing
-* MANGO V2 FPGA: Minimal integration effort required
-* Multiple clusters: Work in progress
 
 In MANGO V2, GPUs were added to the pool of supported accelerators, and CPU devices are now handled independently (in the previous version, CPU and FPGA usage was mutually exclusive).
 As part of our work, we introduced a new module named Heterogeneous Hardware Abstraction Layer (HHAL) \ref{HHAL}, capable of handling communication with multiple target accelerators and providing an easy path for integrating new devices.
