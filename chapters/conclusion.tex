@@ -49,22 +49,21 @@ Since BarbequeRTRM does not currently support reconfiguration of allocated resou
 
 \subsection{Native CPU Support}
 
-% TODO: reworded maybe?
-In the current implementation, the GN module is used to run kernels in the user's host system CPU. The GN module was developed as an HN emulator, so its working method is therefore not optimized for efficiently running kernels on CPU devices, as its API is limited to that of HN.
+In the current implementation, the GN module is used to run kernels in the user's host system CPU. The GN module was developed as an HN emulator, so its execution model is therefore not optimized for efficiently running kernels on CPU devices, as its API is limited to that of HN and mimics its behavior.
 
 To properly support CPUs as target accelerators, a new architecture node must be introduced, along with an HHAL manager that interacts with it.
 
 \subsection{HNlib Integration}
 
-% TODO: add clarification about lack of hardware access at the time?
 The restructuring of the MANGO software stack, centered around the introduction of the Heterogeneous Hardware Abstraction Layer, forced a rework of the Libmango module. This entailed the removal of the Libmango-HNlib interaction, hence effectively eliminating the HN accelerators from the pool of MANGO supported architectures.
 With accelerator communication now taking place through the HHAL module, an HN Manager should be added to HHAL in order to reestablish it.
+As we did not have physical access to the custom MANGO hardware, designed to work with the HN library, no integration effort was carried out.
 
 \subsection{HHAL "hybrid" mode communication} \label{sub-sect:hhal-hybrid-mode}
 
 As seen in our experimental results in chapter \ref{ch:ExperimentalResults}, the performance of MANGO is hurt by the client-server approach of the HHAL. Although this aspect is key for a distributed system, it can be improved when dealing with a system which runs both the MANGO host and the HHAL on the same cluster. 
 
-Our proposed "hybrid" mode will introduce a new type of communication between, most importantly the MANGO host and the HHAL, but also Barbeque if it runs on the same machine. It will switch from pure socket connections to a mix of shared memory, for necessary bookkeeping between Barbeque and MANGO, and a library directly linked to the MANGO executable, bypassing all types of IPC when dealing with kernel executions and buffer transfers.
+Our proposed "hybrid" mode will introduce a new type of communication between, most importantly the MANGO host and the HHAL, but also BarbequeRTRM if it runs on the same machine. It will switch from pure socket connections to a mix of shared memory, for necessary bookkeeping between BarbequeRTRM and MANGO, and a library directly linked to the MANGO executable, bypassing all types of IPC when dealing with kernel executions and buffer transfers.
 
 This will provide a significant performance improvement for memory-bound applications in the cases where socket communication is not required.
 
