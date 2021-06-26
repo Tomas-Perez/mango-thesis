@@ -142,7 +142,7 @@
 
 \setlength{\parskip}{0.5em}
 
-\pagestyle{empty}
+\pagestyle{fancy}
 
 \cleardoublepage
 \newpage
@@ -150,6 +150,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TOC
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% change numbering into Roman numbers for the introductory part
+\setcounter{page}{1}
+\pagenumbering{Roman}
 \tableofcontents
 \cleardoublepage
 \newpage
@@ -172,16 +175,10 @@
 \cleardoublepage
 \newpage
 
-\pagestyle{fancy}
-% change numbering into Roman numbers for the introductory part
-\setcounter{page}{1}
-\pagenumbering{Roman}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Abstract
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{chapters/abstract}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sommario
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -189,11 +186,10 @@
 \input{chapters/sommario}
 \selectlanguage{english}
 
+\cleardoublepage
 % Now lets go back to normal numbering
 \setcounter{page}{1}
 \pagenumbering{arabic}
-
-\cleardoublepage
 \input{chapters/introduction}
 \input{chapters/state_of_the_art}
 \input{chapters/architecture_description}
@@ -208,5 +204,3 @@
 \bibliography{thesis}
 
 \end{document}
-
-%TODO fix academic year
