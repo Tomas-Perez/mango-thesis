@@ -13,6 +13,8 @@ Depending on the individual capabilities of each accelerator, the accelerator-fa
 
 In addition, developers must be capable of easily expanding the MANGO system by adding support of other architectures. The HHAL module, along with platform libraries (NAN, HN and GN), take care of these requirements.
 
+Even though the current implementation runs entirely on a single machine, the internal communication of the system is designed to enable the expansion of the architecture into multiple distributed nodes.
+
 User applications, however complex, must be scheduled to run on the system available resources. This task, also involving the resource allocation, can be performed with multiple optimization goals in mind, job that is carried out by the Resource Manager: BarbequeRTRM.
 
 \begin{figure}[ht]
@@ -504,8 +506,7 @@ However, there is another primary job the \texttt{PlatformProxy} carries out. Af
 The Heterogeneous Hardware Abstraction Layer (HHAL) is the module of the MANGO system that takes care of the communication with the multiple accelerator libraries.
 As such, HHAL abstracts accelerator specific information in a manner that allows the resource manager to fully exploit architecture specific features, while freeing Libmango from the inherent complexity of handling multiple architectures.
 
-% TODO: emphasize more the distributed nature of HHAL
-Due to the fact that multiple modules running as independent processes need to make use of the Heterogeneous Hardware Abstraction Layer, HHAL works in a client-server manner. The server is run as a daemon, and the client is used by other modules to interact with it. In this way, both BarbequeRTRM and Libmango can make use of a common instance of the HHAL module.
+Due to the fact that multiple modules, running as independent processes or potentially on distributed nodes, need to make use of the Heterogeneous Hardware Abstraction Layer, HHAL works in a client-server manner. The server is run as a daemon, and the client is used by other modules to interact with it through sockets. In this way, both BarbequeRTRM and Libmango can make use of a common instance of the HHAL module.
 
 HHAL exposes an architecture-agnostic API with the necessary functionalities to permit the managing of kernels, buffers and events on any of the supported architectures. The module is structured as a front-facing API and a set of architecture specific managers that implement the required functionalities for their specific architecture.
 
@@ -672,7 +673,7 @@ The Buffer and Event arguments consist of the respective's Buffer or Event id, w
 
 In previous implementations of the MANGO system, a user provided Kernel had to be pre-compiled into a binary file (or the format required by the target accelerator) before its utilization in the MANGO system. Despite the optimality of this process, it puts limits on the agile and iterative nature of the development of software solutions.
 
-Giving developers the ability to work directly with kernel source code greatly facilitates the development process. Ideally, once a solution is in place, kernels would be pre-compiled for optimal performance. % TODO: Actually a good point of JIT is that we can apply some optimizations at runtime.
+Giving developers the ability to work directly with kernel source code greatly facilitates the development process. Furthermore, having access to the source code would ultimately enable MANGO to apply optimizations by leveraging runtime system information.
 
 The Dynamic Compiler included in the HHAL module offers the functionality of "dynamic" compilation of kernels. That is, the developer provides a kernel's source code to be compiled as required before being written into its target accelerator's memory.
 
@@ -1119,7 +1120,7 @@ As described in \cite{exploring_manycore_architectures_through_the_mango_approac
     \centering
     \includegraphics[width=0.8\textwidth]{img/nu+.png}
     \captionsetup{justification=centering}
-    \caption{nu+ architecture (credit: \cite{exploring_manycore_architectures_through_the_mango_approach})}
+    \caption{nu+ architecture \cite{exploring_manycore_architectures_through_the_mango_approach}}
     \label{fig:nu_arch}
 \end{figure}
 
@@ -1127,8 +1128,7 @@ A nu+ compiler based on the LLVM project was developed from scratch, as explored
 
 \subsubsection{DCT}
 
-% TODO: requires input and output buffers because of its passive nature? 
-DCT accelerators are passive accelerators designed to run a single kernel, so their initialization and usage differ from the other supported accelerators. Because of its passive nature, the accelerator requires input and output buffers, as well as memory locations for synchronization to start at a pre-defined virtual memory address, which has to be retrieved through the HN API \cite{mango_exploring_manycore_architectures_2.1}.
+DCT accelerators are passive accelerators designed to run a single kernel, so their initialization and usage differ from the other supported accelerators. Because of its passive nature, the accelerator requires input buffers, output buffers and synchronization memory locations to start at a pre-defined virtual memory address, which has to be retrieved through the HN API \cite{mango_exploring_manycore_architectures_2.1}.
 
 \subsection{Hardware Emulation}
 

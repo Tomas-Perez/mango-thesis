@@ -429,7 +429,16 @@ The first version of the MANGO project, here referenced to as MANGO V1, presents
 
 Providing a C and a C++ API, what separates MANGO from the previously mentioned alternatives is the inclusion of a resource manager (BarbequeRTRM \ref{bbque}). The resource manager is capable of scheduling user's tasks over the system available accelerators according to user requirements and the current state of the system. 
 A custom hardware architecture, consisting on multiple clusters of FPGA accelerators, and capable of fast reconfiguration, was developed along the MANGO software stack and utilized for the exploration of manycore architectures for HPC systems.
-As a result, MANGO V1 offers support for PEAK, nu+ and DCT accelerators, while also providing CPU emulation of these, for development and testing purposes.
+As a result, MANGO V1 offers support for PEAK, nu+ and DCT accelerators, while also providing CPU emulation of these (GN), for development and testing purposes.
+
+\begin{lstlisting}[style=CStyle, caption=MANGO GN saxpy example (kernel), floatplacement=H, label={lst:mangov1_kernel_sample}]
+#pragma mango_kernel
+void saxpy(float a, float *x, float *y, float *out, int n) {
+    for (int i=0; i < n; i++) {
+	    out[i] = a * x[i] + y[i];
+    }
+}
+\end{lstlisting}
 
 \begin{lstlisting}[style=CStyle, caption=MANGO saxpy example (host), floatplacement=H, label={lst:mangov1_sample}]
 #define KERNEL 1
@@ -483,7 +492,7 @@ int main(int argc, char const *argv[])
 \end{lstlisting}
 
 Mainly due to its resource management capabilities, MANGO's programming model provides a level of abstraction over the hardware far greater than its competition, removing the querying of platform information from the list of user responsibilities. 
-As seen in listing \ref{lst:mangov1_sample}, the only architecture specific information required is a kernel compatible with its target accelerator. Multiple kernel versions can be provided for a single task, leaving to the resource manager the decision of which accelerator performs its execution. 
+As seen in listing \ref{lst:mangov1_sample}, the only architecture specific information required is a kernel compatible with its target accelerator. Multiple kernel versions can be provided for a single task, leaving to the resource manager the decision of which accelerator performs its execution, in the provided example, the kernel in listing \ref{lst:mangov1_kernel_sample} targeting the GN architecture is used. 
 
 MANGO's API exposes a set of data structures for the specification of an user's application. A \texttt{TaskGraph} holds \texttt{Kernel}, \texttt{Buffer} and \texttt{Event} data structures, defining their dependencies. 
 Once the task graph is defined, the resource allocation is performed.
@@ -569,4 +578,4 @@ The main advantage this functionality gives is smoothing the development process
 
 The key advantage of MANGO over the other mentioned programming models is its integration with a resource manager, namely BarbequeRTRM \ref{bbque}. While the previous models focus on executing a single kernel or set of kernels as fast as possible on a given platform, they do not take into account the current state of the machine that they are running on. If multiple applications could be running at the same time, there is a chance that the device most suitable for a given application is currently busy serving something else. Depending on what other devices are available, their relative performance for the kernel, power consumption and other aspects, it may be more efficient to execute the work on a different device or just wait for the preferred one to be available. In addition, it could also be advantageous to suspend the execution of a given application in order to give priority to another which is more time sensitive.
 
-Lastly, no other model except Celerity offers distributed execution of an application over multiple clusters. Since its inception, one of the goals of MANGO was to provide this capability, allowing it to exploit the heterogeneity of a large number of different machines. In conjunction with Barbeque, which also provides the capability to manage resources in a distributed system, it would be possible to launch a number of different applications on a multitude of computers and achieve an efficient and performant execution of all tasks. There are still advancements to be done in this front, as it was not the topic of our work, but many implementation decisions were driven by it.
+Lastly, no other model except Celerity offers distributed execution of an application over multiple clusters. Since its inception, one of the goals of MANGO was to provide this capability, allowing it to exploit the heterogeneity of a large number of different machines. In conjunction with BarbequeRTRM, which also provides the capability to manage resources in a distributed system, it would be possible to launch a number of different applications on a multitude of computers and achieve an efficient and performant execution of all tasks. There are still advancements to be done in this front, as it was not the topic of our work, but many implementation decisions were driven by it.
