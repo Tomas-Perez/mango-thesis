@@ -431,8 +431,6 @@ Providing a C and a C++ API, what separates MANGO from the previously mentioned 
 A custom hardware architecture, consisting on multiple clusters of FPGA accelerators, and capable of fast reconfiguration, was developed along the MANGO software stack and utilized for the exploration of manycore architectures for HPC systems.
 As a result, MANGO V1 offers support for PEAK, nu+ and DCT accelerators, while also providing CPU emulation of these, for development and testing purposes.
 
-% TODO: add kernel example?
-
 \begin{lstlisting}[style=CStyle, caption=MANGO saxpy example (host), floatplacement=H, label={lst:mangov1_sample}]
 #define KERNEL 1
 #define B1 1
@@ -538,6 +536,10 @@ A comparison of the capabilities of each programming model can be seen in table 
     \caption{Comparison of programming model capabilities}
     \label{tab:progamming-model-comparison}
 \end{table}
+
+* MANGO V1 CPU: GN Emulation, mutually exclusive with FPGA, only used for testing
+* MANGO V2 FPGA: Minimal integration effort required
+* Multiple clusters: Work in progress
 
 In MANGO V2, GPUs were added to the pool of supported accelerators, and CPU devices are now handled independently (in the previous version, CPU and FPGA usage was mutually exclusive).
 As part of our work, we introduced a new module named Heterogeneous Hardware Abstraction Layer (HHAL) \ref{HHAL}, capable of handling communication with multiple target accelerators and providing an easy path for integrating new devices.
