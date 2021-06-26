@@ -3,15 +3,15 @@ In this Chapter we will cover the experimental phase of our work. First comes a 
 
 During this experimental campaign, our goals were to:
 \begin{itemize}
-    \item Measure the performance of MANGO with respect to other available programming models.
-    \item Compare the programmability of MANGO with respect to other available programming models.
+    \item Compare MANGO with other available programming models, in terms of performance and programmability.
     \item Analyze where the main overheads of the current MANGO implementation are and how they can be reduced.
+    \item Evaluate our communication scheme between the Libmango API and the HHAL client, and how it can be improved.
 \end{itemize}
 
 \section{Setup and Methodology} \label{sect:setup-methodology}
 All our tests were run on a Dell XPS 9570 laptop. This particular model is equipped with an Intel Core i7 8750H CPU, 16 GB RAM and an Nvidia GeForce GTX 1050 Ti GPU with Max-Q Design (4GB VRAM). In terms of Operating System, the machine was running Ubuntu 18.04.2 LTS 64-bit (Kernel Version: 5.4.0-48-generic).
 
-For reproducibility, the versions of the software run are as follows:
+For reproducibility, the versions of the software run were the following:
 \begin{itemize}
     \item CUDA 11.0
     \item OpenCL 1.2 CUDA (Driver version: 450.51.06)
@@ -63,10 +63,10 @@ A breakdown of the three benchmarks chosen can be seen in table \ref{tab:benchma
 To evaluate performance in both HotSpot and PathFinder, we will measure:
 
 \begin{itemize}
-    \item Total execution time: time since the beginning of the proper benchmark (i.e. after all input initialization and I/O) and the end (after all resource deallocations, but before checking output results).
-    \item Kernel execution time: time since the launch of a kernel and the end of its execution.
-    \item Buffer write time: time to write data to the device, i.e transfer data from the host to the device.
-    \item Buffer read time: time to read data from the device, i.e. transfer data from the device to the host.
+    \item Total execution time: Time since the beginning of the proper benchmark (i.e. after all input initialization and I/O) and the end (after all resource deallocations, but before checking output results).
+    \item Kernel execution time: Time since the launch of a kernel and the end of its execution.
+    \item Buffer write time: Time to write data to the device, i.e transfer data from the host to the device.
+    \item Buffer read time: Time to read data from the device, i.e. transfer data from the device to the host.
 \end{itemize}
 
 For AXPY, we will measure the performance of the different systems as the percentage of theoretical peak bandwidth they can achieve. We will take into account both GPU memory bandwidth, measuring accesses to GPU global memory, and PCI-E bandwidth, measuring data transfers between the Host and the Device and vice versa.
@@ -117,12 +117,14 @@ Where:
     \item $t$ is the transfer time in seconds.
 \end{itemize}
 
-In AXPY we are not interested in the scaling over different input sizes but in the bandwidths achieved with large inputs. A large input maximizes the amount of memory to transfer and access, meaning that a larger part of the available bandwidth can be exploited.  
+In AXPY we are not interested in the scaling over different input sizes but in the bandwidths achieved with large inputs. A large input maximizes the amount of memory to transfer and access, meaning that a larger part of the available bandwidth can be exploited.
 
 It is important to note that for all benchmarks in both CUDA and OpenCL we execute the set of benchmarks twice. Once to measure the total execution time of the entire benchmark and another to measure each individual component. As all our measurements in these models are done externally (i.e. we cannot make intrusive profiling modifications like with MANGO) they could incur in extra overhead due to the need of forcing synchronization between the host and the device in order to make measurements. For example, OpenCL buffer writes are usually enqueued in a \texttt{CommandQueue} and executed asynchronously, to measure them we forced a synchronous transfer by calling \texttt{clFinish} on the \texttt{CommandQueue}.
 
-% TODO: Marcarlo más
-Finally, in the case of MANGO, we performed the measurements on two different sectors of the application. As mentioned previously, the HHAL library is implemented in a client-server arrangement, where the communication between client and server is performed via socket. This provides us with an easy way to run the HHAL in a separate cluster in the future. However, this adds extra communication overhead to the MANGO client which is not present in either CUDA nor OpenCL, as they both run directly on the same host machine. Due to this, we measure performance both on the client side (taking into account IPC overhead) but also directly on the HHAL server (in order to compare our implementation with CUDA and OpenCL).
+In the case of MANGO, to evaluate its performance and compare it directly with CUDA and OpenCL we perform profiling of the application at the HHAL server, disregarding the overhead added by IPC communication. As mentioned previously, the HHAL library is implemented in a client-server arrangement, where the communication between client and server is performed via a socket. This provides us with an easy way to run the HHAL in a separate cluster in the future. However, it adds extra communication overhead to the MANGO client which is not present in either CUDA nor OpenCL, as they both are designed to run directly on the same host machine as the target accelerator.
+
+\subsection{IPC}
+To evaluate the communication scheme between Libmango and HHAL, we also performed measurements directly on the Libmango API side. This measurements will also take the previously mentioned IPC overhead into account, which we will compare directly with the metrics obtained on the HHAL server itself. The discrepancies between the two sets of values will provide us with an overview of the aspects of the system that are most affected by IPC communication and how they could be improved.
 
 \subsection{Programmability}
 
@@ -138,13 +140,13 @@ Thus, a positive RD indicates that a given implementation requires more LOC than
 
 \section{Results}
 
-In this section we will present the results of our experiments. First we will make performance comparisons against CUDA and OpenCL, then we will cover the overhead experimented by the client due to IPC with the HHAL server and finally we will analyze the programmability improvements achieved by MANGO over CUDA and OpenCL.
+In this section we will present the results of our experiments. First, we will make performance comparisons against CUDA and OpenCL, then we will cover the overhead experimented by the client due to IPC with the HHAL server. Finally, we will analyze the programmability improvements achieved by MANGO over CUDA and OpenCL.
 
 \subsection{Performance}
 
 \subsubsection{HotSpot}
 
-Starting with HotSpot, we can see that performance across all metrics is very similar for all implementations. In addition, all programming models follow the same scaling as input size increases. 
+Starting with HotSpot, we can see that performance across all metrics is very similar for all of the different programming model implementations. In addition, all models follow the same scaling as input size increases. 
 
 The overhead presented by MANGO in this benchmark is noticeable, but not significant. For example, when running with a grid size of 8192 x 8192, CUDA is the fastest completing the entire execution in \textasciitilde 2516ms while MANGO takes \textasciitilde 2692ms, a difference of only 6.5\%. 
 
@@ -178,7 +180,7 @@ When decomposing the benchmark into its different aspects we can see that the ov
     \label{fig:hotspot_buffer_transfers_mean}%
 \end{figure}
 
-Actually, the most important overhead is the one linked to kernel executions, which are performed more frequently than buffer writes (only 2 buffer writes versus 16 kernel executions) and also require more time to be performed. In this case, CUDA and OpenCL are 6.2\% and 3.7\% faster respectively for the largest grid size used. This can be seen in figure \ref{fig:hotspot_kernel_executions_mean}.
+The most important overhead is actually the one linked to kernel executions, which are performed more frequently than buffer writes (only 2 buffer writes versus 16 kernel executions) and also individually require more time to be performed. In this case, CUDA and OpenCL are 6.2\% and 3.7\% faster respectively for the largest grid size used. This can be seen in figure \ref{fig:hotspot_kernel_executions_mean}.
 
 \begin{figure}
     \centering
@@ -190,7 +192,7 @@ Actually, the most important overhead is the one linked to kernel executions, wh
     \label{fig:hotspot_kernel_executions_mean}
 \end{figure}
 
-The influence of kernel execution time can be seen in the benchmark breakdown in figure \ref{fig:hotspot_breakdown} which compares how the total running time of the benchmark is distributed among the different aspects of the execution, plus some miscellaneous operations which are not particularly relevant for this benchmark. These breakdowns are generated using the biggest input size for HotSpot, 8192 x 8192. In the figure it is clearly pictured how kernel execution time takes up more than 90\% of the total benchmark time across all programming models.
+The benchmark breakdown figure \ref{fig:hotspot_breakdown} clearly shows the influence of kernel execution time in the overall running time. This breakdown compares how the total running time of the benchmark is distributed among the different aspects of the execution, plus some miscellaneous operations which are not particularly relevant for this benchmark. To generate these metrics we used the measurements obtained when running the biggest input size for HotSpot, 8192 x 8192. The figure clearly pictures how kernel execution time takes up more than 90\% of the total benchmark time.
 
 \begin{figure}
     \centering
@@ -204,7 +206,7 @@ The influence of kernel execution time can be seen in the benchmark breakdown in
 
 \subsubsection{PathFinder}
 
-Moving on to PathFinder we can see a much more significant difference in the performance of MANGO and OpenCL with respect to CUDA in figure \ref{fig:pathfinder_total_duration_mean}. In addition, a clear increase in the steepness of the curve can be seen in the case of MANGO, as it steers away from the OpenCL implementation. This would indicate that there is some noticeable overhead present in the kernel executions, as they increase in number along with the input size of PathFinder.
+Moving on to PathFinder we can see a much more significant difference in the performance of MANGO and OpenCL with respect to CUDA in figure \ref{fig:pathfinder_total_duration_mean}. In addition, a clear increase in the steepness of the curve can be seen in the case of MANGO, as it steers away from the OpenCL implementation as the input size increases. This would indicate that there is some noticeable overhead present in the kernel executions, as they increase in number along with the input size of PathFinder.
 
 \begin{figure}
     \centering
@@ -216,7 +218,7 @@ Moving on to PathFinder we can see a much more significant difference in the per
     \label{fig:pathfinder_total_duration_mean}
 \end{figure}
 
-Figure \ref{fig:pathfinder_kernel_executions_mean} confirms our suspicion, as there is a clear separation between the kernel execution times of MANGO and the ones of CUDA and OpenCL, which are quite similar with each other. Comparing the the time taken for the biggest input size, CUDA is 20\% faster for each kernel executed, while OpenCL is 17.9\% faster.
+Figure \ref{fig:pathfinder_kernel_executions_mean} confirms our suspicion, as there is a clear separation between the kernel execution times of MANGO and the ones of CUDA and OpenCL, which are quite similar with each other. Comparing the the time taken for the biggest input size, CUDA is 20\% faster than MANGO for each kernel executed, while OpenCL is 17.9\% faster.
 
 \begin{figure}
     \centering
@@ -228,7 +230,7 @@ Figure \ref{fig:pathfinder_kernel_executions_mean} confirms our suspicion, as th
     \label{fig:pathfinder_kernel_executions_mean}
 \end{figure}
 
-Focusing now on buffer transfers, as seen in figure \ref{fig:pathfinder_buffer_transfers_mean}, OpenCL gains the advantage for the bigger buffer sizes written by PathFinder. Meanwhile MANGO stays in line with the pure CUDA implementation, although with some overhead still present. In terms of buffer reads, MANGO pulls ahead with the largest buffer size, with CUDA and OpenCL being 28.9\% and 43\% slower respectively. However it is important to note that the buffers read as a result are significantly smaller than the ones written as input, so these initial differences could be negligible for larger buffer sizes, as seen for HotSpot in figure \ref{fig:hotspot_buffer_transfers_mean}.
+Focusing now on buffer transfers, as seen in figure \ref{fig:pathfinder_buffer_transfers_mean}, OpenCL gains the advantage for the bigger buffer sizes written by PathFinder. Meanwhile MANGO stays in line with the pure CUDA implementation, although with some overhead still present. In terms of buffer reads, MANGO pulls ahead with the largest buffer size, with CUDA and OpenCL being 28.9\% and 43\% slower respectively. However it is important to note that the buffers read as a result are significantly smaller than the ones written as input, for larger buffer sizes this initial differences could become negligible, as seen for HotSpot in figure \ref{fig:hotspot_buffer_transfers_mean}.
 
 \begin{figure}%
     \centering
@@ -248,7 +250,7 @@ Focusing now on buffer transfers, as seen in figure \ref{fig:pathfinder_buffer_t
     \label{fig:pathfinder_buffer_transfers_mean}%
 \end{figure}
 
-Finally, we move on to the benchmark breakdown which, similarly to the one for HotSpot, it is generated with the largest input size for PathFinder, 16384 x 16384. Here in figure \ref{fig:pathfinder_breakdown} we can clearly see that the factor that most contributes to the difference in performance between the different implementations are actually the miscellaneous tasks (plus resource allocation for MANGO), taking up around 50\% of the running time. These include all the boilerplate and preparations required to setup the different execution environments. While this is very minimal in the case of CUDA, as it is a single-source model, where kernel and host code are precompiled and loaded together, the setup is much more significant for MANGO and OpenCL. Both OpenCL and MANGO require loading a separate kernel file which involves I/O operations. After that OpenCL also adds kernel compilation and device setup, while MANGO requires communication with BBQUE to perform resource allocation and deallocation. These aspects are not significant for HotSpot as the total running time is much longer and the overhead of the setup is constant, no matter the input size.
+Finally, we move on to the benchmark breakdown which, similarly to the one for HotSpot, is generated with the largest input size for PathFinder, 16384 x 16384. Here in figure \ref{fig:pathfinder_breakdown} we can clearly see that the factor that most contributes to the difference in performance between the different implementations are actually the miscellaneous tasks (plus resource allocation for MANGO), taking up around 50\% of the running time. These include all the boilerplate and preparations required to setup the different execution environments. While this is very minimal in the case of CUDA, as it is a single-source model, where kernel and host code are precompiled and loaded together, the setup is much more significant for MANGO and OpenCL. Both OpenCL and MANGO require loading a separate kernel file, requiring I/O operations. After that OpenCL also adds kernel compilation and device setup, while MANGO requires communication with BBQUE to perform resource allocation and deallocation. These aspects are not significant for HotSpot as the total running time is much longer and the overhead of the setup is constant, no matter the input size.
 
 \begin{figure}
     \centering
@@ -286,7 +288,7 @@ As we know that AXPY is purely memory bandwidth bound, we can translate this ker
     \label{fig:axpy_bandwidth_mean}
 \end{figure}
 
-What is interesting is that if we look at the maximum bandwidth achieved by each model MANGO is able to beat both CUDA and OpenCL, being 1\% and 4.5\% faster than each programming model respectively. This indicates that our implementation does not inherently pose a limit to the performance that could be achieved by the GPU when compared to pure CUDA and the overhead is affected by varying external factors, such as background processes or Operating System context switches. 
+What is interesting is that if we look at the maximum bandwidth achieved by each model MANGO is able to beat both CUDA and OpenCL, being 1\% and 4.5\% faster than each programming model respectively. This indicates that our implementation does not inherently pose a limit to the performance that could be achieved by the GPU when compared to pure CUDA and the overhead is likely affected by varying external factors, such as background processes or Operating System context switches. 
 
 \begin{figure}
     \centering
@@ -360,9 +362,9 @@ Starting with figure \ref{fig:hotspot_total_and_kernel_executions_mean_ipc} we c
     \label{fig:hotspot_total_and_kernel_executions_mean_ipc}%
 \end{figure}
 
-For the same metrics, PathFinder sees a much steeper increase in execution time along with the execution time. As can be see in figure \ref{fig:pathfinder_total_and_kernel_executions_mean_ipc}b, this is more closely linked with the kernel execution time which here shows a clear separation between IPC and no IPC. In addition, the PathFinder kernel is run more times as the input size increases, so this overhead piles up with multiple executions.
+For the same metrics, PathFinder sees a much steeper increase in total running time along with the execution time. As can be see in figure \ref{fig:pathfinder_total_and_kernel_executions_mean_ipc}b, this is more closely linked with the kernel execution time which here shows a clear separation between IPC and no IPC. In addition, the PathFinder kernel is run more times as the input size increases, so this overhead piles up with multiple executions.
 
-If we compare these results with the ones in HotSpot we can conclude that the overhead experienced with IPC is fixed and does not scale with input size. This is supported by the fact that HotSpot kernel executions are an order of magnitude larger than PathFinder executions (150ms for HotSpot versus 90/4$\mu$s for PathFinder).
+If we compare these results with the ones in HotSpot, we can conclude that the overhead experienced with IPC is fixed and does not scale with input size. This is supported by the fact that HotSpot kernel executions are an order of magnitude larger than PathFinder executions (150ms for HotSpot versus 90/40 $\mu$s for PathFinder).
 
 \begin{figure}%
     \centering
@@ -432,9 +434,9 @@ It is important to note however that some IPC will still be needed within the sa
 
 Although this discussed approach works for a single cluster, it is not extensible to a distributed system. If the target device runs on a separate computer from the MANGO host, there is no shared memory available and no way to directly talk with the device through a simple library like it would be possible with the device physically attached to the host. 
 
-For this reason, we first presented our measurements without taking into account IPC, as this is a fairer comparison between the different programming models. The CUDA and OpenCL implementations assume that the host will be connected directly to the accelerators, thus they do not need to implement any kind of external communication. However, once we introduce a second machine, the overhead will be similar, if not exactly the same, for any model used as it is the only way to coordinate the host and device across a distributed system.
+For this reason, we first presented our measurements without taking into account IPC, as this is a fairer comparison between the different programming models. The CUDA and OpenCL implementations assume that the host will be connected directly to the accelerators, thus they do not need to implement any kind of external communication. However, once we introduce a second machine, the overhead will be similar, if not exactly the same, for any model used as coordination between the host and device across a distributed system will be a requirement.
 
-By creating the HHAL in a client-server fashion we followed the approach used when creating the initial HN library, which allows the HHAL server to be easily distributed and run on a separate cluster. Once the platform matures, however, the improvements mentioned previously will be very important for the cases when the MANGO host and the HHAL run on a single machine. This topic is discussed further in section \ref{sub-sect:hhal-hybrid-mode}.
+By creating the HHAL in a client-server fashion we followed the approach used when creating the initial HN library, which allows the HHAL server to be easily distributed and run on a separate cluster. Once the platform matures, however, the improvements mentioned previously will be very important for the cases when the MANGO host and the HHAL do run on a single machine. This topic is discussed further in section \ref{sub-sect:hhal-hybrid-mode}.
 
 Improvements can also be made on the HHAL side, without taking into account IPC. First, the overheads experienced for kernel executions can be attributed to the CUDA device context assignment which is currently repeated for each kernel launch. This is necessary, as we want MANGO to be able to run a kernel on any of the available GPUs. However, as the CUDA device context is set on a per-thread basis, this overhead could be avoided. In principle it would be possible to create a separate thread for each available device and assign a fixed context to each one as soon as the HHAL server is up and running.
 
@@ -480,9 +482,9 @@ On the host side, the CUDA implementation gains the upper hand on MANGO, needing
 
 \textbf{Resource deallocations:} while all programming models need to explicitly request resource allocation for input and output buffers, MANGO does not leave the user with the responsibility to perform the inverse operations, at least not individually. When the MANGO implementations finish, they can simply call the context deallocation function and all requested resources will be correctly released. On the other hand, both OpenCL and CUDA require explicit release of resources. In the case of CUDA, this only entails calling \texttt{cudaFree} for each \texttt{cudaMalloc} call, for OpenCL it is much more involved, however. The programmer needs to release, on top of the allocated buffers, the following resources: \texttt{CommandQueue}, \texttt{Kernel}, \texttt{Program}, \texttt{Context}, a buffer for the program source string, a buffer for querying device ids and a buffer for querying platform ids.
 
-\textbf{Device selection:} OpenCL requires manual querying of the available platforms on the host as well as the available devices in order to select the device to use for the benchmark. Both are multi-step processes requiring multiple function calls and host heap memory allocations. As CUDA only runs on Nvidia GPUs, one only needs to select a particular device ID among the ones available, but that can also be skipped (and was, for our tests) if there is only a single GPU available or there is no preference in which GPU to run the kernel. Finally, MANGO does all this work automatically, needing no input from the user apart from providing the device kernels along with information about which platform they target (in this case Nvidia). In the background, BBQUE and the HHAL will make sure to assign the kernel to run on the most suitable device.
+\textbf{Device selection:} OpenCL requires manual querying of the available platforms on the host as well as the available devices in order to select the device to use for the benchmark. Both are multi-step processes requiring multiple function calls and host heap memory allocations. As CUDA only runs on Nvidia GPUs, one only needs to select a particular device ID among the ones available, but that can also be skipped (and was, for our tests) if there is only a single GPU available or there is no preference in which GPU to run the kernel. Finally, MANGO does all this work automatically, needing no input from the user apart from providing the device kernels along with information about which platform they target (in this case Nvidia). In the background, BBQUE and the HHAL will make sure to assign the kernel to run on the most suitable device. This approach is significantly more optimal in terms of resource management, at no extra code cost for the MANGO user. Neither CUDA nor OpenCL provide similar functionalities, so an equivalent implementation would require considerably more programmer effort.
 
-\textbf{Error handling:} as both CUDA and OpenCL work with exit codes in order to communicate runtime errors, there is a need to perform explicit error handling at each function call in their benchmark implementations. For brevity, most of this error handling was extracted into preprocessor macros, so they do not contribute significantly to the total LOC. Some OpenCL calls however cannot be easily handled by a macro and need extra error handling code. Meanwhile, the last layer of the MANGO API maps runtime errors into exceptions so they can be handled more easily by the user.
+\textbf{Error handling:} as both CUDA and OpenCL work with exit codes in order to communicate runtime errors, there is a need to perform explicit error handling at each function call in their benchmark implementations. For brevity, most of this error handling was extracted into preprocessor macros, so they do not contribute significantly to the total LOC. Some OpenCL calls however cannot be easily handled by a macro and need extra error handling code. Meanwhile, the last layer of the MANGO API maps runtime errors into exceptions so they can be handled more easily by the user. Note that the error handling code added for both CUDA and OpenCL follows a "fail-fast" approach, essentially converting an error code coming from the library into a program crash, similar to throwing an exception, like MANGO does.
 
 A breakdown of LOC differences for these particular sections of the code in both benchmarks can be seen in tables \ref{tab:hotspot-factors-loc} and \ref{tab:pathfinder-factors-loc} which refer to HotSpot and PathFinder respectively. As shown here, the main disadvantage of MANGO over CUDA is due to the kernel call code. This could be improved by leveraging C++'s templates, allowing for a variety of argument types and quantities to be supplied directly to MANGO's \texttt{kernel\_launch} call. This will turn the implementation of the function significantly more complex, but will provide a much more concise API for the users of the platform.
 
