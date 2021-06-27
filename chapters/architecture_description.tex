@@ -686,7 +686,7 @@ enum class source_type {
 
 The \texttt{BINARY} type is for pre-compiled kernels in binary format. While \texttt{SOURCE} and \texttt{STRING} refer to source code in a file or in a string in memory respectively.
 
-The Dynamic Compiler is automatically used by HHAL when either a SOURCE or a STRING source type is provided in the kernel write function call. \ref{HHAL:KernelActions}
+The Dynamic Compiler is automatically used by HHAL when either a SOURCE or a STRING source type is provided in the kernel write function call \ref{HHAL:KernelActions}. 
 
 The usage of the Dynamic Compiler is simple, requiring only the instantiation of a \texttt{Compiler} object, and a single \texttt{get\_binary()} function call to obtain a kernel's binary from its source.
 
