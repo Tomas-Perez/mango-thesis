@@ -9,9 +9,9 @@ During this experimental campaign, our goals were to:
 \end{itemize}
 
 \section{Setup and Methodology} \label{sect:setup-methodology}
-All our tests were run on a Dell XPS 9570 laptop. This particular model is equipped with an Intel Core i7 8750H CPU, 16 GB RAM and an Nvidia GeForce GTX 1050 Ti GPU with Max-Q Design (4GB VRAM). In terms of Operating System, the machine was running Ubuntu 18.04.2 LTS 64-bit (Kernel Version: 5.4.0-48-generic).
+All our tests were run on a Dell XPS 9570 laptop. This particular model is equipped with an Intel Core i7 8750H CPU, 16 GB RAM and an Nvidia GeForce GTX 1050 Ti GPU with Max-Q Design (4GB VRAM). In terms of Operating System, the machine runs Ubuntu 18.04.2 LTS 64-bit (Kernel Version: 5.4.0-48-generic).
 
-For reproducibility, the versions of the software run were the following:
+For reproducibility, the utilized software versions were the following:
 \begin{itemize}
     \item CUDA 11.0
     \item OpenCL 1.2 CUDA (Driver version: 450.51.06)
@@ -63,8 +63,8 @@ A breakdown of the three benchmarks chosen can be seen in table \ref{tab:benchma
 To evaluate performance in both HotSpot and PathFinder, we will measure:
 
 \begin{itemize}
-    \item Total execution time: Time since the beginning of the proper benchmark (i.e. after all input initialization and I/O) and the end (after all resource deallocations, but before checking output results).
-    \item Kernel execution time: Time since the launch of a kernel and the end of its execution.
+    \item Total execution time: Time between the beginning of the proper benchmark (i.e. after all input initialization and I/O) and the end (after all resource deallocations, but before checking output results).
+    \item Kernel execution time: Time between the launch of a kernel and the end of its execution.
     \item Buffer write time: Time to write data to the device, i.e transfer data from the host to the device.
     \item Buffer read time: Time to read data from the device, i.e. transfer data from the device to the host.
 \end{itemize}
@@ -211,7 +211,7 @@ The benchmark breakdown figure \ref{fig:hotspot_breakdown} clearly shows the inf
 
 \subsubsection{PathFinder}
 
-Moving on to PathFinder we can see a much more significant difference in the performance of MANGO and OpenCL with respect to CUDA in figure \ref{fig:pathfinder_total_duration_mean}. In addition, a clear increase in the steepness of the curve can be seen in the case of MANGO, as it steers away from the OpenCL implementation as the input size increases. This would indicate that there is some noticeable overhead present in the kernel executions, as they increase in number along with the input size of PathFinder.
+Moving on to PathFinder, we can see a much more significant difference in the performance of MANGO and OpenCL with respect to CUDA in figure \ref{fig:pathfinder_total_duration_mean}. In addition, a clear increase in the steepness of the curve can be seen in the case of MANGO, as it steers away from the OpenCL implementation as the input size increases. This would indicate that there is some noticeable overhead present in the kernel executions, as they increase in number along with the input size of PathFinder.
 
 \begin{figure}
     \centering
@@ -305,7 +305,7 @@ What is interesting is that if we look at the maximum bandwidth achieved by each
     \label{fig:axpy_bandwidth_max}
 \end{figure}
 
-Finally, we look at the transfer times achieved between the host and the device and vice versa and how these translate to the percentage of PCI-E bandwidth achieved. These comparisons can be seen in figures \ref{fig:axpy_buffer_transfers_mean} and \ref{fig:axpy_buffer_transfers_bandwidth_mean} respectively. In terms of device-to-host transfers, the difference in performance is negligible, although none of the models provide an optimal speed for the available PCI-E connection. For host-to-device transfers, MANGO gets second place, with CUDA being 6\% faster and OpenCL 7\% slower. Still, none of the models achieve close to maximum usage of the PCI-E connection.
+Finally, we look at the transfer times achieved between the host and the device and vice versa, and how these translate to the percentage of PCI-E bandwidth achieved. These comparisons can be seen in figures \ref{fig:axpy_buffer_transfers_mean} and \ref{fig:axpy_buffer_transfers_bandwidth_mean} respectively. In terms of device-to-host transfers, the difference in performance is negligible, although none of the models provide an optimal speed for the available PCI-E connection. For host-to-device transfers, MANGO gets second place, with CUDA being 6\% faster and OpenCL 7\% slower. Still, none of the models achieve close to maximum usage of the PCI-E connection.
 
 \begin{figure}%
     \centering

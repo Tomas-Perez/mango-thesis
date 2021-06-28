@@ -492,7 +492,7 @@ int main(int argc, char const *argv[])
 \end{lstlisting}
 
 Mainly due to its resource management capabilities, MANGO's programming model provides a level of abstraction over the hardware far greater than its competition, removing the querying of platform information from the list of user responsibilities. 
-As seen in listing \ref{lst:mangov1_sample}, the only architecture specific information required is a kernel compatible with its target accelerator. Multiple kernel versions can be provided for a single task, leaving to the resource manager the decision of which accelerator performs its execution, in the provided example, the kernel in listing \ref{lst:mangov1_kernel_sample} targeting the GN architecture is used. 
+As seen in listing \ref{lst:mangov1_sample}, the only architecture specific information required is a kernel compatible with its target accelerator. Multiple kernel versions can be provided for a single task, leaving to the resource manager the decision of which accelerator performs its execution. In the provided example, the kernel in listing \ref{lst:mangov1_kernel_sample} targeting the GN architecture is used. 
 
 MANGO's API exposes a set of data structures for the specification of an user's application. A \texttt{TaskGraph} holds \texttt{Kernel}, \texttt{Buffer} and \texttt{Event} data structures, defining their dependencies. 
 Once the task graph is defined, the resource allocation is performed.
@@ -515,7 +515,7 @@ The capabilities we are interested in for the presented programming models are:
 \begin{itemize}
     \item Device support, including CPU, GPU and FPGAs.
     \item Whether the model uses a single-source approach, where host and device code can coexist in the same source file, are written in the same programming language and can share common pieces of code.
-    \item The portability of the device kernels, as in whether it is possible for a kernel written to target a given device to be compiled for and executed in a different supported device.
+    \item The portability of the device kernels, as in whether it is possible for a kernel written to target a specific device, to be compiled for and executed on a different supported device.
     \item The ability to compile kernels at runtime (Just In Time compilation), according to their target accelerators.
     \item Resource management capabilities, allowing efficient use of the available devices depending on their current load, power consumption and relative performance.
     \item Support for control and distribution of the application along multiple clusters, each one with a set of diverse target devices.
@@ -527,8 +527,8 @@ A comparison of the capabilities of each programming model can be seen in table 
     \centering
     \begin{tabular}{l|c|c|c|c|c|c|c|c}
     \textit{Model} & \textit{CPU} & \textit{GPU} & \textit{FPGA} & \makecell{\textit{Single} \\ \textit{source}} & \makecell{\textit{Kernel} \\ \textit{portability}} & \makecell{\textit{Kernel JIT} \\ \textit{compilation}} & \makecell{\textit{Resource} \\ \textit{management}} & \makecell{\textit{Multiple} \\ \textit{clusters}} \\ \hline
-    MANGO V1 & Yes$^1$ & No & Yes & No & No & No & Yes & Yes$^4$ \\
-    MANGO V2 & Yes$^2$ & Yes & Yes$^3$ & No & No & Yes & Yes & Yes$^4$ \\
+    MANGO V1 & Yes$^1$ & No & Yes & No & No & No & Yes & Yes$^3$ \\
+    MANGO V2 & Yes & Yes & Yes$^2$ & No & No & Yes & Yes & Yes$^3$ \\
     CUDA & No & Yes & No & Yes & No & No & No & No \\
     OpenCL & Yes & Yes & Yes & No & Yes & Yes & No & No \\
     EngineCL & Yes & Yes & Yes & No & Yes & Yes & No & No \\
@@ -542,10 +542,9 @@ A comparison of the capabilities of each programming model can be seen in table 
     \end{tabular}
     \begin{flushleft}
     \footnotesize{
-        $^1$ GN Emulation, mutually exlusive with FPGAs, only used for testing \\ 
-        $^2$ Currently GN emulation only, direct CPU in the future \\ 
-        $^3$ Minimal integration effort required \\ 
-        $^4$ Work in progress
+        $^1$ Mutually exclusive with FPGAs, only used for testing \\ 
+        $^2$ Minimal integration effort required \\ 
+        $^3$ Work in progress
     }
     \end{flushleft}
     \captionsetup{justification=centering}
