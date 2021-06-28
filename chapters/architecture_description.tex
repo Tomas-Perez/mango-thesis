@@ -816,8 +816,10 @@ class NvidiaManager {
         NvidiaManagerExitCode deassign_buffer(int buffer_id);
         NvidiaManagerExitCode deassign_event(int event_id);
 
-        NvidiaManagerExitCode kernel_write(int kernel_id, std::string image_path);
-        NvidiaManagerExitCode kernel_start(int kernel_id, const Arguments &arguments);
+        NvidiaManagerExitCode 
+            kernel_write(int kernel_id, std::string image_path);
+        NvidiaManagerExitCode 
+            kernel_start(int kernel_id, const Arguments &arguments);
 
         NvidiaManagerExitCode allocate_memory(int buffer_id);
         NvidiaManagerExitCode allocate_kernel(int kernel_id);
@@ -827,10 +829,14 @@ class NvidiaManager {
         NvidiaManagerExitCode release_kernel(int kernel_id);
         NvidiaManagerExitCode release_event(int event_id);
 
-        NvidiaManagerExitCode write_to_memory(int buffer_id, const void *source, size_t size);
-        NvidiaManagerExitCode read_from_memory(int buffer_id, void *dest, size_t size);
-        NvidiaManagerExitCode write_sync_register(int event_id, uint32_t data);
-        NvidiaManagerExitCode read_sync_register(int event_id, uint32_t *data);
+        NvidiaManagerExitCode 
+            write_to_memory(int buffer_id, const void *source, size_t size);
+        NvidiaManagerExitCode 
+            read_from_memory(int buffer_id, void *dest, size_t size);
+        NvidiaManagerExitCode 
+            write_sync_register(int event_id, uint32_t data);
+        NvidiaManagerExitCode 
+            read_sync_register(int event_id, uint32_t *data);
        
     private:
         void launch_kernel(int kernel_id, char *arg_array, int arg_count, char* scalar_allocations);
@@ -995,15 +1001,15 @@ public:
 
   CudaApiExitCode allocate_memory(int buffer_id, size_t size);
   CudaApiExitCode deallocate_memory(int buffer_id);
-  CudaApiExitCode write_memory
-    (int buffer_id, const void *data, size_t size);
-  CudaApiExitCode read_memory
-    (int buffer_id, void *dest_buffer, size_t size);
+  CudaApiExitCode 
+    write_memory(int buffer_id, const void *data, size_t size);
+  CudaApiExitCode 
+    read_memory(int buffer_id, void *dest_buffer, size_t size);
 
   CudaApiExitCode allocate_kernel(int kernel_id, size_t size);
   CudaApiExitCode deallocate_kernel(int kernel_id);
-  CudaApiExitCode write_kernel
-    (int kernel_id, const void *data, size_t size);
+  CudaApiExitCode 
+    write_kernel(int kernel_id, const void *data, size_t size);
   
   CudaApiExitCode launch_kernel(int kernel_id, const char *function_name, CudaResourceArgs resource_args, const char *args, int arg_count);
 };
@@ -1032,9 +1038,9 @@ struct CudaDims {
 
 // Resource specific arguments for kernel launch
 struct CudaResourceArgs {
-    int device_id;
-    CudaDims grid_dim;
-    CudaDims block_dim;
+  int device_id;
+  CudaDims grid_dim;
+  CudaDims block_dim;
 };
 \end{lstlisting}
 
