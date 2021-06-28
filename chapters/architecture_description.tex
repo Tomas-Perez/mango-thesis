@@ -239,7 +239,7 @@ void saxpy(float a, float *x, float *y, float *o, float n) {
 }
 \end{lstlisting}
 
-We now define the kernel and buffers integer identifiers, as well as a \texttt{saxpy} function that matches the \textbf{saxpy.cu} \ref{saxpycu} kernel computation, we will use it to check the obtained results.
+We now define the kernel and buffers integer identifiers, as well as a \texttt{saxpy} function that matches the \textbf{saxpy.cu} kernel seen in listing \ref{saxpycu}, which we will use to check the obtained results.
 
 \begin{lstlisting}[style=CStyle, caption=Sample - Initialization]
 int main(int argc, char const *argv[])
@@ -407,9 +407,9 @@ Here its worth mentioning the \textbf{recipe} file (further explained in section
 
 As previously stated, The Libmango-BarbequeRTRM communication is done through an Application Controller belonging to the Programming Model Synchronization Layer, which is created when a Libmango Context is initialized.
 
-When initializing an Application Controller, an application name and a recipe file are provided. The first one for identification purposes and the second one for application requirements specification \ref{bbque:recipe}.
+When initializing an Application Controller, an application name and a recipe file are provided. The first one for identification purposes and the second one for application requirements specification (more information about recipes in section \ref{bbque:recipe}).
 
-As shown in figure \ref{fig:barbecue-flow}, the next step after initialization is the resource allocation, for this, a task graph representing dependencies between the application components needs to be created and passed in the \texttt{resource\_allocation()} function call. The task graph is similar to the Libmango one \ref{arch:TaskGraph}, requiring a simple translation before being sent for resource allocation. 
+As shown in figure \ref{fig:barbecue-flow}, the next step after initialization is the resource allocation, for this, a task graph representing dependencies between the application components needs to be created and passed in the \texttt{resource\_allocation()} function call. The task graph is similar to the Libmango one covered in section \ref{arch:TaskGraph}, requiring a simple translation before being sent for resource allocation. 
 
 Once the resource allocation is completed, the \textbf{Execution Synchronizer} locks on the \texttt{onConfigure()} function, waiting for kernels to start. During this time, applications can proceed by loading kernels into their assigned devices and writing into input buffers. Once a kernel is run, the \texttt{onConfigure()} function unlocks, spawning a monitor thread for each running kernel in order to keep track of execution time and throughput of each of them. 
 For BarbequeRTRM to be up to date with the application's execution status, event notifications for events such as kernel start and stop, and buffer writes and reads are notified by Libmango.
@@ -422,7 +422,7 @@ The \textbf{Recipe} file has already been mentioned a few times in the document.
 
 The recipe is an XML \cite{xml} format file named with a \texttt{.recipe} extension, through which developers can request the QoS or performance level that their application can achieve when a certain set of resources is assigned by the resource manager. These requirements are internally referred to as Application Working Modes (AWM) \cite{mango_exploring_manycore_architectures}. However, to further fit MANGO requirements, a resources section was introduced.
 
-As observed in the sample \ref{bbque:recipe_example}, the \texttt{application} tag is the root tag from which the application information is defined, where a \texttt{priority} value can be specified, with \texttt{0} as the highest priority.
+As observed in listing \ref{bbque:recipe_example}, the \texttt{application} tag is the root tag from which the application information is defined, where a \texttt{priority} value can be specified, with \texttt{0} as the highest priority.
 
 Under the \texttt{platform} section, the \texttt{id} value identifies the architecture targeted in the enclosed specification. Specifications for multiple targets can be provided, leaving to BarbequeRTRM the decision of choosing the target to be utilized.
 
@@ -438,7 +438,7 @@ Referring back to AWMs, in the \texttt{awm} section, the following attributes ar
 The \texttt{resources} subsections contain the resource assignment configurations. Under \texttt{cpu}, the CPU time quota \texttt{pe} is expressed in percentage, the amount of memory is defined in the \texttt{mem} tag, the number of accelerator cores as \texttt{pe} under \texttt{acc} and the network bandwidth as \texttt{net}.
 
 Since due to the MANGO programming model, per-task and per-buffer resource mapping is required, the AWM specification is not enough to cover the MANGO needs. The \texttt{tg} section was introduced to allow specification of task graph related mapping information.
-As seen in the sample \ref{bbque:recipe_example}, under the \texttt{reqs} tag, \texttt{task} information is provided for each task (kernel) in the application. The attributes are:
+As seen in listing \ref{bbque:recipe_example}, under the \texttt{reqs} tag, \texttt{task} information is provided for each task (kernel) in the application. The attributes are:
 
 \begin{itemize}
     \item \texttt{id}: A number identifier.
@@ -649,7 +649,7 @@ Once again, accelerator specifics are handled by the architecture's manager. In 
 \subsubsection{Kernel Actions} \label{HHAL:KernelActions}
 Before a Kernel is run, its source first has to be written into the accelerator's memory. The HHAL API provides a kernel write function that takes the kernel's id and a map of unit to sources, out of which the previously assigned unit's source is taken.
 
-Multiple kernel's source types are supported by HHAL, this is further explained in the Dynamic Compiler \ref{HHAL:DynamicCompiler} subsection.
+Multiple kernel's source types are supported by HHAL, this is further explained in section \ref{HHAL:DynamicCompiler}, Dynamic Compiler.
 
 \begin{lstlisting}[style=CStyle, caption=HHAL API - Kernel actions]
     HHALExitCode kernel_write(int kernel_id, const std::map<Unit, hhal_kernel_source> &kernel_sources);
@@ -658,7 +658,7 @@ Multiple kernel's source types are supported by HHAL, this is further explained 
 
 After a Kernel is written and its dependencies are correctly set up, it can be run, or "started" via the kernel start function. As kernels require argument support, this function not only takes the kernel's id but also an \textbf{Arguments} object which consists of a vector of kernel arguments.
 
-Three types of arguments are supported by HHAL: Scalar arguments, Buffer arguments and Event arguments. These are the arguments wrapped by Libmango for the user to provide (as seen in Section \ref{Libmango:KernelManagement}).  
+Three types of arguments are supported by HHAL: Scalar arguments, Buffer arguments and Event arguments. These are the arguments wrapped by Libmango for the user to provide (as seen in section \ref{Libmango:KernelManagement}).  
 
 Scalar arguments consist of a scalar value belonging to one of the supported types. These are signed and unsigned integers of sizes 8, 16, 32 and 64 bits, as well as floating point values. 
 
@@ -686,7 +686,7 @@ enum class source_type {
 
 The \texttt{BINARY} type is for pre-compiled kernels in binary format. While \texttt{SOURCE} and \texttt{STRING} refer to source code in a file or in a string in memory respectively.
 
-The Dynamic Compiler is automatically used by HHAL when either a SOURCE or a STRING source type is provided in the kernel write function call \ref{HHAL:KernelActions}. 
+The Dynamic Compiler is automatically used by HHAL when either a SOURCE or a STRING source type is provided in the kernel write function call. 
 
 The usage of the Dynamic Compiler is simple, requiring only the instantiation of a \texttt{Compiler} object, and a single \texttt{get\_binary()} function call to obtain a kernel's binary from its source.
 
@@ -706,7 +706,7 @@ For kernel sources belonging to the C family, the Clang frontend for the LLVM pr
 
 Otherwise, compilation is done through system calls as specified in the configuration, utilizing a compiler tool installed in the user's machine.
 
-In the case of CUDA kernels (targeting Nvidia accelerators), the CUDA Compiler tool \ref{Nvidia:CudaCompiler} from the Nvidia Architecture Node is utilized for compilation. This tool exploits the CUDA runtime compilation library NVRTC to compile CUDA kernels into a ptx format as required by the Nvidia Architecture Node.
+In the case of CUDA kernels (targeting Nvidia accelerators), the CUDA Compiler tool (covered in section \ref{Nvidia:CudaCompiler}) from the Nvidia Architecture Node is utilized for compilation. This tool exploits the CUDA runtime compilation library NVRTC to compile CUDA kernels into a ptx format as required by the Nvidia Architecture Node.
 
 \subsubsection{Configuration} \label{HHAL:DynamicCompilerConfiguration}
 
@@ -803,7 +803,7 @@ Each new architecture requires a manager that implements the HHAL API function c
 
 Modifications to the existing HHAL code resolve to the addition of the new architecture type and calls to the manager when dispatching the multiple API actions.
 
-In this section, we will go over the Nvidia Manager to exemplify the implementation of an HHAL Manager. The Nvidia Manager communicates with the Nvidia Architecture Node \ref{NvidiaArchitectureNode}, referenced in code as \texttt{CudaApi}, which is the library implemented for launching kernels in Nvidia GPUs.
+In this section, we will go over the Nvidia Manager to exemplify the implementation of an HHAL Manager. The Nvidia Manager communicates with the Nvidia Architecture Node (further details in section \ref{NvidiaArchitectureNode}), referenced in code as \texttt{CudaApi}, which is the library implemented for launching kernels in Nvidia GPUs.
 
 \begin{lstlisting}[style=CStyle, caption=HHAL Nvidia Manager - Manager Class]
 class NvidiaManager {
@@ -976,7 +976,7 @@ Once the execution finishes, the kernel's termination event is notified.
 
 The Nvidia Architecture Node (NAN) is the bridge between the MANGO system, specifically the HHAL module, and the low-level Nvidia libraries utilized to communicate with Nvidia GPUs.
 
-The main focus of the NAN is enabling MANGO to launch CUDA kernels in Nvidia accelerators. As shown in the diagram \ref{fig:NANDiagram}, the NAN exploits the CUDA Driver API \cite{cuda_driver_api} library, which exposes a variety of functions that allow low-level interfacing with the system-available Nvidia devices.
+The main focus of the NAN is enabling MANGO to launch CUDA kernels in Nvidia accelerators. As shown in figure \ref{fig:NANDiagram}, the NAN exploits the CUDA Driver API \cite{cuda_driver_api} library, which exposes a variety of functions that allow low-level interfacing with the system-available Nvidia devices.
 
 \subsection{CUDA Kernels} \label{Nvidia:CudaCompiler}
 
@@ -1038,7 +1038,7 @@ struct CudaResourceArgs {
 };
 \end{lstlisting}
 
-Resource arguments, grouped in the \texttt{CudaResourceArgs} structure as shown in listing \ref{NAN:ResourceArguments}, allow the specification of thread block and grid dimensions when launching a kernel, as well as the target device's id. An explanation of the execution configuration of CUDA kernels is available in the Nvidia CUDA section of the State of the Art chapter, \ref{STATE:cuda}.
+Resource arguments, grouped in the \texttt{CudaResourceArgs} structure as shown in listing \ref{NAN:ResourceArguments}, allow the specification of thread block and grid dimensions when launching a kernel, as well as the target device's id. An explanation of the execution configuration of CUDA kernels is available in section \ref{STATE:cuda} of the State of the Art chapter, covering Nvidia CUDA.
 
 \subsubsection{Kernel arguments}
 
@@ -1134,5 +1134,5 @@ Kernels targeting the GN platform require binaries compiled for the system's CPU
 
 Furthermore, kernel execution is performed through system calls. As a consequence, the kernel entry function must receive its parameters as an array of characters.
 
-As previously covered, the Dynamic Compiler of the HHAL module is capable of generating kernel entrypoints for kernels written in the C language \ref{HHAL:DynamicCompiler}.
+As previously covered, the Dynamic Compiler (section \ref{HHAL:DynamicCompiler}) of the HHAL module is capable of generating kernel entrypoints for kernels written in the C language .
 
